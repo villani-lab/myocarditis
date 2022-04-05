@@ -1,2 +1,1 @@
-# myocarditis
-Myocarditis: I &lt;3 you
+# Myocarditis: I &lt;3 you
