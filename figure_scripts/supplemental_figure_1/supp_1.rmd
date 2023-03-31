@@ -1,0 +1,217 @@
+---
+title: "Supplemental Figure 1"
+output: rmarkdown::github_document
+always_allow_html: true
+---
+
+## Setup
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(tidyverse)
+library(glue)
+library(rlang)
+library(parameters)
+library(ggforestplot)
+library(rmarkdown)
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('stacked_bar.R')
+source('blood_condition_abundance.R')
+source('blood_troponin_abundance.R')
+
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import scanpy as sc
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+```{python results='hide', read_data}
+tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
+blood_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global.zarr')
+```
+
+
+## Supplemental Figure 1A
+
+```{python, supp_1a}
+python_functions.make_gene_dotplot(tissue_global.to_anndata(),
+                  cluster_order=['1. Endothelial cells', '7. Dendritic cells', '4. Myeloid cells',
+                                 '9. B and plasma cells', '3. T and NK cells', '6. Cardiomyocytes',
+                                 '2. Mural cells', '5. Fibroblasts', '8. Neuronal cells',
+                            ],
+                  gene_order=['VWF', 'AQP1', 'CA4', 'HEY1', 'HLA-DQA1', 'CD1C',
+                         'CLEC9A', 'IRF8', 'CD14', 'CD68', 'C1QA', 'FCGR3A',
+                         'CD79A', 'MZB1', 'MS4A1', 'CD3D', 'CD8A', 'KLRB1', 'TNNI3',
+                         'MB', 'RGS5', 'MYH11', 'KCNJ8', 'ACTA2', 'DCN',
+                         'PDGFRA', 'PLP1', 'NRXN1'],
+                  title='Tissue Global'
+                 )
+```
+
+
+## Supplemental Figure 1B
+
+```{python supp_1b}
+# get number of cells from each institution
+n_mgh = (tissue_global.obs['institution'] == 'mgh').sum()
+n_sanger = (tissue_global.obs['institution'] == 'sanger').sum()
+name_dict = {
+    'mgh': f'MGH (n={n_mgh:,})',
+    'sanger': f'Sanger (n={n_sanger:,})'
+}
+tissue_global.obs['n_institution'] = [name_dict[x] for x in tissue_global.obs['institution']]
+
+# plot umap
+fig = pg.scatter(tissue_global,
+                 basis='umap',
+                 attrs='n_institution',
+                 panel_size=(5,5),
+                 palettes="#0072B5FF,#E18727FF",
+                 wspace=0.8,
+                 return_fig=True)
+fig.patch.set_visible(True)
+ax = fig.axes[0]
+ax.xaxis.label.set_fontsize(16)
+ax.yaxis.label.set_fontsize(16)
+ax.set_title('Institution', fontsize=16)
+ax.legend(bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0,
+          markerscale=20, frameon=False,
+          prop={'size': 14})
+plt.show()
+plt.close()
+```
+
+
+## Supplemental Figure 1D
+
+```{python supp_1d}
+tissue_global.obs['Condition'] = [x.capitalize() for x in tissue_global.obs['condition']]
+tissue_global_anndata = tissue_global.to_anndata()
+sc.tl.embedding_density(tissue_global_anndata, groupby='Condition')
+sc.pl.embedding_density(tissue_global_anndata, basis='umap', key=f'umap_density_Condition', colorbar_loc=None)
+```
+
+
+## Supplemental Figure 1E
+
+```{python supp_1e}
+# join all post-steroid timepoints into one category
+post_steroid_cats = ['post_steroid', 'post_2nd_line_tx', 'off_is']
+blood_global.obs['scatterplot_timepoints'] = ['post_steroid' if x in post_steroid_cats else x for x in blood_global.obs['timepoint_cat']]
+blood_global.obs['scatterplot_timepoints'] = blood_global.obs['scatterplot_timepoints'].astype('category')
+
+# get dataframe with timepoints for each donor
+subset_df = blood_global.obs[['donor', 'scatterplot_timepoints']]
+unique_df = subset_df.drop_duplicates()
+
+# highlight samples used as controls
+unique_df['control'] = unique_df['donor'].isin(['SIC_31', 'SIC_109']) & (unique_df['scatterplot_timepoints'] == 'on_ici')
+
+# order donor samples by timepoint
+timepoint_order = ['pre_ici', 'on_ici', 'pre_steroid', 'post_steroid']
+unique_df['scatterplot_timepoints'] = pd.Categorical(unique_df['scatterplot_timepoints'], timepoint_order)
+unique_df = unique_df.sort_values('scatterplot_timepoints')
+
+
+# plot
+sns.set_style("whitegrid")
+fig, ax = plt.subplots(figsize=(3, 9))
+sns.scatterplot(data=unique_df, x='scatterplot_timepoints', y='donor',
+                hue='control', palette=[sns.color_palette()[0], sns.color_palette()[4]],
+                s=120, legend=False)
+fig.suptitle("Timepoints per Donor")
+ax.set(xlabel=None, ylabel=None)
+ax.set_xticklabels(['Pre-ICI', 'On-ICI', 'Pre-Steroid', 'Post-Steroid'])
+plt.xticks(rotation=90)
+plt.margins(x=.15)
+plt.subplots_adjust(top=.95, left=.35, bottom=.2)
+plt.tight_layout()
+plt.show()
+plt.close()
+```
+
+
+## Supplemental Figure 1F
+
+```{python supp_1f}
+python_functions.make_gene_dotplot(blood_global.to_anndata(),
+             cluster_order=['1. Myeloid', '2. CD8 and NK', '3. CD4', '4. B and Plasma', '5. pDCs and cDCs'],
+             gene_order=['LYZ',	'CD14',	'AIF1',
+                         'CD8A', 'NKG7', 'KLRF1',
+                         'CD4', 'CD3D', 'IL7R',
+                         'CD79A', 'MS4A1', 'JCHAIN',
+                         'CD1C', 'CLEC10A', 'LILRA4'],
+             title="Blood Global")
+```
+
+
+## Supplemental Figure 1G
+
+```{python supp_1g}
+# subset for timepoints in analyses
+blood_subset = blood_global[blood_global.obs['timepoint_cat'].isin(['on_ici', 'pre_steroid'])].copy()
+blood_subset.obs['Condition'] = ['On-ICI' if x == 'on_ici' else 'Myocarditis' for x in blood_subset.obs['timepoint_cat']]
+blood_subset.obs['Condition'] = pd.Categorical(blood_subset.obs['Condition'], ['On-ICI', 'Myocarditis'])
+blood_subset_anndata = blood_subset.to_anndata()
+sc.tl.embedding_density(blood_subset_anndata, groupby='Condition')
+sc.pl.embedding_density(blood_subset_anndata, basis='umap', key=f'umap_density_Condition', colorbar_loc=None)
+```
+
+
+## Supplemental Figure 1H
+
+```{r message = F, results = 'hold', supp_1h}
+# read in all blood cell metadata
+blood_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global_obs.csv')
+condition_blood_obs_filtered <- condition_filter_df(blood_global_obs)
+
+# fit lineage level model
+lineage_order <- c("Myeloid", "CD8 and NK", "CD4", "B and Plasma", "pDCs and cDCs")
+condition_lineage_percents <- condition_get_percent_per_level(condition_blood_obs_filtered, level='lineage') %>%
+    set_factor_order(col_name = 'lineage_names', order = lineage_order)
+condition_lineage_model <- condition_fit_model(condition_lineage_percents, level='lineage')
+paged_table(condition_lineage_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(condition_coef, condition_se, condition_pval)))
+
+condition_plot_sample_perc(condition_lineage_percents, title='Blood Global', level='lineage')
+condition_plot_ci_interval(condition_lineage_model, 'Blood Global', level='lineage')
+```
+
+
+## Supplemental Figure 1I
+
+```{r message = F, results = 'hold', supp_1i}
+blood_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global_obs.csv')
+troponin_blood_obs_filtered <- troponin_filter_df(blood_global_obs)
+
+# fit lineage level model
+troponin_lineage_percents <- troponin_get_percent_per_level(troponin_blood_obs_filtered, level='lineage') %>%
+  set_factor_order(col_name = 'lineage_names', order = lineage_order)
+troponin_lineage_model <- troponin_fit_model(troponin_lineage_percents, level='lineage')
+
+paged_table(troponin_lineage_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(trop_coef, trop_se, trop_pval)))
+troponin_plot_model(troponin_lineage_model, troponin_lineage_percents, "All Cells",
+           level='lineage', point_size = 2.2, type='simple')
+```
+
+
+
+

@@ -1,0 +1,432 @@
+HGNC ID	Approved symbol	Approved name	Status	Locus type	Previous symbols	Alias symbols	Chromosome	NCBI Gene ID	Ensembl gene ID	Vega gene ID	Group ID	Group name
+HGNC:5487	IGHD1OR15-1A	immunoglobulin heavy diversity 1/OR15-1A (non-functional)	Approved	immunoglobulin gene		IGHD1/OR15-1A, IGHD1OR151A	15q11.2	28335	ENSG00000271336	OTTHUMG00000184580	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5488	IGHD1OR15-1B	immunoglobulin heavy diversity 1/OR15-1B (non-functional)	Approved	immunoglobulin gene		IGHD1/OR15-1B, IGHD1OR151B	15q11.2	28334	ENSG00000270185	OTTHUMG00000184585	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5493	IGHD2OR15-2A	immunoglobulin heavy diversity 2/OR15-2A (non-functional)	Approved	immunoglobulin gene		IGHD2/OR15-2A, IGHD2OR152A	15q11.2	28333	ENSG00000282599	OTTHUMG00000184594	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5494	IGHD2OR15-2B	immunoglobulin heavy diversity 2/OR15-2B (non-functional)	Approved	immunoglobulin gene		IGHD2/OR15-2B, IGHD2OR152B	15q11.2	28332	ENSG00000282268	OTTHUMG00000184595	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5500	IGHD3OR15-3A	immunoglobulin heavy diversity 3/OR15-3A (non-functional)	Approved	immunoglobulin gene		IGHD3/OR15-3A, IGHD3OR153A	15q11.2	28331	ENSG00000282520	OTTHUMG00000184598	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5501	IGHD3OR15-3B	immunoglobulin heavy diversity 3/OR15-3B (non-functional)	Approved	immunoglobulin gene		IGHD3/OR15-3B, IGHD3OR153B	15q11.2	28330	ENSG00000282089	OTTHUMG00000184596	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5506	IGHD4OR15-4A	immunoglobulin heavy diversity 4/OR15-4A (non-functional)	Approved	immunoglobulin gene		IGHD4/OR15-4A, IGHD4OR154A	15q11.2	28329	ENSG00000271317	OTTHUMG00000184621	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5507	IGHD4OR15-4B	immunoglobulin heavy diversity 4/OR15-4B (non-functional)	Approved	immunoglobulin gene		IGHD4/OR15-4B, IGHD4OR154B	15q11.2	28328	ENSG00000270451	OTTHUMG00000184611	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5512	IGHD5OR15-5A	immunoglobulin heavy diversity 5/OR15-5A (non-functional)	Approved	immunoglobulin gene		IGHD5/OR15-5A, IGHD5OR155A	15q11.2	28327	ENSG00000270961	OTTHUMG00000184622	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5513	IGHD5OR15-5B	immunoglobulin heavy diversity 5/OR15-5B (non-functional)	Approved	immunoglobulin gene		IGHD5/OR15-5B, IGHD5OR155B	15q11.2	28326	ENSG00000270824	OTTHUMG00000184624	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5524	IGHEP2	immunoglobulin heavy constant epsilon P2 (pseudogene)	Approved	immunoglobulin pseudogene			9p24.1	3499	ENSG00000254017	OTTHUMG00000019482	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5563	IGHV1OR15-1	immunoglobulin heavy variable 1/OR15-1 (non-functional)	Approved	immunoglobulin gene		IGHV1/OR15-1	15q11.2	388077	ENSG00000270505	OTTHUMG00000184670	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5564	IGHV1OR15-2	immunoglobulin heavy variable 1/OR15-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR15-2	15q11.1	100287128	ENSG00000259337	OTTHUMG00000176334	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5565	IGHV1OR15-3	immunoglobulin heavy variable 1/OR15-3 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR15-3	15q11.2	646370	ENSG00000271288	OTTHUMG00000184673	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5566	IGHV1OR15-4	immunoglobulin heavy variable 1/OR15-4 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR15-4	15q11.2	646379	ENSG00000270356	OTTHUMG00000176336	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5567	IGHV1OR15-5	immunoglobulin heavy variable 1/OR15-5 (non-functional)	Approved	immunoglobulin gene		IGHV1/OR15-5	15q11.2 not on reference assembly	100384884			350	Immunoglobulin heavy (IGH) orphons
+HGNC:5568	IGHV1OR15-6	immunoglobulin heavy variable 1/OR15-6 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR15-6	15q11.2	28320	ENSG00000270685	OTTHUMG00000184707	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5569	IGHV1OR15-9	immunoglobulin heavy variable 1/OR15-9 (non-functional)	Approved	immunoglobulin gene	VSIG7	IGHV1/OR15-9, IGHV1OR159	15q11.1	390531	ENSG00000188403	OTTHUMG00000171652	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5570	IGHV1OR16-1	immunoglobulin heavy variable 1/OR16-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR16-1	16p11.2	28315	ENSG00000261704	OTTHUMG00000176645	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5571	IGHV1OR16-2	immunoglobulin heavy variable 1/OR16-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR16-2	16p11.2	28314	ENSG00000259852	OTTHUMG00000176445	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5572	IGHV1OR16-3	immunoglobulin heavy variable 1/OR16-3 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR16-3	16p11.2	28313	ENSG00000260048	OTTHUMG00000176557	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5573	IGHV1OR16-4	immunoglobulin heavy variable 1/OR16-4 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV1/OR16-4	16p11.2	28312	ENSG00000259997	OTTHUMG00000176448	350	Immunoglobulin heavy (IGH) orphons
+HGNC:38040	IGHV1OR21-1	immunoglobulin heavy variable 1/OR21-1 (non-functional)	Approved	immunoglobulin gene		IGHV1/OR21-1	21p11.2	390530	ENSG00000277282	OTTHUMG00000188295	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5579	IGHV2OR16-5	immunoglobulin heavy variable 2/OR16-5 (non-functional)	Approved	immunoglobulin gene		IGHV2/OR16-5	16p11.2	100129631	ENSG00000259303	OTTHUMG00000152881	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5633	IGHV3OR15-7	immunoglobulin heavy variable 3/OR15-7 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR15-7	15q11.2	28318	ENSG00000259490	OTTHUMG00000171835	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5634	IGHV3OR16-10	immunoglobulin heavy variable 3/OR16-10 (non-functional)	Approved	immunoglobulin gene		IGHV3/OR16-10	16p11.2	28306	ENSG00000233732	OTTHUMG00000176446	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5635	IGHV3OR16-11	immunoglobulin heavy variable 3/OR16-11 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-11	16p11.2	28305	ENSG00000270318	OTTHUMG00000184731	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5636	IGHV3OR16-12	immunoglobulin heavy variable 3/OR16-12 (non-functional)	Approved	immunoglobulin gene		IGHV3/OR16-12	16p11.2	28304	ENSG00000270467	OTTHUMG00000176355	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5637	IGHV3OR16-13	immunoglobulin heavy variable 3/OR16-13 (non-functional)	Approved	immunoglobulin gene		IGHV3/OR16-13	16p11.2	100287372	ENSG00000271178	OTTHUMG00000176357	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5638	IGHV3OR16-14	immunoglobulin heavy variable 3/OR16-14 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-14	16p11.2	100568447			350	Immunoglobulin heavy (IGH) orphons
+HGNC:5639	IGHV3OR16-15	immunoglobulin heavy variable 3/OR16-15 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-15	16p11.2	28301	ENSG00000261834	OTTHUMG00000176442	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5640	IGHV3OR16-16	immunoglobulin heavy variable 3/OR16-16 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-16	16p11.2	28300	ENSG00000259842	OTTHUMG00000176367	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5641	IGHV3OR16-6	immunoglobulin heavy variable 3/OR16-6 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-6	16p11.2	647187	ENSG00000270864	OTTHUMG00000176443	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5642	IGHV3OR16-7	immunoglobulin heavy variable 3/OR16-7 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV3/OR16-7	16p11.2	28309	ENSG00000271620	OTTHUMG00000184739	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5643	IGHV3OR16-8	immunoglobulin heavy variable 3/OR16-8 (non-functional)	Approved	immunoglobulin gene		IGHV3/OR16-8	16p11.2	388255	ENSG00000271130	OTTHUMG00000176449	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5644	IGHV3OR16-9	immunoglobulin heavy variable 3/OR16-9 (non-functional)	Approved	immunoglobulin gene		IGHV3/OR16-9	16p11.2	28307	ENSG00000270472	OTTHUMG00000184753	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5658	IGHV4OR15-8	immunoglobulin heavy variable 4/OR15-8 (non-functional)	Approved	immunoglobulin gene	VSIG6	IGHV4/OR15-8, IGHV4OR158	15q11.2	28317	ENSG00000259261	OTTHUMG00000171934	350	Immunoglobulin heavy (IGH) orphons
+HGNC:5477	IGH	immunoglobulin heavy locus	Approved	gene with protein product	IGHDY1, IGH@		14q32.33	3492			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5554	IGHV1-46	immunoglobulin heavy variable 1-46	Approved	immunoglobulin gene			14q32.33	28465	ENSG00000211962	OTTHUMG00000151963	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5665	IGHV7-4-1	immunoglobulin heavy variable 7-4-1	Approved	immunoglobulin gene			14q32.33	57289	ENSG00000282122	OTTHUMG00000191141	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5666	IGHV7-40	immunoglobulin heavy variable 7-40 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28381	ENSG00000253467	OTTHUMG00000152088	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5663	IGHV7-27	immunoglobulin heavy variable 7-27 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28383	ENSG00000254326	OTTHUMG00000152070	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5667	IGHV7-56	immunoglobulin heavy variable 7-56 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28380	ENSG00000253131	OTTHUMG00000151975	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5664	IGHV7-34-1	immunoglobulin heavy variable 7-34-1 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28382	ENSG00000253325	OTTHUMG00000152085	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5669	IGHV7-81	immunoglobulin heavy variable 7-81 (non-functional)	Approved	immunoglobulin gene			14q32.33	28378	ENSG00000211979	OTTHUMG00000151731	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5670	IGHVII-1-1	immunoglobulin heavy variable (II)-1-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-1-1	14q32.33	28377	ENSG00000254279	OTTHUMG00000152325	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5671	IGHVII-15-1	immunoglobulin heavy variable (II)-15-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-15-1	14q32.33	28376	ENSG00000253458	OTTHUMG00000152275	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5672	IGHVII-20-1	immunoglobulin heavy variable (II)-20-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-20-1	14q32.33	28375			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5673	IGHVII-22-1	immunoglobulin heavy variable (II)-22-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-22-1	14q32.33	28374	ENSG00000253345	OTTHUMG00000152102	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5674	IGHVII-26-2	immunoglobulin heavy variable (II)-26-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-26-2	14q32.33	28373	ENSG00000253482	OTTHUMG00000152066	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5675	IGHVII-28-1	immunoglobulin heavy variable (II)-28-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-28-1	14q32.33	28372	ENSG00000253149	OTTHUMG00000152101	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5555	IGHV1-58	immunoglobulin heavy variable 1-58	Approved	immunoglobulin gene			14q32.33	28464	ENSG00000211968	OTTHUMG00000151953	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5676	IGHVII-30-1	immunoglobulin heavy variable (II)-30-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-30-1	14q32.33	28371	ENSG00000253491	OTTHUMG00000152099	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:52400	IGHVII-30-21	immunoglobulin heavy variable (II)-30-21 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-30-21	14q32.33	107548099	ENSG00000283607	OTTHUMG00000191969	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5677	IGHVII-31-1	immunoglobulin heavy variable (II)-31-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-31-1	14q32.33 not on reference assembly	28370		OTTHUMG00000191969	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5678	IGHVII-33-1	immunoglobulin heavy variable (II)-33-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-33-1	14q32.33	28369	ENSG00000254203	OTTHUMG00000152086	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5679	IGHVII-40-1	immunoglobulin heavy variable (II)-40-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-40-1	14q32.33	28368	ENSG00000253294	OTTHUMG00000152098	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5680	IGHVII-43-1	immunoglobulin heavy variable (II)-43-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-43-1	14q32.33	28367	ENSG00000283195	OTTHUMG00000191837	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5681	IGHVII-44-2	immunoglobulin heavy variable (II)-44-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-44-2	14q32.33	28366	ENSG00000253895	OTTHUMG00000152080	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5682	IGHVII-46-1	immunoglobulin heavy variable (II)-46-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-46-1	14q32.33	28365	ENSG00000253808	OTTHUMG00000151952	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5683	IGHVII-49-1	immunoglobulin heavy variable (II)-49-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-49-1	14q32.33	28364	ENSG00000253386	OTTHUMG00000151974	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5684	IGHVII-51-2	immunoglobulin heavy variable (II)-51-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-51-2	14q32.33	28363	ENSG00000253941	OTTHUMG00000151969	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5685	IGHVII-53-1	immunoglobulin heavy variable (II)-53-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-53-1	14q32.33	28362	ENSG00000253714	OTTHUMG00000151954	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5556	IGHV1-67	immunoglobulin heavy variable 1-67 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28463	ENSG00000253274	OTTHUMG00000151868	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5686	IGHVII-60-1	immunoglobulin heavy variable (II)-60-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-60-1	14q32.33	28361	ENSG00000254329	OTTHUMG00000151951	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5557	IGHV1-68	immunoglobulin heavy variable 1-68 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28462	ENSG00000253703	OTTHUMG00000151876	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5687	IGHVII-62-1	immunoglobulin heavy variable (II)-62-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-62-1	14q32.33	28360	ENSG00000253747	OTTHUMG00000151965	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5688	IGHVII-65-1	immunoglobulin heavy variable (II)-65-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-65-1	14q32.33	28359	ENSG00000253169	OTTHUMG00000151970	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5689	IGHVII-67-1	immunoglobulin heavy variable (II)-67-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-67-1	14q32.33	28358	ENSG00000253820	OTTHUMG00000151864	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5690	IGHVII-74-1	immunoglobulin heavy variable (II)-74-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-74-1	14q32.33	28357	ENSG00000254134	OTTHUMG00000151875	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5691	IGHVII-78-1	immunoglobulin heavy variable (II)-78-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(II)-78-1	14q32.33	28356	ENSG00000253674	OTTHUMG00000151863	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5695	IGHVIII-2-1	immunoglobulin heavy variable (III)-2-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-2-1	14q32.33	28355	ENSG00000253780	OTTHUMG00000152321	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5702	IGHVIII-5-1	immunoglobulin heavy variable (III)-5-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-5-1	14q32.33	28354	ENSG00000253387	OTTHUMG00000152274	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5703	IGHVIII-5-2	immunoglobulin heavy variable (III)-5-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-5-2	14q32.33	28353	ENSG00000254053	OTTHUMG00000152278	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5692	IGHVIII-11-1	immunoglobulin heavy variable (III)-11-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-11-1	14q32.33	28352	ENSG00000254215	OTTHUMG00000152296	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5693	IGHVIII-13-1	immunoglobulin heavy variable (III)-13-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-13-1	14q32.33	28351	ENSG00000253412	OTTHUMG00000152272	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5558	IGHV1-69	immunoglobulin heavy variable 1-69	Approved	immunoglobulin gene	IGHV1-E		14q32.33	28461	ENSG00000211973	OTTHUMG00000151862	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5694	IGHVIII-16-1	immunoglobulin heavy variable (III)-16-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-16-1	14q32.33	28350	ENSG00000283948	OTTHUMG00000191975	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5696	IGHVIII-22-2	immunoglobulin heavy variable (III)-22-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-22-2	14q32.33	28349	ENSG00000254045	OTTHUMG00000152060	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5697	IGHVIII-25-1	immunoglobulin heavy variable (III)-25-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-25-1	14q32.33	28348	ENSG00000253367	OTTHUMG00000152072	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5698	IGHVIII-26-1	immunoglobulin heavy variable (III)-26-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-26-1	14q32.33	28347	ENSG00000253462	OTTHUMG00000152059	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5699	IGHVIII-38-1	immunoglobulin heavy variable (III)-38-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-38-1	14q32.33	28346	ENSG00000253989	OTTHUMG00000152090	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5700	IGHVIII-44	immunoglobulin heavy variable (III)-44 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-44	14q32.33	28345	ENSG00000283562	OTTHUMG00000152065	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5701	IGHVIII-47-1	immunoglobulin heavy variable (III)-47-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-47-1	14q32.33	28344	ENSG00000253862	OTTHUMG00000151949	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5704	IGHV8-51-1	immunoglobulin heavy variable IGHV8-51-1 (non-functional)	Approved	immunoglobulin gene	IGHVIII-51-1	IGHV(III)-51-1	14q32.33	28343	ENSG00000254167	OTTHUMG00000151957	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5705	IGHVIII-67-2	immunoglobulin heavy variable (III)-67-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-67-2	14q32.33	28342	ENSG00000254036	OTTHUMG00000151861	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5706	IGHVIII-67-3	immunoglobulin heavy variable (III)-67-3 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-67-3	14q32.33	28341	ENSG00000253635	OTTHUMG00000151879	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:49601	IGHV1-69D	immunoglobulin heavy variable 1-69D	Approved	immunoglobulin gene			14q32.33	102723169	ENSG00000280411	OTTHUMG00000189341	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5707	IGHVIII-67-4	immunoglobulin heavy variable (III)-67-4 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-67-4	14q32.33	28340	ENSG00000254052	OTTHUMG00000151874	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5708	IGHVIII-76-1	immunoglobulin heavy variable (III)-76-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-76-1	14q32.33	28339	ENSG00000253310	OTTHUMG00000151872	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5709	IGHVIII-82	immunoglobulin heavy variable (III)-82 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(III)-82	14q32.33	28338	ENSG00000253303	OTTHUMG00000151732	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5710	IGHVIV-44-1	immunoglobulin heavy variable (IV)-44-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGHV(IV)-44-1	14q32.33	28337	ENSG00000253465	OTTHUMG00000152064	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5482	IGHD1-1	immunoglobulin heavy diversity 1-1	Approved	immunoglobulin gene		IGHD11	14q32.33	28510	ENSG00000236170	OTTHUMG00000152359	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5486	IGHD1-7	immunoglobulin heavy diversity 1-7	Approved	immunoglobulin gene		DM1, IGHD17	14q32.33	28509	ENSG00000237197	OTTHUMG00000152357	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5483	IGHD1-14	immunoglobulin heavy diversity 1-14 (non-functional)	Approved	immunoglobulin gene		IGHD114, DM2	14q32.33	28508	ENSG00000227108	OTTHUMG00000152369	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5484	IGHD1-20	immunoglobulin heavy diversity 1-20	Approved	immunoglobulin gene		IGHD120	14q32.33	28507	ENSG00000237020	OTTHUMG00000152432	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5485	IGHD1-26	immunoglobulin heavy diversity 1-26	Approved	immunoglobulin gene		IGHD126	14q32.33	28506	ENSG00000211907	OTTHUMG00000152429	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5490	IGHD2-2	immunoglobulin heavy diversity 2-2	Approved	immunoglobulin gene		IGHD22	14q32.33	28505	ENSG00000211931	OTTHUMG00000152356	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5560	IGHV1-38-4	immunoglobulin heavy variable 1-38-4 (non-functional)	Approved	immunoglobulin gene	IGHV1-C	IGHV1-c	14q32.33 not on reference assembly	28460			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5492	IGHD2-8	immunoglobulin heavy diversity 2-8	Approved	immunoglobulin gene		IGHD28, DLR1	14q32.33	28504	ENSG00000211925	OTTHUMG00000152361	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5489	IGHD2-15	immunoglobulin heavy diversity 2-15	Approved	immunoglobulin gene		IGHD215, D2	14q32.33	28503	ENSG00000211918	OTTHUMG00000152430	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5491	IGHD2-21	immunoglobulin heavy diversity 2-21	Approved	immunoglobulin gene		IGHD221	14q32.33	28502	ENSG00000211912	OTTHUMG00000152428	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5498	IGHD3-3	immunoglobulin heavy diversity 3-3	Approved	immunoglobulin gene		IGHD33, DXP4	14q32.33	28501	ENSG00000211930	OTTHUMG00000152358	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5499	IGHD3-9	immunoglobulin heavy diversity 3-9	Approved	immunoglobulin gene		IGHD39, DXP1	14q32.33	28500	ENSG00000211924	OTTHUMG00000152352	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5495	IGHD3-10	immunoglobulin heavy diversity 3-10	Approved	immunoglobulin gene		IGHD310, DXP'1	14q32.33	28499	ENSG00000211923	OTTHUMG00000152354	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5496	IGHD3-16	immunoglobulin heavy diversity 3-16	Approved	immunoglobulin gene		IGHD316	14q32.33	28498	ENSG00000211917	OTTHUMG00000152439	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5497	IGHD3-22	immunoglobulin heavy diversity 3-22	Approved	immunoglobulin gene		IGHD322	14q32.33	28497	ENSG00000211911	OTTHUMG00000152434	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5505	IGHD4-4	immunoglobulin heavy diversity 4-4	Approved	immunoglobulin gene		IGHD44, DA4	14q32.33	28496	ENSG00000233655	OTTHUMG00000152355	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5502	IGHD4-11	immunoglobulin heavy diversity 4-11 (non-functional)	Approved	immunoglobulin gene		IGHD411, DA1	14q32.33	28495	ENSG00000232543	OTTHUMG00000152368	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5562	IGHV1-69-2	immunoglobulin heavy variable 1-69-2	Approved	immunoglobulin gene	IGHV1-F	IGHV1-f	14q32.33	28458	ENSG00000281990	OTTHUMG00000191146	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5503	IGHD4-17	immunoglobulin heavy diversity 4-17	Approved	immunoglobulin gene		IGHD417	14q32.33	28494	ENSG00000227800	OTTHUMG00000152437	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5504	IGHD4-23	immunoglobulin heavy diversity 4-23 (non-functional)	Approved	immunoglobulin gene		IGHD423	14q32.33	28493	ENSG00000227196	OTTHUMG00000152438	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5511	IGHD5-5	immunoglobulin heavy diversity 5-5	Approved	immunoglobulin gene		IGHD55, DK4	14q32.33	28492	ENSG00000211928	OTTHUMG00000152360	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5508	IGHD5-12	immunoglobulin heavy diversity 5-12	Approved	immunoglobulin gene		IGHD512, DK1	14q32.33	28491	ENSG00000211921	OTTHUMG00000152367	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5509	IGHD5-18	immunoglobulin heavy diversity 5-18	Approved	immunoglobulin gene		IGHD518	14q32.33	28490	ENSG00000211915	OTTHUMG00000152433	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5510	IGHD5-24	immunoglobulin heavy diversity 5-24 (non-functional)	Approved	immunoglobulin gene		IGHD524	14q32.33	28489	ENSG00000211909	OTTHUMG00000152427	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5517	IGHD6-6	immunoglobulin heavy diversity 6-6	Approved	immunoglobulin gene		IGHD66, D(N4)	14q32.33	28488	ENSG00000228131	OTTHUMG00000152353	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5514	IGHD6-13	immunoglobulin heavy diversity 6-13	Approved	immunoglobulin gene		IGHD613, DN1	14q32.33	28487	ENSG00000211920	OTTHUMG00000152370	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5515	IGHD6-19	immunoglobulin heavy diversity 6-19	Approved	immunoglobulin gene		IGHD619	14q32.33	28486	ENSG00000211914	OTTHUMG00000152431	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5576	IGHV2-5	immunoglobulin heavy variable 2-5	Approved	immunoglobulin gene			14q32.33	28457	ENSG00000211937	OTTHUMG00000152287	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5516	IGHD6-25	immunoglobulin heavy diversity 6-25	Approved	immunoglobulin gene		IGHD625	14q32.33	28485	ENSG00000225825	OTTHUMG00000152436	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5518	IGHD7-27	immunoglobulin heavy diversity 7-27	Approved	immunoglobulin gene		IGHD727, DHQ52	14q32.33	28484	ENSG00000236597	OTTHUMG00000152435	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5574	IGHV2-10	immunoglobulin heavy variable 2-10 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33 not on reference assembly	28456			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5532	IGHJ1	immunoglobulin heavy joining 1	Approved	immunoglobulin gene			14q32.33	28483	ENSG00000211905	OTTHUMG00000152460	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5533	IGHJ1P	immunoglobulin heavy joining 1P (pseudogene)	Approved	immunoglobulin pseudogene		Jpsi1	14q32.33	28482	ENSG00000227335	OTTHUMG00000152458	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5534	IGHJ2	immunoglobulin heavy joining 2	Approved	immunoglobulin gene			14q32.33	28481	ENSG00000211904	OTTHUMG00000152457	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5535	IGHJ2P	immunoglobulin heavy joining 2P (pseudogene)	Approved	immunoglobulin pseudogene		Jpsi2	14q32.33	28480	ENSG00000237547	OTTHUMG00000152456	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5536	IGHJ3	immunoglobulin heavy joining 3	Approved	immunoglobulin gene			14q32.33	28479	ENSG00000242887	OTTHUMG00000152453	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5537	IGHJ3P	immunoglobulin heavy joining 3P (pseudogene)	Approved	immunoglobulin pseudogene		Jpsi3	14q32.33	28478	ENSG00000237111	OTTHUMG00000152459	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5538	IGHJ4	immunoglobulin heavy joining 4	Approved	immunoglobulin gene			14q32.33	28477	ENSG00000240041	OTTHUMG00000152454	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5539	IGHJ5	immunoglobulin heavy joining 5	Approved	immunoglobulin gene			14q32.33	28476	ENSG00000242472	OTTHUMG00000152461	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5540	IGHJ6	immunoglobulin heavy joining 6	Approved	immunoglobulin gene			14q32.33	28475	ENSG00000211900	OTTHUMG00000152455	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5478	IGHA1	immunoglobulin heavy constant alpha 1	Approved	immunoglobulin gene			14q32.33	3493	ENSG00000211895	OTTHUMG00000152494	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5550	IGHV1-2	immunoglobulin heavy variable 1-2	Approved	immunoglobulin gene		V35	14q32.33	28474	ENSG00000211934	OTTHUMG00000152320	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5575	IGHV2-26	immunoglobulin heavy variable 2-26	Approved	immunoglobulin gene			14q32.33	28455	ENSG00000211951	OTTHUMG00000152100	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5479	IGHA2	immunoglobulin heavy constant alpha 2 (A2m marker)	Approved	immunoglobulin gene			14q32.33	3494	ENSG00000211890	OTTHUMG00000152472	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5525	IGHG1	immunoglobulin heavy constant gamma 1 (G1m marker)	Approved	immunoglobulin gene			14q32.33	3500	ENSG00000211896	OTTHUMG00000152495	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5526	IGHG2	immunoglobulin heavy constant gamma 2 (G2m marker)	Approved	immunoglobulin gene			14q32.33	3501	ENSG00000211893	OTTHUMG00000152482	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5527	IGHG3	immunoglobulin heavy constant gamma 3 (G3m marker)	Approved	immunoglobulin gene			14q32.33	3502	ENSG00000211897	OTTHUMG00000152539	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5528	IGHG4	immunoglobulin heavy constant gamma 4 (G4m marker)	Approved	immunoglobulin gene			14q32.33	3503	ENSG00000211892	OTTHUMG00000152481	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5529	IGHGP	immunoglobulin heavy constant gamma P (non-functional)	Approved	immunoglobulin gene	IGHGP1		14q32.33	3505	ENSG00000253755	OTTHUMG00000152493	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5480	IGHD	immunoglobulin heavy constant delta	Approved	immunoglobulin gene		FLJ00382, FLJ46727, MGC29633	14q32.33	3495	ENSG00000211898	OTTHUMG00000152538	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5522	IGHE	immunoglobulin heavy constant epsilon	Approved	immunoglobulin gene			14q32.33	3497	ENSG00000211891	OTTHUMG00000152483	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5523	IGHEP1	immunoglobulin heavy constant epsilon P1 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	3498	ENSG00000253692	OTTHUMG00000029957	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5541	IGHM	immunoglobulin heavy constant mu	Approved	immunoglobulin gene			14q32.33	3507	ENSG00000211899	OTTHUMG00000152452	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5577	IGHV2-70	immunoglobulin heavy variable 2-70	Approved	immunoglobulin gene			14q32.33	28454	ENSG00000274576	OTTHUMG00000189342	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:49602	IGHV2-70D	immunoglobulin heavy variable 2-70D	Approved	immunoglobulin gene			14q32.33	102723168	ENSG00000211974	OTTHUMG00000151870	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5613	IGHV3-6	immunoglobulin heavy variable 3-6 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28453	ENSG00000253763	OTTHUMG00000152283	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5620	IGHV3-7	immunoglobulin heavy variable 3-7	Approved	immunoglobulin gene			14q32.33	28452	ENSG00000211938	OTTHUMG00000152271	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5628	IGHV3-9	immunoglobulin heavy variable 3-9	Approved	immunoglobulin gene			14q32.33	28451			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5580	IGHV3-11	immunoglobulin heavy variable 3-11 (gene/pseudogene)	Approved	immunoglobulin gene			14q32.33	28450	ENSG00000211941	OTTHUMG00000152277	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5581	IGHV3-13	immunoglobulin heavy variable 3-13	Approved	immunoglobulin gene			14q32.33	28449	ENSG00000211942	OTTHUMG00000152295	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5582	IGHV3-15	immunoglobulin heavy variable 3-15	Approved	immunoglobulin gene			14q32.33	28448	ENSG00000211943	OTTHUMG00000152282	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5583	IGHV3-16	immunoglobulin heavy variable 3-16 (non-functional)	Approved	immunoglobulin gene			14q32.33	28447	ENSG00000211944	OTTHUMG00000152273	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5584	IGHV3-19	immunoglobulin heavy variable 3-19 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28446	ENSG00000253883	OTTHUMG00000152280	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5552	IGHV1-3	immunoglobulin heavy variable 1-3	Approved	immunoglobulin gene		VI-3B	14q32.33	28473	ENSG00000211935	OTTHUMG00000152323	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5585	IGHV3-20	immunoglobulin heavy variable 3-20	Approved	immunoglobulin gene			14q32.33	28445	ENSG00000211946	OTTHUMG00000152285	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5586	IGHV3-21	immunoglobulin heavy variable 3-21	Approved	immunoglobulin gene			14q32.33	28444	ENSG00000211947	OTTHUMG00000152279	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5587	IGHV3-22	immunoglobulin heavy variable 3-22 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28443	ENSG00000253957	OTTHUMG00000152293	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5588	IGHV3-23	immunoglobulin heavy variable 3-23	Approved	immunoglobulin gene			14q32.33	28442	ENSG00000211949	OTTHUMG00000152091	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5589	IGHV3-25	immunoglobulin heavy variable 3-25 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28441	ENSG00000253441	OTTHUMG00000152073	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5590	IGHV3-29	immunoglobulin heavy variable 3-29 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28440	ENSG00000270474	OTTHUMG00000188328	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5591	IGHV3-30	immunoglobulin heavy variable 3-30	Approved	immunoglobulin gene			14q32.33	28439	ENSG00000270550	OTTHUMG00000188332	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5592	IGHV3-30-2	immunoglobulin heavy variable 3-30-2 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28438	ENSG00000253587	OTTHUMG00000152082	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5593	IGHV3-30-3	immunoglobulin heavy variable 3-30-3	Approved	immunoglobulin gene			14q32.33 not on reference assembly	57290			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5594	IGHV3-30-5	immunoglobulin heavy variable 3-30-5	Approved	immunoglobulin gene			14q32.33 not on reference assembly	89770			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5546	IGHV1-12	immunoglobulin heavy variable 1-12 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28471	ENSG00000254174	OTTHUMG00000152281	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5559	IGHV1-8	immunoglobulin heavy variable 1-8	Approved	immunoglobulin gene			14q32.33 not on reference assembly	28472			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5595	IGHV3-32	immunoglobulin heavy variable 3-32 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28435	ENSG00000254289	OTTHUMG00000152063	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5596	IGHV3-33	immunoglobulin heavy variable 3-33	Approved	immunoglobulin gene			14q32.33	28434	ENSG00000211955	OTTHUMG00000152077	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5597	IGHV3-33-2	immunoglobulin heavy variable 3-33-2 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28433	ENSG00000253440	OTTHUMG00000152096	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5598	IGHV3-35	immunoglobulin heavy variable 3-35 (non-functional)	Approved	immunoglobulin gene			14q32.33	28432	ENSG00000211957	OTTHUMG00000152079	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5599	IGHV3-36	immunoglobulin heavy variable 3-36 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28431	ENSG00000253240	OTTHUMG00000152068	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5600	IGHV3-37	immunoglobulin heavy variable 3-37 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28430	ENSG00000253359	OTTHUMG00000152083	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5601	IGHV3-38	immunoglobulin heavy variable 3-38 (non-functional)	Approved	immunoglobulin gene			14q32.33	28429	ENSG00000211958	OTTHUMG00000152093	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5602	IGHV3-41	immunoglobulin heavy variable 3-41 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28428	ENSG00000278473	OTTHUMG00000152089	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5603	IGHV3-42	immunoglobulin heavy variable 3-42 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28427	ENSG00000254228	OTTHUMG00000152081	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5604	IGHV3-43	immunoglobulin heavy variable 3-43	Approved	immunoglobulin gene			14q32.33	28426	ENSG00000232216	OTTHUMG00000152094	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:50322	IGHV3-43D	immunoglobulin heavy variable 3-43D	Approved	immunoglobulin gene			14q32.33 not on reference assembly	103106901			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5547	IGHV1-14	immunoglobulin heavy variable 1-14 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28470	ENSG00000253709	OTTHUMG00000152290	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5605	IGHV3-47	immunoglobulin heavy variable 3-47 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28425	ENSG00000229092	OTTHUMG00000151968	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5606	IGHV3-48	immunoglobulin heavy variable 3-48	Approved	immunoglobulin gene			14q32.33	28424	ENSG00000211964	OTTHUMG00000151959	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5607	IGHV3-49	immunoglobulin heavy variable 3-49	Approved	immunoglobulin gene			14q32.33	28423	ENSG00000211965	OTTHUMG00000151967	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5608	IGHV3-50	immunoglobulin heavy variable 3-50 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28422	ENSG00000253241	OTTHUMG00000151964	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5609	IGHV3-52	immunoglobulin heavy variable 3-52 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28421	ENSG00000253545	OTTHUMG00000151958	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5610	IGHV3-53	immunoglobulin heavy variable 3-53	Approved	immunoglobulin gene			14q32.33	28420	ENSG00000211967	OTTHUMG00000151966	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5611	IGHV3-54	immunoglobulin heavy variable 3-54 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28419	ENSG00000275475	OTTHUMG00000151962	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5612	IGHV3-57	immunoglobulin heavy variable 3-57 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28418	ENSG00000253759	OTTHUMG00000151961	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5614	IGHV3-60	immunoglobulin heavy variable 3-60 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28417	ENSG00000253742	OTTHUMG00000151956	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5615	IGHV3-62	immunoglobulin heavy variable 3-62 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28416	ENSG00000253132	OTTHUMG00000151950	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5548	IGHV1-17	immunoglobulin heavy variable 1-17 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28469	ENSG00000254046	OTTHUMG00000152288	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5616	IGHV3-63	immunoglobulin heavy variable 3-63 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28415	ENSG00000253936	OTTHUMG00000151977	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5617	IGHV3-64	immunoglobulin heavy variable 3-64	Approved	immunoglobulin gene			14q32.33	28414	ENSG00000223648	OTTHUMG00000151971	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5618	IGHV3-65	immunoglobulin heavy variable 3-65 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28413	ENSG00000253209	OTTHUMG00000151972	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5619	IGHV3-66	immunoglobulin heavy variable 3-66	Approved	immunoglobulin gene			14q32.33	28412	ENSG00000211972	OTTHUMG00000151880	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5621	IGHV3-71	immunoglobulin heavy variable 3-71 (pseudogene)	Approved	immunoglobulin pseudogene	IGHV3-G	IGHV3-g	14q32.33	28411	ENSG00000254056	OTTHUMG00000151881	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5622	IGHV3-72	immunoglobulin heavy variable 3-72	Approved	immunoglobulin gene			14q32.33	28410	ENSG00000225698	OTTHUMG00000151865	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5623	IGHV3-73	immunoglobulin heavy variable 3-73	Approved	immunoglobulin gene			14q32.33	28409	ENSG00000211976	OTTHUMG00000151867	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5624	IGHV3-74	immunoglobulin heavy variable 3-74	Approved	immunoglobulin gene			14q32.33	28408	ENSG00000224650	OTTHUMG00000151860	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5625	IGHV3-75	immunoglobulin heavy variable 3-75 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28407	ENSG00000254176	OTTHUMG00000151866	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5626	IGHV3-76	immunoglobulin heavy variable 3-76 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28406	ENSG00000253247	OTTHUMG00000151878	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5549	IGHV1-18	immunoglobulin heavy variable 1-18	Approved	immunoglobulin gene			14q32.33	28468	ENSG00000211945	OTTHUMG00000152276	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5627	IGHV3-79	immunoglobulin heavy variable 3-79 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28405	ENSG00000275747	OTTHUMG00000151871	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5551	IGHV1-24	immunoglobulin heavy variable 1-24	Approved	immunoglobulin gene			14q32.33	28467	ENSG00000211950	OTTHUMG00000152095	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5629	IGHV3-38-3	immunoglobulin heavy variable 3-38-3 (non-functional)	Approved	immunoglobulin gene	IGHV3-D	IGHV3-d	14q32.33 not on reference assembly	28404			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5631	IGHV3-69-1	immunoglobulin heavy variable 3-69-1 (pseudogene)	Approved	immunoglobulin pseudogene	IGHV3-H	IGHV3-h	14q32.33	28402	ENSG00000282600	OTTHUMG00000191145	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5652	IGHV4-4	immunoglobulin heavy variable 4-4	Approved	immunoglobulin gene			14q32.33	28401	ENSG00000276775	OTTHUMG00000152322	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5645	IGHV4-28	immunoglobulin heavy variable 4-28	Approved	immunoglobulin gene			14q32.33	28400	ENSG00000211952	OTTHUMG00000152062	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5646	IGHV4-30-1	immunoglobulin heavy variable 4-30-1	Approved	immunoglobulin gene			14q32.33	28399			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5647	IGHV4-30-2	immunoglobulin heavy variable 4-30-2	Approved	immunoglobulin gene		IGHV4-3, IGHV4302	14q32.33	28398			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5648	IGHV4-30-4	immunoglobulin heavy variable 4-30-4	Approved	immunoglobulin gene		IGHV4-3, IGHV4304	14q32.33 not on reference assembly	28397			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5649	IGHV4-31	immunoglobulin heavy variable 4-31	Approved	immunoglobulin gene			14q32.33 not on reference assembly	28396	ENSG00000231475	OTTHUMG00000152097	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5650	IGHV4-34	immunoglobulin heavy variable 4-34	Approved	immunoglobulin gene			14q32.33	28395	ENSG00000211956	OTTHUMG00000152074	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5651	IGHV4-39	immunoglobulin heavy variable 4-39	Approved	immunoglobulin gene			14q32.33	28394	ENSG00000211959	OTTHUMG00000152067	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5553	IGHV1-45	immunoglobulin heavy variable 1-45	Approved	immunoglobulin gene			14q32.33	28466	ENSG00000211961	OTTHUMG00000152075	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5653	IGHV4-55	immunoglobulin heavy variable 4-55 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28393	ENSG00000254395	OTTHUMG00000151955	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5654	IGHV4-59	immunoglobulin heavy variable 4-59	Approved	immunoglobulin gene			14q32.33	28392	ENSG00000224373	OTTHUMG00000151973	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5655	IGHV4-61	immunoglobulin heavy variable 4-61	Approved	immunoglobulin gene			14q32.33	28391	ENSG00000211970	OTTHUMG00000151976	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5656	IGHV4-80	immunoglobulin heavy variable 4-80 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28390	ENSG00000283906	OTTHUMG00000191973	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5657	IGHV4-38-2	immunoglobulin heavy variable 4-38-2	Approved	immunoglobulin gene	IGHV4-B		14q32.33 not on reference assembly	28389			349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5659	IGHV5-51	immunoglobulin heavy variable 5-51	Approved	immunoglobulin gene			14q32.33	28388	ENSG00000211966	OTTHUMG00000151960	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5660	IGHV5-78	immunoglobulin heavy variable 5-78 (pseudogene)	Approved	immunoglobulin pseudogene			14q32.33	28387	ENSG00000211978	OTTHUMG00000151873	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5661	IGHV5-10-1	immunoglobulin heavy variable 5-10-1	Approved	immunoglobulin gene	IGHV5-A	IGHV5-a	14q32.33	28386	ENSG00000282651	OTTHUMG00000191143	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:5662	IGHV6-1	immunoglobulin heavy variable 6-1	Approved	immunoglobulin gene			14q32.33	28385	ENSG00000211933	OTTHUMG00000152324	349	Immunoglobulin heavy locus at 14q32.33
+HGNC:44978	IGKV1OR10-1	immunoglobulin kappa variable 1/OR10-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR10-1	10q11.21	642424	ENSG00000237592	OTTHUMG00000018005	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5764	IGKV1OR1-1	immunoglobulin kappa variable 1/OR1-1 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP1	IGKV1/OR1-1	1q21.1	3525	ENSG00000276674	OTTHUMG00000184566	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5765	IGKV1OR15-118	immunoglobulin kappa variable 1/OR15-118 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP2	IGKV1/OR-118, IGKV1/OR15-118	15 not on reference assembly	100312985			352	Immunoglobulin kappa (IGK) orphons
+HGNC:5761	IGKV1OR-2	immunoglobulin kappa variable 1/OR-2 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVPZ2	IGKV1/OR-2	9q13	3532	ENSG00000156755	OTTHUMG00000013330	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5766	IGKV1OR2-0	immunoglobulin kappa variable 1/OR2-0 (non-functional)	Approved	immunoglobulin gene		IGKV1/OR2-0	2p11.2	28867			352	Immunoglobulin kappa (IGK) orphons
+HGNC:5760	IGKV1OR2-1	immunoglobulin kappa variable 1/OR2-1 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVPZ1, IGKV1OR-1	IGKV1/OR-1, IGKV1/OR2-1	2p11.1	3531	ENSG00000235235	OTTHUMG00000155081	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5767	IGKV1OR2-108	immunoglobulin kappa variable 1/OR2-108 (non-functional)	Approved	immunoglobulin gene		IGKV1/OR2-108, IGKV1OR2108, IGO1	2q12-q14	28862	ENSG00000231292	OTTHUMG00000153338	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5768	IGKV1OR2-11	immunoglobulin kappa variable 1/OR2-11 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR2-11	2q11.2	28863	ENSG00000270187	OTTHUMG00000184518	352	Immunoglobulin kappa (IGK) orphons
+HGNC:37488	IGKV1OR2-118	immunoglobulin kappa variable 1/OR2-118 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR2-118	2p11.2	339562	ENSG00000270999	OTTHUMG00000184560	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5772	IGKV1OR22-1	immunoglobulin kappa variable 1/OR22-1 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP5	IGKV1/OR22-1	22q11.1	3530	ENSG00000253481	OTTHUMG00000149996	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5773	IGKV1OR22-5	immunoglobulin kappa variable 1/OR22-5 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP7, IGKV1OR22-5A	IGKV1/OR22-5, IGKV1/OR22-5A	22q11	28850	ENSG00000230481	OTTHUMG00000147349	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5769	IGKV1OR2-3	immunoglobulin kappa variable 1/OR2-3 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR2-3	2q11.2	28866	ENSG00000204670	OTTHUMG00000155330	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5770	IGKV1OR2-6	immunoglobulin kappa variable 1/OR2-6 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR2-6	2q11.2	28865	ENSG00000271569	OTTHUMG00000184513	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5771	IGKV1OR2-9	immunoglobulin kappa variable 1/OR2-9 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/OR2-9	2q11.2	28864	ENSG00000271351	OTTHUMG00000184517	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5762	IGKV1OR-3	immunoglobulin kappa variable 1/OR-3 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVPZ3	IGKV1/OR-3	9q12	644731	ENSG00000204776	OTTHUMG00000013335	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5763	IGKV1OR-4	immunoglobulin kappa variable 1/OR-4 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVPZ4	IGKV1/OR-4	reserved	3534			352	Immunoglobulin kappa (IGK) orphons
+HGNC:37729	IGKV1ORY-1	immunoglobulin kappa variable 1/ORY-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV1/ORY-1	Yq11.21	439957			352	Immunoglobulin kappa (IGK) orphons
+HGNC:5805	IGKV2OR2-1	immunoglobulin kappa variable 2/OR2-1 (pseudogene)	Approved	immunoglobulin pseudogene	IGKV2OR2-1A	IGKV2/OR2-1, IGKV2/OR2-1A	2q11.2	28861	ENSG00000270748	OTTHUMG00000155332	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5806	IGKV2OR2-10	immunoglobulin kappa variable 2/OR2-10 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-10	2q11.2	28855	ENSG00000276050	OTTHUMG00000188278	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5808	IGKV2OR2-2	immunoglobulin kappa variable 2/OR2-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-2	2q11.2	28859	ENSG00000271402	OTTHUMG00000155326	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5812	IGKV2OR22-3	immunoglobulin kappa variable 2/OR22-3 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP4	IGKV2/OR22-3	22q11.1	3529	ENSG00000253460	OTTHUMG00000149994	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5813	IGKV2OR22-4	immunoglobulin kappa variable 2/OR22-4 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP6	IGKV2/OR22-4	22q11.1	28847	ENSG00000253691	OTTHUMG00000149991	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5809	IGKV2OR2-4	immunoglobulin kappa variable 2/OR2-4 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-4	2q11.2	28858			352	Immunoglobulin kappa (IGK) orphons
+HGNC:5810	IGKV2OR2-7	immunoglobulin kappa variable 2/OR2-7 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-7	2q11.2	652873	ENSG00000270450	OTTHUMG00000184523	352	Immunoglobulin kappa (IGK) orphons
+HGNC:37489	IGKV2OR2-7D	immunoglobulin kappa variable 2/OR2-7D (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-7D	2q11.2	100310869	ENSG00000271015	OTTHUMG00000184526	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5811	IGKV2OR2-8	immunoglobulin kappa variable 2/OR2-8 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV2/OR2-8	2q11.2	100996600	ENSG00000278537	OTTHUMG00000188277	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5833	IGKV3OR22-2	immunoglobulin kappa variable 3/OR22-2 (pseudogene)	Approved	immunoglobulin pseudogene	IGKVP3	IGKV3/OR22-2	22q11.1	3527	ENSG00000254264	OTTHUMG00000149995	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5830	IGKV3OR2-268	immunoglobulin kappa variable 3/OR2-268 (non-functional)	Approved	immunoglobulin gene	IGKV268, IGKV3OR2-268A	IGKV3/OR2-268, IGKV3/OR2-268A	2p12	3523	ENSG00000233999	OTTHUMG00000153256	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5832	IGKV3OR2-5	immunoglobulin kappa variable 3/OR2-5 (pseudogene)	Approved	immunoglobulin pseudogene		IGKV3/OR2-5	2q11.2	28854	ENSG00000270252	OTTHUMG00000184519	352	Immunoglobulin kappa (IGK) orphons
+HGNC:5715	IGK	immunoglobulin kappa locus	Approved	gene with protein product	IGK@		2p11.2	50802			351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5734	IGKV1-22	immunoglobulin kappa variable 1-22 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28936	ENSG00000253578	OTTHUMG00000151646	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5735	IGKV1-27	immunoglobulin kappa variable 1-27	Approved	immunoglobulin gene		IGKV127, A20	2p11.2	28935	ENSG00000244575	OTTHUMG00000151640	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5736	IGKV1-32	immunoglobulin kappa variable 1-32 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28934	ENSG00000253870	OTTHUMG00000151687	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5737	IGKV1-33	immunoglobulin kappa variable 1-33	Approved	immunoglobulin gene		IGKV133, O18	2p11.2	28933	ENSG00000242076	OTTHUMG00000151682	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5738	IGKV1-35	immunoglobulin kappa variable 1-35 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28932	ENSG00000253461	OTTHUMG00000151681	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5739	IGKV1-37	immunoglobulin kappa variable 1-37 (non-functional)	Approved	immunoglobulin gene		IGKV137, O14	2p11.2	28931	ENSG00000239862	OTTHUMG00000151689	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5740	IGKV1-39	immunoglobulin kappa variable 1-39 (gene/pseudogene)	Approved	immunoglobulin gene			2p11.2	28930	ENSG00000242371	OTTHUMG00000151678	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5759	IGKV1D-8	immunoglobulin kappa variable 1D-8	Approved	immunoglobulin gene			2p11.2	28904	ENSG00000239819	OTTHUMG00000151570	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5746	IGKV1D-12	immunoglobulin kappa variable 1D-12	Approved	immunoglobulin gene			2p11.2	28903	ENSG00000278857	OTTHUMG00000188272	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5747	IGKV1D-13	immunoglobulin kappa variable 1D-13	Approved	immunoglobulin gene			2p11.2	28902	ENSG00000276566	OTTHUMG00000188271	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5741	IGKV1-5	immunoglobulin kappa variable 1-5	Approved	immunoglobulin gene			2p11.2	28299	ENSG00000243466	OTTHUMG00000151560	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5748	IGKV1D-16	immunoglobulin kappa variable 1D-16	Approved	immunoglobulin gene			2p11.2	28901	ENSG00000241244	OTTHUMG00000151569	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5749	IGKV1D-17	immunoglobulin kappa variable 1D-17	Approved	immunoglobulin gene			2p11.2	28900	ENSG00000242766	OTTHUMG00000151610	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5750	IGKV1D-22	immunoglobulin kappa variable 1D-22 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28899	ENSG00000253365	OTTHUMG00000151604	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5751	IGKV1D-27	immunoglobulin kappa variable 1D-27 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28898	ENSG00000224607	OTTHUMG00000151607	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5752	IGKV1D-32	immunoglobulin kappa variable 1D-32 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28897	ENSG00000253191	OTTHUMG00000151614	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5753	IGKV1D-33	immunoglobulin kappa variable 1D-33	Approved	immunoglobulin gene			2p11.2	28896	ENSG00000239975	OTTHUMG00000151602	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5754	IGKV1D-35	immunoglobulin kappa variable 1D-35 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28895	ENSG00000232747	OTTHUMG00000151603	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5755	IGKV1D-37	immunoglobulin kappa variable 1D-37 (non-functional)	Approved	immunoglobulin gene		IGKV1D37, O4	2p11.2	28894	ENSG00000250036	OTTHUMG00000159960	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5756	IGKV1D-39	immunoglobulin kappa variable 1D-39	Approved	immunoglobulin gene			2p11.2	28893	ENSG00000251546	OTTHUMG00000159962	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5757	IGKV1D-42	immunoglobulin kappa variable 1D-42 (non-functional)	Approved	immunoglobulin gene			2p11.2	28892	ENSG00000211633	OTTHUMG00000151573	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5742	IGKV1-6	immunoglobulin kappa variable 1-6	Approved	immunoglobulin gene			2p11.2	28943	ENSG00000239855	OTTHUMG00000151559	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5758	IGKV1D-43	immunoglobulin kappa variable 1D-43	Approved	immunoglobulin gene			2p11.2	28891	ENSG00000242580	OTTHUMG00000151572	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5788	IGKV2-4	immunoglobulin kappa variable 2-4 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28929	ENSG00000253435	OTTHUMG00000151536	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5776	IGKV2-10	immunoglobulin kappa variable 2-10 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28928	ENSG00000253278	OTTHUMG00000151635	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5777	IGKV2-14	immunoglobulin kappa variable 2-14 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28927	ENSG00000253265	OTTHUMG00000151642	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5778	IGKV2-18	immunoglobulin kappa variable 2-18 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28926	ENSG00000254157	OTTHUMG00000151644	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5779	IGKV2-19	immunoglobulin kappa variable 2-19 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28925	ENSG00000253732	OTTHUMG00000151651	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5780	IGKV2-23	immunoglobulin kappa variable 2-23 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28924	ENSG00000253625	OTTHUMG00000151638	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5781	IGKV2-24	immunoglobulin kappa variable 2-24	Approved	immunoglobulin gene			2p11.2	28923	ENSG00000241294	OTTHUMG00000151655	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5782	IGKV2-26	immunoglobulin kappa variable 2-26 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28922	ENSG00000254098	OTTHUMG00000151648	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5783	IGKV2-28	immunoglobulin kappa variable 2-28	Approved	immunoglobulin gene			2p11.2	28921	ENSG00000244116	OTTHUMG00000151652	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5743	IGKV1-8	immunoglobulin kappa variable 1-8	Approved	immunoglobulin gene		IGKV18, L9	2p11.2	28942	ENSG00000240671	OTTHUMG00000151634	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5784	IGKV2-29	immunoglobulin kappa variable 2-29 (gene/pseudogene)	Approved	immunoglobulin gene			2p11.2	28920	ENSG00000253998	OTTHUMG00000151641	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5785	IGKV2-30	immunoglobulin kappa variable 2-30	Approved	immunoglobulin gene			2p11.2	28919	ENSG00000243238	OTTHUMG00000151692	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5786	IGKV2-36	immunoglobulin kappa variable 2-36 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28918	ENSG00000253487	OTTHUMG00000151683	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5787	IGKV2-38	immunoglobulin kappa variable 2-38 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28917	ENSG00000253592	OTTHUMG00000151685	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5789	IGKV2-40	immunoglobulin kappa variable 2-40	Approved	immunoglobulin gene			2p11.2	28916	ENSG00000273962	OTTHUMG00000188265	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5792	IGKV2D-10	immunoglobulin kappa variable 2D-10 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28890	ENSG00000253906	OTTHUMG00000151567	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5744	IGKV1-9	immunoglobulin kappa variable 1-9	Approved	immunoglobulin gene		IGKV19, L8	2p11.2	28941	ENSG00000241755	OTTHUMG00000151637	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5793	IGKV2D-14	immunoglobulin kappa variable 2D-14 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28889	ENSG00000254292	OTTHUMG00000151565	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5794	IGKV2D-18	immunoglobulin kappa variable 2D-18 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28888	ENSG00000254220	OTTHUMG00000151620	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5795	IGKV2D-19	immunoglobulin kappa variable 2D-19 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28887	ENSG00000253765	OTTHUMG00000151617	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5796	IGKV2D-23	immunoglobulin kappa variable 2D-23 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28886	ENSG00000254345	OTTHUMG00000151605	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5797	IGKV2D-24	immunoglobulin kappa variable 2D-24 (non-functional)	Approved	immunoglobulin gene			2p11.2	28885	ENSG00000241566	OTTHUMG00000151618	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5798	IGKV2D-26	immunoglobulin kappa variable 2D-26	Approved	immunoglobulin gene			2p11.2	28884	ENSG00000211623	OTTHUMG00000151606	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5799	IGKV2D-28	immunoglobulin kappa variable 2D-28	Approved	immunoglobulin gene			2p11.2	28883	ENSG00000242534	OTTHUMG00000151616	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5800	IGKV2D-29	immunoglobulin kappa variable 2D-29	Approved	immunoglobulin gene			2p11.2	28882	ENSG00000243264	OTTHUMG00000151619	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5801	IGKV2D-30	immunoglobulin kappa variable 2D-30	Approved	immunoglobulin gene			2p11.2	28881	ENSG00000239571	OTTHUMG00000151613	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5802	IGKV2D-36	immunoglobulin kappa variable 2D-36 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28880	ENSG00000253127	OTTHUMG00000151611	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5730	IGKV1-12	immunoglobulin kappa variable 1-12	Approved	immunoglobulin gene		IGKV112, L19	2p11.2	28940	ENSG00000243290	OTTHUMG00000151643	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5803	IGKV2D-38	immunoglobulin kappa variable 2D-38 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28879	ENSG00000254009	OTTHUMG00000159961	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5804	IGKV2D-40	immunoglobulin kappa variable 2D-40	Approved	immunoglobulin gene			2p11.2	28878	ENSG00000251039	OTTHUMG00000159963	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5821	IGKV3-7	immunoglobulin kappa variable 3-7 (non-functional)	Approved	immunoglobulin gene			2p11.2	28915	ENSG00000243063	OTTHUMG00000151636	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5815	IGKV3-11	immunoglobulin kappa variable 3-11	Approved	immunoglobulin gene			2p11.2	28914	ENSG00000241351	OTTHUMG00000151633	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5829	IGKV3D-7	immunoglobulin kappa variable 3D-7	Approved	immunoglobulin gene			2p11.2	28877	ENSG00000228325	OTTHUMG00000184555	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5816	IGKV3-15	immunoglobulin kappa variable 3-15	Approved	immunoglobulin gene			2p11.2	28913	ENSG00000244437	OTTHUMG00000151653	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5823	IGKV3D-11	immunoglobulin kappa variable 3D-11	Approved	immunoglobulin gene			2p11.2	28876	ENSG00000211632	OTTHUMG00000151563	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5834	IGKV4-1	immunoglobulin kappa variable 4-1	Approved	immunoglobulin gene		IGKV41, B3	2p11.2	28908	ENSG00000211598	OTTHUMG00000151533	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5817	IGKV3-20	immunoglobulin kappa variable 3-20	Approved	immunoglobulin gene			2p11.2	28912	ENSG00000239951	OTTHUMG00000151639	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5824	IGKV3D-15	immunoglobulin kappa variable 3D-15 (gene/pseudogene)	Approved	immunoglobulin gene			2p11.2	28875	ENSG00000224041	OTTHUMG00000151568	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5835	IGKV5-2	immunoglobulin kappa variable 5-2	Approved	immunoglobulin gene		IGKV52, B2	2p11.2	28907	ENSG00000211599	OTTHUMG00000151535	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5818	IGKV3-25	immunoglobulin kappa variable 3-25 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28911	ENSG00000253202	OTTHUMG00000151645	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5825	IGKV3D-20	immunoglobulin kappa variable 3D-20	Approved	immunoglobulin gene			2p11.2	28874	ENSG00000211625	OTTHUMG00000151615	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5836	IGKV6-21	immunoglobulin kappa variable 6-21 (non-functional)	Approved	immunoglobulin gene		IGKV621, A26	2p11.2	28906	ENSG00000211611	OTTHUMG00000151654	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5819	IGKV3-31	immunoglobulin kappa variable 3-31 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28910	ENSG00000253158	OTTHUMG00000151688	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5826	IGKV3D-25	immunoglobulin kappa variable 3D-25 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28873	ENSG00000254097	OTTHUMG00000151609	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5837	IGKV6D-21	immunoglobulin kappa variable 6D-21 (non-functional)	Approved	immunoglobulin gene		IGKV6D21, A10	2p11.2	28870	ENSG00000225523	OTTHUMG00000151608	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5820	IGKV3-34	immunoglobulin kappa variable 3-34 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28909	ENSG00000253860	OTTHUMG00000151693	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5827	IGKV3D-31	immunoglobulin kappa variable 3D-31 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28872	ENSG00000253999	OTTHUMG00000151612	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5838	IGKV6D-41	immunoglobulin kappa variable 6D-41 (non-functional)	Approved	immunoglobulin gene			2p11.2	28869	ENSG00000211626	OTTHUMG00000151621	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5828	IGKV3D-34	immunoglobulin kappa variable 3D-34 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28871	ENSG00000253501	OTTHUMG00000151601	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5839	IGKV7-3	immunoglobulin kappa variable 7-3 (pseudogene)	Approved	immunoglobulin pseudogene			2p11.2	28905	ENSG00000197794	OTTHUMG00000151534	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5731	IGKV1-13	immunoglobulin kappa variable 1-13 (gene/pseudogene)	Approved	immunoglobulin gene			2p11.2	28939	ENSG00000253497	OTTHUMG00000151647	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5719	IGKJ1	immunoglobulin kappa joining 1	Approved	immunoglobulin gene		J1	2p11.2	28950	ENSG00000211597	OTTHUMG00000151679	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5720	IGKJ2	immunoglobulin kappa joining 2	Approved	immunoglobulin gene		J2	2p11.2	28949	ENSG00000211596	OTTHUMG00000151691	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5721	IGKJ3	immunoglobulin kappa joining 3	Approved	immunoglobulin gene			2p11.2	28948	ENSG00000211595	OTTHUMG00000151680	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5722	IGKJ4	immunoglobulin kappa joining 4	Approved	immunoglobulin gene			2p11.2	28947	ENSG00000211594	OTTHUMG00000151695	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5723	IGKJ5	immunoglobulin kappa joining 5	Approved	immunoglobulin gene			2p11.2	28946	ENSG00000211593	OTTHUMG00000151676	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5716	IGKC	immunoglobulin kappa constant	Approved	immunoglobulin gene		HCAK1	2p11.2	3514	ENSG00000211592	OTTHUMG00000151684	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5732	IGKV1-16	immunoglobulin kappa variable 1-16	Approved	immunoglobulin gene		IGKV116, L1	2p11.2	28938	ENSG00000240864	OTTHUMG00000151649	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:5733	IGKV1-17	immunoglobulin kappa variable 1-17	Approved	immunoglobulin gene		IGKV117, A30	2p11.2	28937	ENSG00000240382	OTTHUMG00000151650	351	Immunoglobulin kappa locus at 2p11.2
+HGNC:15696	IGLCOR22-1	immunoglobulin lambda constant/OR22-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLC/OR22-1	22q12.2-q12.3	84096	ENSG00000254127	OTTHUMG00000030375	354	Immunoglobulin lambda (IGL) orphons
+HGNC:15697	IGLCOR22-2	immunoglobulin lambda constant/OR22-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGLC/OR22-2	22q12.2-q12.3	84086	ENSG00000271093	OTTHUMG00000184769	354	Immunoglobulin lambda (IGL) orphons
+HGNC:28614	IGLJCOR18	immunoglobulin lambda joining-constant/OR18 (pseudogene)	Approved	immunoglobulin pseudogene		IGLJ-COR18, IGLJ-C/OR18	18p11.31	204777	ENSG00000265243	OTTHUMG00000178366	354	Immunoglobulin lambda (IGL) orphons
+HGNC:5932	IGLV8OR8-1	immunoglobulin lambda variable 8/OR8-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV8/OR8-1	8q11.21	100996586	ENSG00000215177	OTTHUMG00000164149	354	Immunoglobulin lambda (IGL) orphons
+HGNC:15694	IGLVIVOR22-1	immunoglobulin lambda variable (IV)/OR22-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)/OR22-1	22q11.2-q12.1	84088	ENSG00000271138	OTTHUMG00000184784	354	Immunoglobulin lambda (IGL) orphons
+HGNC:15695	IGLVIVOR22-2	immunoglobulin lambda variable (IV)/OR22-2 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)/OR22-2	22q12.2-q12.3	84087	ENSG00000243519	OTTHUMG00000099456	354	Immunoglobulin lambda (IGL) orphons
+HGNC:5853	IGL	immunoglobulin lambda locus	Approved	gene with protein product	IGL@		22q11.2	3535			353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5894	IGLV2-5	immunoglobulin lambda variable 2-5 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28818	ENSG00000253234	OTTHUMG00000151216	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5895	IGLV2-8	immunoglobulin lambda variable 2-8	Approved	immunoglobulin gene			22q11.22	28817	ENSG00000278196	OTTHUMG00000151240	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5887	IGLV2-11	immunoglobulin lambda variable 2-11	Approved	immunoglobulin gene			22q11.22	28816	ENSG00000211668	OTTHUMG00000151236	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5888	IGLV2-14	immunoglobulin lambda variable 2-14	Approved	immunoglobulin gene			22q11.22	28815	ENSG00000211666	OTTHUMG00000151235	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5889	IGLV2-18	immunoglobulin lambda variable 2-18	Approved	immunoglobulin gene			22q11.22	28814	ENSG00000211664	OTTHUMG00000151232	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5890	IGLV2-23	immunoglobulin lambda variable 2-23	Approved	immunoglobulin gene			22q11.22	28813	ENSG00000211660	OTTHUMG00000151234	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5891	IGLV2-28	immunoglobulin lambda variable 2-28 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28812	ENSG00000253451	OTTHUMG00000151183	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5892	IGLV2-33	immunoglobulin lambda variable 2-33 (non-functional)	Approved	immunoglobulin gene			22q11.22	28811	ENSG00000211656	OTTHUMG00000151178	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5893	IGLV2-34	immunoglobulin lambda variable 2-34 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28810	ENSG00000253120	OTTHUMG00000151174	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5896	IGLV3-1	immunoglobulin lambda variable 3-1	Approved	immunoglobulin gene			22q11.22	28809	ENSG00000211673	OTTHUMG00000151224	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5876	IGLV1-36	immunoglobulin lambda variable 1-36	Approved	immunoglobulin gene			22q11.22	28826	ENSG00000211655	OTTHUMG00000151074	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5904	IGLV3-2	immunoglobulin lambda variable 3-2 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28808	ENSG00000253963	OTTHUMG00000151212	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5915	IGLV3-4	immunoglobulin lambda variable 3-4 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28807	ENSG00000226420	OTTHUMG00000151238	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5916	IGLV3-6	immunoglobulin lambda variable 3-6 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28806	ENSG00000253448	OTTHUMG00000151222	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5917	IGLV3-7	immunoglobulin lambda variable 3-7 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28805	ENSG00000254077	OTTHUMG00000151208	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5918	IGLV3-9	immunoglobulin lambda variable 3-9 (gene/pseudogene)	Approved	immunoglobulin gene			22q11.22	28804	ENSG00000211670	OTTHUMG00000151239	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5897	IGLV3-10	immunoglobulin lambda variable 3-10	Approved	immunoglobulin gene			22q11.22	28803	ENSG00000211669	OTTHUMG00000151237	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5898	IGLV3-12	immunoglobulin lambda variable 3-12	Approved	immunoglobulin gene			22q11.22	28802	ENSG00000211667	OTTHUMG00000151233	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5899	IGLV3-13	immunoglobulin lambda variable 3-13 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28801	ENSG00000253590	OTTHUMG00000151215	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5900	IGLV3-15	immunoglobulin lambda variable 3-15 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28800	ENSG00000253786	OTTHUMG00000151210	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5901	IGLV3-16	immunoglobulin lambda variable 3-16	Approved	immunoglobulin gene			22q11.22	28799	ENSG00000211665	OTTHUMG00000151231	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5877	IGLV1-40	immunoglobulin lambda variable 1-40	Approved	immunoglobulin gene			22q11.22	28825	ENSG00000211653	OTTHUMG00000151072	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5902	IGLV3-17	immunoglobulin lambda variable 3-17 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28798	ENSG00000253152	OTTHUMG00000151227	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5903	IGLV3-19	immunoglobulin lambda variable 3-19	Approved	immunoglobulin gene			22q11.22	28797	ENSG00000211663	OTTHUMG00000151226	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5905	IGLV3-21	immunoglobulin lambda variable 3-21	Approved	immunoglobulin gene			22q11.22	28796	ENSG00000211662	OTTHUMG00000151213	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5906	IGLV3-22	immunoglobulin lambda variable 3-22 (gene/pseudogene)	Approved	immunoglobulin gene			22q11.22	28795	ENSG00000211661	OTTHUMG00000151229	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5907	IGLV3-24	immunoglobulin lambda variable 3-24 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28794	ENSG00000253822	OTTHUMG00000151230	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5908	IGLV3-25	immunoglobulin lambda variable 3-25	Approved	immunoglobulin gene			22q11.22	28793	ENSG00000211659	OTTHUMG00000151221	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5909	IGLV3-26	immunoglobulin lambda variable 3-26 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28792	ENSG00000253913	OTTHUMG00000151211	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5910	IGLV3-27	immunoglobulin lambda variable 3-27	Approved	immunoglobulin gene			22q11.22	28791	ENSG00000211658	OTTHUMG00000151171	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5911	IGLV3-29	immunoglobulin lambda variable 3-29 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28790	ENSG00000253338	OTTHUMG00000151168	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5912	IGLV3-30	immunoglobulin lambda variable 3-30 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28789	ENSG00000253329	OTTHUMG00000151182	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5878	IGLV1-41	immunoglobulin lambda variable 1-41 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28824	ENSG00000253818	OTTHUMG00000151056	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5913	IGLV3-31	immunoglobulin lambda variable 3-31 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28788	ENSG00000253920	OTTHUMG00000151179	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5914	IGLV3-32	immunoglobulin lambda variable 3-32 (non-functional)	Approved	immunoglobulin gene			22q11.22	28787	ENSG00000211657	OTTHUMG00000151166	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5919	IGLV4-3	immunoglobulin lambda variable 4-3	Approved	immunoglobulin gene			22q11.22	28786	ENSG00000211672	OTTHUMG00000151244	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5920	IGLV4-60	immunoglobulin lambda variable 4-60	Approved	immunoglobulin gene			22q11.22	28785	ENSG00000211639	OTTHUMG00000150851	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5921	IGLV4-69	immunoglobulin lambda variable 4-69	Approved	immunoglobulin gene			22q11.22	28784	ENSG00000211637	OTTHUMG00000150857	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5922	IGLV5-37	immunoglobulin lambda variable 5-37	Approved	immunoglobulin gene			22q11.22	28783	ENSG00000211654	OTTHUMG00000151069	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5923	IGLV5-39	immunoglobulin lambda variable 5-39	Approved	immunoglobulin gene			22q11.2 alternate reference locus	28782			353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5924	IGLV5-45	immunoglobulin lambda variable 5-45	Approved	immunoglobulin gene			22q11.22	28781	ENSG00000211650	OTTHUMG00000151054	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5925	IGLV5-48	immunoglobulin lambda variable 5-48 (non-functional)	Approved	immunoglobulin gene			22q11.22	28780	ENSG00000211647	OTTHUMG00000151041	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5926	IGLV5-52	immunoglobulin lambda variable 5-52	Approved	immunoglobulin gene			22q11.22	28779	ENSG00000211643	OTTHUMG00000151049	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5879	IGLV1-44	immunoglobulin lambda variable 1-44	Approved	immunoglobulin gene			22q11.22	28823	ENSG00000211651	OTTHUMG00000151050	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5927	IGLV6-57	immunoglobulin lambda variable 6-57	Approved	immunoglobulin gene			22q11.22	28778	ENSG00000211640	OTTHUMG00000150996	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5928	IGLV7-35	immunoglobulin lambda variable 7-35 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28777	ENSG00000253631	OTTHUMG00000151067	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5929	IGLV7-43	immunoglobulin lambda variable 7-43	Approved	immunoglobulin gene			22q11.22	28776	ENSG00000211652	OTTHUMG00000151053	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5930	IGLV7-46	immunoglobulin lambda variable 7-46 (gene/pseudogene)	Approved	immunoglobulin gene			22q11.22	28775	ENSG00000211649	OTTHUMG00000151040	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5931	IGLV8-61	immunoglobulin lambda variable 8-61	Approved	immunoglobulin gene			22q11.22	28774	ENSG00000211638	OTTHUMG00000150844	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5933	IGLV9-49	immunoglobulin lambda variable 9-49	Approved	immunoglobulin gene			22q11.22	28773	ENSG00000223350	OTTHUMG00000151045	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5884	IGLV10-54	immunoglobulin lambda variable 10-54	Approved	immunoglobulin gene			22q11.22	28772	ENSG00000211642	OTTHUMG00000150993	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5885	IGLV10-67	immunoglobulin lambda variable 10-67 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28771	ENSG00000253794	OTTHUMG00000150849	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5886	IGLV11-55	immunoglobulin lambda variable 11-55 (non-functional)	Approved	immunoglobulin gene			22q11.22	28770	ENSG00000211641	OTTHUMG00000150995	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5934	IGLVI-20	immunoglobulin lambda variable (I)-20 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-20	22q11.22	28769	ENSG00000254240	OTTHUMG00000151242	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5880	IGLV1-47	immunoglobulin lambda variable 1-47	Approved	immunoglobulin gene			22q11.22	28822	ENSG00000211648	OTTHUMG00000151048	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5935	IGLVI-38	immunoglobulin lambda variable (I)-38 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-38	22q11.22	28768	ENSG00000253889	OTTHUMG00000151073	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5936	IGLVI-42	immunoglobulin lambda variable (I)-42 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-42	22q11.22	28767	ENSG00000254175	OTTHUMG00000151043	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5937	IGLVI-56	immunoglobulin lambda variable (I)-56 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-56	22q11.22	28766	ENSG00000253126	OTTHUMG00000151583	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5938	IGLVI-63	immunoglobulin lambda variable (I)-63 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-63	22q11.22	28765	ENSG00000253752	OTTHUMG00000150855	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5939	IGLVI-68	immunoglobulin lambda variable (I)-68 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-68	22q11.22	28764	ENSG00000254355	OTTHUMG00000150853	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5940	IGLVI-70	immunoglobulin lambda variable (I)-70 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(I)-70	22q11.22	28763	ENSG00000253239	OTTHUMG00000150834	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5941	IGLVIV-53	immunoglobulin lambda variable (IV)-53 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)-53	22q11.22	28762	ENSG00000253935	OTTHUMG00000151585	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5942	IGLVIV-59	immunoglobulin lambda variable (IV)-59 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)-59	22q11.22	28761	ENSG00000254308	OTTHUMG00000150847	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5943	IGLVIV-64	immunoglobulin lambda variable (IV)-64 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)-64	22q11.22	28760	ENSG00000253242	OTTHUMG00000150852	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5944	IGLVIV-65	immunoglobulin lambda variable (IV)-65 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)-65	22q11.22	28759	ENSG00000254161	OTTHUMG00000150861	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5881	IGLV1-50	immunoglobulin lambda variable 1-50 (non-functional)	Approved	immunoglobulin gene			22q11.22	28821	ENSG00000211645	OTTHUMG00000151051	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:15692	IGLVIV-66-1	immunoglobulin lambda variable (IV)-66-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(IV)-66-1	22q11.22	84097	ENSG00000253874	OTTHUMG00000150862	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5945	IGLVV-58	immunoglobulin lambda variable (V)-58 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(V)-58	22q11.22	28758	ENSG00000253637	OTTHUMG00000150893	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5946	IGLVV-66	immunoglobulin lambda variable (V)-66 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(V)-66	22q11.22	28757	ENSG00000254075	OTTHUMG00000151584	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:15689	IGLVVI-22-1	immunoglobulin lambda variable (VI)-22-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(VI)-22-1	22q11.22	84091	ENSG00000253546	OTTHUMG00000151219	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:15690	IGLVVI-25-1	immunoglobulin lambda variable (VI)-25-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(VI)-25-1	22q11.22	84090	ENSG00000253779	OTTHUMG00000151586	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:15691	IGLVVII-41-1	immunoglobulin lambda variable (VII)-41-1 (pseudogene)	Approved	immunoglobulin pseudogene		IGLV(VII)-41-1	22q11.22	84089	ENSG00000254073	OTTHUMG00000151296	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5863	IGLJ1	immunoglobulin lambda joining 1	Approved	immunoglobulin gene			22q11.22	28833	ENSG00000211674	OTTHUMG00000151225	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5864	IGLJ2	immunoglobulin lambda joining 2	Approved	immunoglobulin gene			22q11.22	28832	ENSG00000211676	OTTHUMG00000151243	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5865	IGLJ3	immunoglobulin lambda joining 3	Approved	immunoglobulin gene			22q11.22	28831	ENSG00000211678	OTTHUMG00000151220	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5866	IGLJ4	immunoglobulin lambda joining 4 (non-functional)	Approved	immunoglobulin gene			22q11.22	28830	ENSG00000211680	OTTHUMG00000151184	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5882	IGLV1-51	immunoglobulin lambda variable 1-51	Approved	immunoglobulin gene			22q11.22	28820	ENSG00000211644	OTTHUMG00000151035	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5867	IGLJ5	immunoglobulin lambda joining 5 (non-functional)	Approved	immunoglobulin gene			22q11.22	28829	ENSG00000211681	OTTHUMG00000151170	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5868	IGLJ6	immunoglobulin lambda joining 6	Approved	immunoglobulin gene			22q11.22	28828	ENSG00000211682	OTTHUMG00000151181	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5869	IGLJ7	immunoglobulin lambda joining 7	Approved	immunoglobulin gene			22q11.22	28827	ENSG00000211684	OTTHUMG00000151167	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5855	IGLC1	immunoglobulin lambda constant 1	Approved	immunoglobulin gene	IGLC		22q11.22	3537	ENSG00000211675	OTTHUMG00000151218	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5856	IGLC2	immunoglobulin lambda constant 2	Approved	immunoglobulin gene	IGLC		22q11.22	3538	ENSG00000211677	OTTHUMG00000151214	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5857	IGLC3	immunoglobulin lambda constant 3 (Kern-Oz+ marker)	Approved	immunoglobulin gene	IGLC		22q11.22	3539	ENSG00000211679	OTTHUMG00000151217	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5858	IGLC4	immunoglobulin lambda constant 4 (pseudogene)	Approved	immunoglobulin pseudogene	IGLC		22q11.22	3540	ENSG00000254029	OTTHUMG00000151180	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5859	IGLC5	immunoglobulin lambda constant 5 (pseudogene)	Approved	immunoglobulin pseudogene	IGLC		22q11.22	3541	ENSG00000254030	OTTHUMG00000151176	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5860	IGLC6	immunoglobulin lambda constant 6 (gene/pseudogene)	Approved	immunoglobulin gene	IGLC		22q11.22	3542	ENSG00000222037	OTTHUMG00000151165	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5861	IGLC7	immunoglobulin lambda constant 7	Approved	immunoglobulin gene			22q11.22	28834	ENSG00000211685	OTTHUMG00000151017	353	Immunoglobulin lambda locus at 22q11.2
+HGNC:5883	IGLV1-62	immunoglobulin lambda variable 1-62 (pseudogene)	Approved	immunoglobulin pseudogene			22q11.22	28819	ENSG00000253823	OTTHUMG00000150848	353	Immunoglobulin lambda locus at 22q11.2
