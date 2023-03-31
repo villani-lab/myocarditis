@@ -1,7 +1,6 @@
 ---
 title: "Supplemental Figure 1"
 output: rmarkdown::github_document
-always_allow_html: true
 ---
 
 ## Setup
@@ -15,6 +14,7 @@ library(parameters)
 library(ggforestplot)
 library(rmarkdown)
 library(reticulate)
+library(knitr)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
@@ -185,7 +185,7 @@ lineage_order <- c("Myeloid", "CD8 and NK", "CD4", "B and Plasma", "pDCs and cDC
 condition_lineage_percents <- condition_get_percent_per_level(condition_blood_obs_filtered, level='lineage') %>%
     set_factor_order(col_name = 'lineage_names', order = lineage_order)
 condition_lineage_model <- condition_fit_model(condition_lineage_percents, level='lineage')
-paged_table(condition_lineage_model %>%
+kable(condition_lineage_model %>%
               select(!c(data, model)) %>%
               unnest(cols = c(condition_coef, condition_se, condition_pval)))
 
@@ -205,7 +205,7 @@ troponin_lineage_percents <- troponin_get_percent_per_level(troponin_blood_obs_f
   set_factor_order(col_name = 'lineage_names', order = lineage_order)
 troponin_lineage_model <- troponin_fit_model(troponin_lineage_percents, level='lineage')
 
-paged_table(troponin_lineage_model %>%
+kable(troponin_lineage_model %>%
               select(!c(data, model)) %>%
               unnest(cols = c(trop_coef, trop_se, trop_pval)))
 troponin_plot_model(troponin_lineage_model, troponin_lineage_percents, "All Cells",

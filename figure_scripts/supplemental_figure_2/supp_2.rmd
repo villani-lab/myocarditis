@@ -1,0 +1,75 @@
+---
+title: "Supplemental Figure 2"
+output: rmarkdown::github_document
+---
+
+
+## Setup
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(tidyverse)
+library(glue)
+library(RColorBrewer)
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('stacked_bar.R')
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import scanpy as sc
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+
+```{python results='hide', read_data}
+tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
+tissue_b = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_b.zarr')
+```
+
+## Supplemental Figure 2A
+
+```{python results='hold', supp_2a}
+tissue_t.obs['Condition'] = [x.capitalize() for x in tissue_t.obs['condition']]
+tissue_t_anndata = tissue_t.to_anndata()
+sc.tl.embedding_density(tissue_t_anndata, groupby='Condition')
+sc.pl.embedding_density(tissue_t_anndata, basis='umap', key=f'umap_density_Condition', colorbar_loc=None)
+```
+
+
+## Supplemental Figure 2B
+
+```{python results='hold', supp_2b_get_data}
+stacked_bar_df = python_functions.get_stacked_bar_df(tissue_t, 't')
+stacked_bar_order = tissue_t.obs['umap_name'].cat.categories.values
+```
+
+```{r supp_2b_plot}
+stacked_bar_order = py$stacked_bar_order[!str_detect(py$stacked_bar_order, 'Doublets')]
+plot_clust_perc_by_donor(py$stacked_bar_df, 't', cluster_order = stacked_bar_order)
+```
+
+
+## Supplemental Figure 2E
+
+```{python}
+python_functions.hex_featureplot(tissue_t, 'STMN1', cmap=python_functions.blues_cmap)
+```
+
+
+## Supplemental Figure 2F
+
+```{python}
+python_functions.plot_umap(tissue_b, 'Tissue: B and Plasma', python_functions.tissue_b_pal, marker_multiplier=5)
+```
+

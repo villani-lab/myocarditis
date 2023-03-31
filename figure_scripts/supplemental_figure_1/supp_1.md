@@ -13,6 +13,7 @@ library(parameters)
 library(ggforestplot)
 library(rmarkdown)
 library(reticulate)
+library(knitr)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
@@ -209,7 +210,7 @@ lineage_order <- c("Myeloid", "CD8 and NK", "CD4", "B and Plasma", "pDCs and cDC
 condition_lineage_percents <- condition_get_percent_per_level(condition_blood_obs_filtered, level='lineage') %>%
     set_factor_order(col_name = 'lineage_names', order = lineage_order)
 condition_lineage_model <- condition_fit_model(condition_lineage_percents, level='lineage')
-paged_table(condition_lineage_model %>%
+kable(condition_lineage_model %>%
               select(!c(data, model)) %>%
               unnest(cols = c(condition_coef, condition_se, condition_pval)))
 
@@ -229,13 +230,13 @@ condition_plot_ci_interval(condition_lineage_model, 'Blood Global', level='linea
 
 ![](supp_1_files/figure-gfm/supp_1h-14.png)<!-- -->
 
-<div data-pagedtable="false">
-
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["lineage_names"],"name":[1],"type":["fct"],"align":["left"]},{"label":["condition_coef"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["condition_se"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["condition_pval"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["padj"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["CI_low"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["CI_high"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"B and Plasma","2":"-0.2875080","3":"0.4111846","4":"0.4917424","5":"0.6192912","6":"-1.140253","7":"0.5652366"},{"1":"CD4","2":"-0.4129804","3":"0.5957525","4":"0.4954330","5":"0.6192912","6":"-1.648495","7":"0.8225347"},{"1":"CD8 and NK","2":"-0.7080733","3":"0.5348113","4":"0.1991061","5":"0.6192912","6":"-1.817204","7":"0.4010575"},{"1":"Myeloid","2":"0.1249661","3":"0.3911682","4":"0.7523848","5":"0.7523848","6":"-0.686267","7":"0.9361992"},{"1":"pDCs and cDCs","2":"-0.3040933","3":"0.4057097","4":"0.4614757","5":"0.6192912","6":"-1.145484","7":"0.5372972"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-
-</div>
+| lineage\_names | condition\_coef | condition\_se | condition\_pval |      padj |    CI\_low |  CI\_high |
+| :------------- | --------------: | ------------: | --------------: | --------: | ---------: | --------: |
+| B and Plasma   |     \-0.2875080 |     0.4111846 |       0.4917424 | 0.6192912 | \-1.140253 | 0.5652366 |
+| CD4            |     \-0.4129804 |     0.5957525 |       0.4954330 | 0.6192912 | \-1.648495 | 0.8225347 |
+| CD8 and NK     |     \-0.7080733 |     0.5348113 |       0.1991061 | 0.6192912 | \-1.817204 | 0.4010575 |
+| Myeloid        |       0.1249661 |     0.3911682 |       0.7523848 | 0.7523848 | \-0.686267 | 0.9361992 |
+| pDCs and cDCs  |     \-0.3040933 |     0.4057097 |       0.4614757 | 0.6192912 | \-1.145484 | 0.5372972 |
 
 ## Supplemental Figure 1I
 
@@ -248,7 +249,7 @@ troponin_lineage_percents <- troponin_get_percent_per_level(troponin_blood_obs_f
   set_factor_order(col_name = 'lineage_names', order = lineage_order)
 troponin_lineage_model <- troponin_fit_model(troponin_lineage_percents, level='lineage')
 
-paged_table(troponin_lineage_model %>%
+kable(troponin_lineage_model %>%
               select(!c(data, model)) %>%
               unnest(cols = c(trop_coef, trop_se, trop_pval)))
 troponin_plot_model(troponin_lineage_model, troponin_lineage_percents, "All Cells",
@@ -257,10 +258,10 @@ troponin_plot_model(troponin_lineage_model, troponin_lineage_percents, "All Cell
 
 ![](supp_1_files/figure-gfm/supp_1i-1.png)<!-- -->
 
-<div data-pagedtable="false">
-
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["lineage_names"],"name":[1],"type":["fct"],"align":["left"]},{"label":["trop_coef"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["trop_se"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["trop_pval"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["padj"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"B and Plasma","2":"-0.005078876","3":"0.003649957","4":"0.184370523","5":"0.225683480"},{"1":"CD4","2":"-0.030550817","3":"0.009928954","4":"0.007669999","5":"0.012783332"},{"1":"CD8 and NK","2":"-0.056968896","3":"0.018063713","4":"0.006555541","5":"0.012783332"},{"1":"Myeloid","2":"0.077072984","3":"0.019174657","4":"0.001114196","5":"0.005570979"},{"1":"pDCs and cDCs","2":"-0.003623845","3":"0.002868027","4":"0.225683480","5":"0.225683480"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-
-</div>
+| lineage\_names |  trop\_coef |  trop\_se | trop\_pval |      padj |
+| :------------- | ----------: | --------: | ---------: | --------: |
+| B and Plasma   | \-0.0050789 | 0.0036500 |  0.1843705 | 0.2256835 |
+| CD4            | \-0.0305508 | 0.0099290 |  0.0076700 | 0.0127833 |
+| CD8 and NK     | \-0.0569689 | 0.0180637 |  0.0065555 | 0.0127833 |
+| Myeloid        |   0.0770730 | 0.0191747 |  0.0011142 | 0.0055710 |
+| pDCs and cDCs  | \-0.0036238 | 0.0028680 |  0.2256835 | 0.2256835 |

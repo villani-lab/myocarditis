@@ -1,0 +1,221 @@
+---
+title: "Figure 1"
+output: rmarkdown::github_document
+---
+
+## Set up
+
+
+Load R libraries
+```{r message=FALSE}
+# load packages
+library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(knitr)
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('masc.R')
+source('plot_masc.R')
+source('blood_fatal_abundance.R')
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+
+```{python results = 'hide', read_data}
+tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
+blood_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global.zarr')
+```
+
+## Figure 1A
+
+```{r message=FALSE, fig.width = 15, fig.height = 10, fig_1a}
+# read in data
+formatted_df <- read_csv('/projects/home/ikernin/github_repos/test_myocarditis/tables/tidy_fig1A.csv')
+
+# get matrix
+mtx <- formatted_df %>%
+  select(!donor) %>%
+  as.matrix()
+rownames(mtx) <- formatted_df$donor
+mtx <- t(mtx)
+mtx[which(is.na(mtx))] <- 0
+rownames(mtx) <- c('Age', 'Sex:Male', 'Fatal',
+                   'Combination Therapy', 'sc-Heart',
+                   'sc-PBMC', 'bulk-Heart', 'bulk-Tumor', 'Serum')
+
+# color fatal sample names
+col_name_color <- unname(ifelse(mtx['Fatal',] == '1', 'red', 'black'))
+mtx <- mtx[which(rownames(mtx) != 'Fatal'), ] # remove fatal row
+
+# col split
+col_split <- factor(c(rep('Myocarditis', 28), rep('Control', 8)))
+col_split <- fct_inorder(col_split)
+
+# row split
+row_split <- c(rep('meta', 3), rep('analyses',5))
+row_split <- factor(row_split, levels=unique(row_split))
+
+# colors
+col_age = c(brewer.pal(9, 'YlOrRd'), '#400010')
+make_rect <- function(j, i, x, y, width, height, fill) {
+  grid.rect(x = x, y = y,
+            width = width, height = height,
+            gp = gpar(col = "black"))
+  if (i == 1){ # ie age
+    grid.rect(x = x, y = y,
+              width = width, height = height,
+              gp = gpar(fill = col_age[as.numeric(mtx[i,j])], col='black'))
+  }
+  else if (as.numeric(mtx[i,j]) == 1){
+    grid.rect(x = x, y = y,
+              width = width, height = height,
+              gp = gpar(col="black", fill='#5A5A5A'))
+  } else if (as.numeric(mtx[i,j]) == 0){
+    grid.rect(x = x, y = y,
+              width = width, height = height,
+              gp = gpar(col="black", fill='white'))
+  }
+}
+
+# make heatmap body
+ht <- Heatmap(mtx,
+        cell_fun = make_rect,
+        rect_gp = gpar(type = "none"),
+        border_gp = gpar(col = "black"),
+        cluster_columns = FALSE,
+        cluster_rows = FALSE,
+        show_row_names = TRUE,
+        row_title = NULL,
+        row_split = row_split,
+        row_gap = unit(2, 'mm'),
+        column_names_gp = gpar(col = col_name_color),
+        column_names_side = "top",
+        show_heatmap_legend = FALSE,
+        row_names_side = "left",
+        show_column_names = TRUE,
+        column_split = col_split,
+        column_names_rot=45,
+        width = ncol(mtx)*unit(6, "mm"),
+        height = nrow(mtx)*unit(6, "mm"),
+        column_gap = unit(3, "mm"))
+
+
+# make legends
+age_lgd <- Legend(labels = c("20-25","40-45","50-55","55-60","60-65",
+                               "65-70","70-75","75-80","80-85","85-90"),
+                  title = "Age",
+                  legend_gp = gpar(fill=col_age),
+                  border = 'black')
+
+fill_lgd <- Legend(labels = c('True', 'False'),
+                   title = 'Fill',
+                   labels_gp = gpar(col = c('black', 'black')),
+                   legend_gp = gpar(fill=c('#5A5A5A', 'white')),
+                   border = 'black')
+
+fatal_lgd <- Legend(labels = c('Non-Fatal', 'Fatal'),
+                   title = 'Name',
+                   labels_gp = gpar(col = c('black', 'red')),
+                   legend_gp = gpar(fill= c('white', 'white')))
+
+pd <- packLegend(age_lgd, fill_lgd, fatal_lgd,
+                 max_height = nrow(mtx)*unit(6, "mm"))
+
+
+draw(ht)
+draw(pd, x = unit(0.93, "npc"), y = unit(0.43, "npc"))
+
+```
+
+
+Figure 1C
+
+```{python results = 'hold', fig_1c}
+python_functions.plot_umap(tissue_global, 'Tissue: Global', python_functions.tissue_global_pal)
+python_functions.plot_umap(blood_global, 'Blood: Global', python_functions.blood_global_pal, marker_multiplier=28)
+```
+
+
+Figure 1D
+
+```{r message = F, results = 'hold', fig.width = 15, fig.height = 10, fig_1d}
+# read in tissue cell metadata
+tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
+filtered_df  <- masc_filter(tissue_global_obs)
+
+# run masc analysis
+lineage_masc_res <- MASC(filtered_df,
+                         cluster = filtered_df$umap_number,
+                         contrast = "condition",
+                         random_effects = "donor",
+                         fixed_effects = "",
+                         verbose = TRUE, save_models = FALSE)
+
+# add cluster information to results
+lineage_masc_formatted <- lineage_masc_res %>%
+  as_tibble() %>%
+  mutate(lineage_number = unlist(map( str_split(cluster, 'cluster'), 2)),
+         lineage_number = as.numeric(lineage_number)) %>%
+  left_join(filtered_df %>%
+              select(umap_name, umap_number) %>%
+              distinct(),
+            by = c('lineage_number' = 'umap_number')) %>%
+  mutate(lineage_names = unlist(map(str_split(umap_name, '\\. '), 2))) %>%
+  relocate(lineage_names, lineage_number) %>%
+  select(!c(cluster, umap_name))
+
+# FDR adjust p-values
+lineage_masc_formatted['p.adj'] <- p.adjust(lineage_masc_formatted$model.pvalue, method = 'fdr')
+kable(lineage_masc_formatted)
+
+# plot results
+plot_masc_by_lineage(lineage_masc_formatted, filtered_df)
+```
+
+
+## Figure 1E
+
+```{r message = F, results = 'hold', fig_1e}
+# read in all blood cell metadata
+blood_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global_obs.csv')
+fatal_blood_obs_filtered <- fatal_filter_df(blood_global_obs)
+
+# fit lineage level model
+lineage_order <- c("Myeloid", "CD8 and NK", "CD4", "B and Plasma", "pDCs and cDCs")
+fatal_lineage_percents <- fatal_get_percent_per_level(fatal_blood_obs_filtered, level='lineage') %>%
+    set_factor_order(col_name = 'lineage_names', order = lineage_order)
+fatal_lineage_model <- fatal_fit_model(fatal_lineage_percents, level='lineage')
+kable(fatal_lineage_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
+
+fatal_plot_sample_perc(fatal_lineage_percents, title='Blood Global', level='lineage')
+fatal_plot_ci_interval(fatal_lineage_model, 'Blood Global', level='lineage')
+
+```
+
+
+

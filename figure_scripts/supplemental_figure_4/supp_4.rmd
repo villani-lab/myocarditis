@@ -1,0 +1,150 @@
+---
+title: "Supplemental Figure 4"
+output: rmarkdown::github_document
+---
+
+
+## Setup
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(tidyverse)
+library(glue)
+library(rlang)
+library(parameters)
+library(ggforestplot)
+library(rmarkdown)
+library(knitr)
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('stacked_bar.R')
+source('blood_condition_abundance.R')
+source('blood_fatal_abundance.R')
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+
+```{python results='hide', read_data}
+blood_cd8_nk = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd8.zarr')
+tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
+```
+
+
+## Supplemental Figure 4A
+
+```{python results='hold', supp_4a}
+# plot gene featureplots
+supp_fig4a_genes = ['CD3D', 'CD8A', 'FCER1G', 'CD28']
+python_functions.multi_hex_featureplot(blood_cd8_nk,
+                      supp_fig4a_genes,
+                      ncol=2,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+
+# plot percent_mito and n_genes
+python_functions.hex_plot(blood_cd8_nk, '% Mito', n_genes=False, gridsize=200, cmap=python_functions.blues_cmap)
+python_functions.hex_plot(blood_cd8_nk, 'N Genes', n_genes=True, gridsize=200, cmap=python_functions.blues_cmap)
+```
+
+
+## Supplemental Figure 4B
+
+```{r message = F, results = 'hold', supp_4b}
+# read in all blood cell metadata
+blood_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global_obs.csv')
+condition_blood_obs_filtered <- condition_filter_df(blood_global_obs)
+
+# fit cluster level model
+condition_cluster_percents <- condition_get_percent_per_level(condition_blood_obs_filtered, level='cluster')
+condition_cluster_model <- condition_fit_model(condition_cluster_percents, level='cluster')
+condition_cluster_lineages <- condition_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
+
+# get get cd8 lineage level results
+cd8_order <- c('b-CD8T: ZNF683 GNLY',
+               'b-CD8T: CX3CR1 IKZF2',
+               'b-CD8T: TCF7 ITGb',
+               'b-CD8T: HLA-DRA RGS1',
+               'b-CD8T: IL7R GZMK',
+               'b-CD8T: cycling',
+               'b-CD8T: CCL3 IFNG',
+               'b-CD8T/NK: MT-high',
+               'b-MAIT: TRAV1-2 KLRb',
+               "b-NK: SPON2 FCER1G",
+               'b-NK: KIR2DL3 KLRC2',
+               'b-NK: SPTSSB XCL1'
+        )
+condition_cd8_percents <- condition_cluster_percents %>% filter(cluster_names %in% cd8_order)
+condition_cd8_percents <- set_factor_order(condition_cd8_percents , col_name = 'cluster_names', order = cd8_order)
+condition_cd8_model <- condition_cluster_model %>% filter(cluster_names %in% cd8_order)
+condition_cd8_model <- set_factor_order(condition_cd8_model , col_name = 'cluster_names', order = cd8_order)
+kable(condition_cd8_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(condition_coef, condition_se, condition_pval)))
+
+condition_plot_sample_perc(condition_cd8_percents, title='CD4')
+condition_plot_ci_interval(condition_cd8_model, 'CD4', level='cluster')
+```
+
+
+## Supplemental Figure 4C
+
+```{r message = F, results = 'hold', supp_4c}
+# read in all blood cell metadata
+fatal_blood_obs_filtered <- fatal_filter_df(blood_global_obs)
+
+# fit cluster level model
+fatal_cluster_percents <- fatal_get_percent_per_level(fatal_blood_obs_filtered, level='cluster')
+fatal_cluster_model <- fatal_fit_model(fatal_cluster_percents, level='cluster')
+fatal_cluster_lineages <- fatal_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
+
+# get get cd8 lineage level results
+fatal_cd8_percents <- fatal_cluster_percents %>% filter(cluster_names %in% cd8_order)
+fatal_cd8_percents <- set_factor_order(fatal_cd8_percents , col_name = 'cluster_names', order = cd8_order)
+fatal_cd8_model <- fatal_cluster_model %>% filter(cluster_names %in% cd8_order)
+fatal_cd8_model <- set_factor_order(fatal_cd8_model , col_name = 'cluster_names', order = cd8_order)
+kable(fatal_cd8_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
+
+fatal_plot_sample_perc(fatal_cd8_percents, title='CD4')
+fatal_plot_ci_interval(fatal_cd8_model, 'CD4', level='cluster')
+
+```
+
+
+## Supplemental Figure 4J
+
+```{python supp_4j}
+supp_fig4j_genes = ['CXCR3', 'CX3CR1']
+python_functions.multi_hex_featureplot(tissue_t,
+                      supp_fig4j_genes,
+                      ncol=2,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+```
+
+
+
+
+
+
+
+
+
+
+
+

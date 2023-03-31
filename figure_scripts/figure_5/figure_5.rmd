@@ -1,0 +1,656 @@
+---
+title: "Figure 5"
+output: rmarkdown::github_document
+---
+
+## Set up
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+# load packages
+library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(DESeq2)
+library(knitr)
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('masc.R')
+source('plot_masc.R')
+source('de.R')
+```
+
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.sparse import csr_matrix
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+
+Read in single-cell data
+```{python read_data}
+tissue_nonimmune = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr')
+tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
+```
+
+
+## Figure 5A
+
+```{python fig_5a}
+python_functions.plot_umap(tissue_nonimmune, 'Tissue: Non-Immune', python_functions.tissue_nonimmune_pal, fig_size=(6, 5), marker_multiplier=15)
+```
+
+
+## Figure 5B
+
+```{python results='hold', fig_5b}
+# split data into endothelial and non-endothelial cells
+endothelial_clusters = ['1. Capillary EC: RGCC CA4',
+                        '9. Arterial EC: RBP7 BTNL9',
+                        '5. Arterial EC: HEY1 SEMA3G',
+                        '2. Capillary EC: CXCL2 JUN',
+                        '11. Venous EC: ACKR1 PLVAP',
+                        '14. Inflammatory EC: CXCL9 IDO1',
+                        '13. Endocardial: NPR3 POSTN',
+                        '3. Capillary EC: VWF CD36',
+                        '15. Lymphatic EC: PDPN CCL21']
+non_endothelial_clusters = ['8. Smooth muscle: TAGLN MYH11',
+                            '7. Pericytes: KCNJ8 ABCC9',
+                            '4. Fibroblasts: DCN LUM',
+                            '16. Myofibroblasts: ACTA2 COL14A1',
+                            '6. Pericytes: HLA-DRB1 S1PR1',
+                            '12. Cardiomyocytes: TNNT2 MB',
+                            '17. Neuronal: PLP1 NRXN1',
+                            '10. Pericytes: RGS5 KCNJ8-low']
+
+endothelial = tissue_nonimmune[tissue_nonimmune.obs['umap_name'].isin(endothelial_clusters)].copy()
+non_endothelial = tissue_nonimmune[tissue_nonimmune.obs['umap_name'].isin(non_endothelial_clusters)].copy()
+
+# plot dotplots
+
+python_functions.make_gene_dotplot(endothelial.to_anndata(),
+             cluster_order=endothelial_clusters,
+             gene_order=['RGCC', 'CA4',  # Capillary EC1
+                         'RBP7', 'BTNL9',  # Arterial EC2
+                         'HEY1', 'SEMA3G',  # Arterial EC1
+                         'CXCL2', 'JUN',  # Capillary EC2
+                         'ACKR1', 'PLVAP',  # Venous EC
+                         'CXCL9', 'IDO1',  # Inflammatory EC
+                         'NPR3', 'POSTN',  # Endocardia
+                         'VWF', 'CD36',  # Capillary EC3
+                         'PDPN', 'CCL21'  # Lymphatic ECs
+                         ],
+             title='Endothelial')
+python_functions.make_gene_dotplot(non_endothelial.to_anndata(),
+             cluster_order=non_endothelial_clusters,
+             gene_order=['TAGLN', 'MYH11',  # Smooth Muscle
+                         'KCNJ8', 'ABCC9',  # Pericytes2
+                         'DCN', 'LUM',  # Fibroblasts
+                         'ACTA2', 'COL14A1', 'ID4',  # Myofibroblasts
+                         'HLA-DRB1', 'S1PR1',  # Pericytes1
+                         'TNNT2', 'MB',  # Cardiomyoctyes
+                         'PLP1', 'NRXN1',  # Neuronal
+                         'RGS5'  # Pericytes3
+                         ],
+             title='Non-Endothelial')
+```
+
+
+## Figure 5C
+
+```{r message = F, warning = F, fig.width = 15, fig.height = 10, fig_5c}
+# read in masc tissue results (see figure_2.rmd fig_2c)
+tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
+masc_filtered_df  <- masc_filter(tissue_global_obs)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/cluster_masc_res.csv')
+plot_masc_by_cell_type(cluster_masc_res, masc_filtered_df, lineage='Nonimmune')
+```
+
+
+## Figure 5D
+
+```{python fig_5d_get_pseudobulk}
+python_functions.get_pseudobulk_info(tissue_nonimmune, 'tissue_nonimmune')
+```
+
+```{r message = F, results = 'hide', fig_5d_de_analysis}
+nonimmune_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_pseudocounts.csv',
+                    meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_metainfo.csv',
+                    save_name = 'tissue_nonimmune')
+```
+
+```{r message = F, fig_5d_plot_sig_n_de}
+# plot number of up/down-expressed genes
+nonimmune_cluster_map <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/nonimmune_cluster_map.csv')
+nonimmune_deres <- nonimmune_deres %>%
+  left_join(nonimmune_cluster_map, by = c('cluster' = 'cluster_number'))
+
+
+get_up_down <- function(data){
+  n_up <- data %>% filter(log2FoldChange > 0) %>% nrow()
+  n_down <- data %>% filter(log2FoldChange < 0) %>% nrow()
+
+  return(list('n_up' = n_up, 'n_down' = n_down))
+}
+
+plot_df <- nonimmune_deres %>%
+  filter(abs(log2FoldChange) >= 0, padj <= 0.1) %>%
+  group_by(cluster_name) %>%
+  nest() %>%
+  filter(cluster_name != 'Doublets/RBCs') %>%
+  mutate(deg = map(data, get_up_down)) %>%
+  unnest_wider(deg) %>%
+  select(cluster_name, n_up, n_down) %>%
+  mutate(n_total = n_up + n_down,
+         n_down = -1 * n_down) %>%
+  pivot_longer(c(n_up, n_down), names_to = 'direction')
+
+breaks <- pretty(plot_df$value) # get plot break values
+
+ggplot(plot_df, aes(x = reorder(cluster_name, n_total), y = value, fill = direction)) +
+  geom_bar(stat = 'identity') +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  scale_y_continuous(breaks = breaks,
+                     labels = abs(breaks)) +
+  scale_fill_manual(values = c('#708090', '#8B3626')) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 16)) +
+  labs(x = element_blank(),
+       y = element_blank(),
+       title = 'Tissue Non-immune DE Results',
+       subtitle = 'Padj < 0.01')
+```
+
+
+## Figure 5E
+
+```{r message = F, results = 'hold', fig.width = 10, fig.height = 16, fig_5e_heatmap}
+nonimmune_clusters <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/nonimmune_cluster_map.csv')
+heatmap_genes <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/nonimmune_heatmap_genes.csv')
+nonimmune_heatmap_df <- get_heatmap_data(nonimmune_deres, heatmap_genes, nonimmune_clusters)
+
+heatmap_df <- nonimmune_heatmap_df %>%
+  mutate(cluster = cluster_name) %>%
+  select(!cluster_name)
+
+
+# Format main body --------------------------------------------------------
+
+# set category order
+category_levels <- sort(unique(heatmap_df$category))
+category_levels <- c(category_levels[category_levels != 'Other'], 'Other')
+
+# reformat from long to wide
+heatmap_df <- heatmap_df %>%
+  distinct() %>%
+  pivot_wider(names_from = cluster, values_from = c(log2FoldChange, padj)) %>%
+  filter(!is.na(category)) %>%
+  mutate(category = factor(category, levels = category_levels)) %>%
+  arrange(category)
+
+# get information for the main body's cells
+heatmap_mtx <- heatmap_df %>%
+  select(starts_with("log2FoldChange")) %>%
+  replace(is.na(.), 0) %>%
+  rename_with(~str_remove(., "log2FoldChange_")) %>%
+  select(order(colnames(.))) %>%
+  as.matrix()
+rownames(heatmap_mtx) <- heatmap_df$gene_symbol
+colnames(heatmap_mtx) <- str_remove(colnames(heatmap_mtx), regex(":.*"))
+
+# move CXCL9 before CXCL10
+which(rownames(heatmap_mtx) == 'CXCL9')
+which(rownames(heatmap_mtx) == 'CXCL10')
+row_order <- c(rownames(heatmap_mtx)[1:(which(rownames(heatmap_mtx) == 'CXCL10')-1)],
+               'CXCL9',
+               rownames(heatmap_mtx)[which(rownames(heatmap_mtx) == 'CXCL10'):(which(rownames(heatmap_mtx) == 'CXCL9')-1)],
+               rownames(heatmap_mtx)[(which(rownames(heatmap_mtx) == 'CXCL9')+1): nrow(heatmap_mtx)])
+heatmap_mtx <- heatmap_mtx[row_order, ]
+
+
+# define cell color range
+heatmap_col_fun <- colorRamp2(c(floor(min(heatmap_mtx)), 0, ceiling(max(heatmap_mtx))),
+                              c("blue", "white", "red"))
+
+# Main body annotation (FDR) ----------------------------------------------
+
+# get fdr values
+fdr_mtx <- heatmap_df %>%
+  select(starts_with('padj')) %>%
+  replace(is.na(.), Inf) %>%
+  rename_with(~str_remove(., "padj_")) %>%
+  select(order(colnames(.))) %>%
+  as.matrix()
+colnames(fdr_mtx) <- str_remove(colnames(fdr_mtx), regex(":.*"))
+rownames(fdr_mtx) <- heatmap_df$gene_symbol
+
+fdr_mtx <- fdr_mtx[row_order, ]
+
+# make sure same cols and rows
+stopifnot(colnames(fdr_mtx) == colnames(heatmap_mtx))
+stopifnot(rownames(fdr_mtx) == rownames(heatmap_mtx))
+
+# make function for plotting fdr value
+fdr_func <- function(j, i, x, y, width, height, fill){
+  if (fdr_mtx[i,j] < 0.1){
+    grid.circle(x = x, y = y, r = unit(1.5, 'mm'),
+                gp = gpar(fill = 'black', col = NA))
+  }
+}
+
+# create legend for fdr
+lgd_fdr = Legend(pch = 16, type = "points", labels = "FDR < 0.1")
+
+
+# put together lineage heatmaps -------------------------------------------
+
+# define column splits
+lineage_list <- list("endothelial" = c("5. Arterial EC",
+                                       "9. Arterial EC",
+                                       "1. Capillary EC",
+                                       "2. Capillary EC",
+                                       "3. Capillary EC",
+                                       "13. Endocardial",
+                                       "14. Inflammatory EC",
+                                       "15. Lymphatic EC",
+                                       "11. Venous EC"),
+                     "mural" = c("6. Pericytes",
+                                 "7. Pericytes",
+                                 "10. Pericytes",
+                                 "8. Smooth muscle"),
+                     "fibroblasts" = c("4. Fibroblasts",
+                                       "16. Myofibroblasts"),
+                     "cardiomyocytes" = "12. Cardiomyocytes",
+                     "nueronal" = "17. Neuronal")
+
+
+make_lineage_heatmap <- function(lineage, n_lineage){
+
+  # make sure same cols and rows
+  stopifnot(colnames(fdr_mtx) == colnames(heatmap_mtx))
+  stopifnot(rownames(fdr_mtx) == rownames(heatmap_mtx))
+
+  # subset heatmap for given lineage
+  lineage_ht <- heatmap_mtx[, lineage_list[lineage][[1]], drop=F]
+  lineage_fdr <- fdr_mtx[, lineage_list[lineage][[1]], drop=F]
+
+  # make function for plotting fdr value
+  fdr_func <- function(j, i, x, y, width, height, fill){
+    if (lineage_fdr[i,j] < 0.1){
+      grid.circle(x = x, y = y, r = unit(1.5, 'mm'),
+                  gp = gpar(fill = 'black', col = NA))
+    }
+  }
+
+  # set column annotation colors
+  lineage_cols <- list("endothelial" = c('#fb8072',
+                                         '#ffed6f',
+                                        '#a65628',
+                                        '#f781bf',
+                                        '#8dd3c7',
+                                        '#4ba93b',
+                                        '#5779bb',
+                                        '#927acc',
+                                        '#d95f02'),
+                      "mural" = c('#fdb462',
+                                  '#fccde5',
+                                  '#c4eaff',
+                                  '#bc80bd'),
+                      "fibroblasts" = c('#bebada',
+                                        '#bf3947'),
+                      "cardiomyocytes" = '#737373',
+                      "nueronal" = '#f48758')
+
+
+  clust_col_fun <- lineage_cols[lineage][[1]]
+  names(clust_col_fun) <- seq(1, ncol(lineage_ht))
+
+  # create column heatmap annotation
+  clust_ha <- HeatmapAnnotation(clust_colors = names(clust_col_fun),
+                                col = list(clust_colors = clust_col_fun),
+                                show_legend = FALSE,
+                                show_annotation_name = FALSE,
+                                simple_anno_size = unit(3, "mm"))
+
+  # split rows by gene category
+  categories_df <- rownames(lineage_ht) %>%
+          as_tibble() %>%
+          mutate(gene_symbol = value) %>%
+          left_join(heatmap_df %>% select(gene_symbol,category))
+  row_split <- str_replace_all(categories_df$category, "_", " ")
+  row_split <- factor(row_split, levels = unique(row_split))
+
+  # format for multiple heatmaps
+  heatmap_name = if (n_lineage == 1) "Log2FC" else as.character(n_lineage)
+  draw_legend = if(n_lineage == 1) TRUE else FALSE
+
+  # create heatmap
+  ht <- Heatmap(lineage_ht, name = heatmap_name,
+                col = heatmap_col_fun,
+                row_split = row_split,
+                cell_fun = fdr_func,
+                top_annotation = clust_ha,
+                show_heatmap_legend = draw_legend,
+                cluster_columns = FALSE,  column_names_side = "top",
+                show_column_names = T, column_names_rot = 45,
+                cluster_rows = FALSE, row_names_side = "left",
+                row_title_rot = 0, row_title_gp=gpar(fontface='bold'),
+                row_gap = unit(2, "mm"), border = TRUE,
+                width = ncol(lineage_ht)*unit(6, "mm"),
+                height = nrow(lineage_ht)*unit(6, "mm"))
+  return(ht)
+}
+
+ht_endothelial <- make_lineage_heatmap('endothelial', n_lineage = 1)
+ht_mural <- make_lineage_heatmap("mural", 2)
+ht_fibroblasts <- make_lineage_heatmap("fibroblasts" , 3)
+ht_cardiomyocytes <- make_lineage_heatmap("cardiomyocytes" , 4)
+ht_nueronal <- make_lineage_heatmap("nueronal" , 5)
+
+draw(ht_endothelial + ht_mural  + ht_fibroblasts + ht_cardiomyocytes + ht_nueronal,
+     annotation_legend_list = list(lgd_fdr),
+     merge_legends = TRUE)
+```
+
+## Figure 5F
+
+```{python fig_5f}
+fig_5f_genes = ['CXCL10', 'CXCL9', 'MDK', 'FLT3LG', 'STAT1']
+python_functions.multi_hexfp_by_condition(tissue_nonimmune, fig_5f_genes, cmap = python_functions.blues_cmap, gridsize=200)
+```
+
+
+## Figure 5H
+
+```{python fig_5h}
+# get pseudobulk counts for all clusters
+python_functions.get_pseudobulk_info(tissue_global, 'tissue_global', cluster_col='global_subcluster_number')
+
+# read in cell-cell data, pseduobulk counts, and cell metadata
+
+interactions = pd.read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/cell_cell_interactions_filtered.csv')
+priority_interactions = pd.read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/cell_cell_priority_interactions.csv')
+count_mtx = pd.read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_pseudocounts.csv', index_col=0)
+meta = pd.read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
+meta = meta[meta['on_steroids'] != True]
+
+# filter for priority interactions
+interactions = interactions[interactions['interacting_pair'].isin(priority_interactions['interacting_pair'])].copy()
+
+# need to map cluster names to numbers
+name_to_number = dict(zip(meta['subcluster_name'], meta['global_subcluster_number']))
+interactions['cluster_a'] = interactions['name_a'].replace(name_to_number)
+interactions['cluster_b'] = interactions['name_b'].replace(name_to_number)
+
+# format data
+def log100k(count_mtx):
+    cols, index = count_mtx.index, count_mtx.columns
+    norm_mtx = csr_matrix(count_mtx.T)
+    scale = 100000 / norm_mtx.sum(axis=1).A1
+    norm_mtx.data *= np.repeat(scale, np.diff(norm_mtx.indptr))
+    norm_mtx.data = np.log1p(norm_mtx.data)
+    norm_mtx = pd.DataFrame.sparse.from_spmatrix(norm_mtx, columns=cols, index=index)
+    return norm_mtx
+
+
+val_mtx = log100k(count_mtx)
+samp_to_cond = dict(zip(meta['donor'], meta['condition']))
+tomato4 = "#8B3626"
+slategray = '#708090'
+
+fig_5h = pd.DataFrame({'name_a': ['h-CD8T: CCL5 NKG7', 'Pericytes: KCNJ8 ABCC9', 'h-cDC: CLEC9A CD1C', 'Fibroblasts: DCN LUM'],
+                       'name_b': ['Venous EC: ACKR1 PLVAP', 'h-CD8T: CD27 LAG3', 'Fibroblasts: DCN LUM', 'h-CD8T: CD27 LAG3'],
+                       'gene_a': ['CXCR3', 'ICAM1', 'FLT3', 'VCAM1'],
+                       'gene_b': ['CXCL9', 'ITGAL', 'FLT3LG', 'ITGA4;ITGB7']})
+fig_5h_df = fig_5h.merge(interactions, how='left', on=['name_a', 'name_b', 'gene_a', 'gene_b'])
+
+fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(15, 4))
+ax = ax.ravel()
+for num, (_, row) in enumerate(fig_5h_df.iterrows()):
+    # get row information
+    name_a, gene_a = row['name_a'], row['gene_a']
+    name_b, gene_b = row['name_b'], row['gene_b']
+    gene_a = gene_a.split(';')[0] if ';' in gene_a else gene_a
+    gene_b = gene_b.split(';')[0] if ';' in gene_b else gene_b
+    clust_a, clust_b = name_to_number[name_a], name_to_number[name_b]
+
+    # get samples with cluster data
+    samps = np.intersect1d(meta[meta['subcluster_name'] == name_a]['donor'],
+                                   meta[meta['subcluster_name'] == name_b]['donor'])
+
+    # collect gene counts
+    plot_df = pd.DataFrame(index=samps)
+    plot_df[f'{name_a}: {gene_a}'] = val_mtx.loc[[f'{i}_c{clust_a}' for i in samps], gene_a].values
+    plot_df[f'{name_b}: {gene_b}'] = val_mtx.loc[[f'{i}_c{clust_b}' for i in samps], gene_b].values
+    plot_df['condition'] = plot_df.index.map(samp_to_cond)
+
+    # plot
+    if 'CD8' in name_b:  # plot CD8 clusters on x-axis for consistency
+        sns.scatterplot(x=f'{name_b}: {gene_b}', y=f'{name_a}: {gene_a}', data=plot_df, hue='condition',
+                        ax=ax[num], palette={'myocarditis': tomato4, 'control': slategray}, legend=False,
+                        s=200, edgecolor='black')
+    else:
+        sns.scatterplot(x=f'{name_a}: {gene_a}', y=f'{name_b}: {gene_b}', data=plot_df, hue='condition',
+                        ax=ax[num], palette={'myocarditis': tomato4, 'control': slategray}, legend=False,
+                        s=200, edgecolor='black')
+fig.tight_layout()
+plt.show()
+```
+
+
+## Figure 5I
+
+```{r message = FALSE, results='hold', fig_5i}
+serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tidy_serum.csv')
+
+# print t-test model stats
+model_df <- serum_df %>%
+  select(!c(patient, timepoint, Sample)) %>%
+  pivot_longer(cols=!condition,
+               names_to='protein',
+               values_to='value') %>%
+  mutate(log1p_value = log1p(value)) %>%
+  group_by(condition, protein) %>%
+  summarize(log1p_values = list(log1p_value)) %>%
+  pivot_wider(names_from = condition,
+              values_from = log1p_values) %>%
+  group_by(protein) %>%
+  summarize(mean_case = mean(unlist(myocarditis)),
+            std_case = sd(unlist(myocarditis)),
+            n_case = length(unlist(myocarditis)),
+            mean_control = mean(unlist(control)),
+            std_control = sd(unlist(control)),
+            n_control = length(unlist(control)),
+            p_value = t.test(unlist(control), unlist(myocarditis))$p.value)
+kable(model_df)
+
+# plot serum values for proteins of interst
+fig_5i_proteins <- c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
+                    'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
+
+plot_df <- serum_df %>%
+  select(!c(Sample, timepoint)) %>%
+  pivot_longer(cols = !c(patient, condition),
+               names_to='protein') %>%
+  filter(protein %in% fig_5i_proteins) %>%
+  mutate(protein = case_when(
+    protein == '6CKine' ~ 'CCL21',
+    protein == 'IP-10' ~ 'CXCL10',
+    protein == 'MIG/CXCL9' ~ 'CXCL9',
+    TRUE ~ protein
+  ))
+
+ggplot(plot_df, aes(x = condition, y = value + 1, fill = condition)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(aes(fill = condition),
+              shape=21) +
+  scale_y_log10()+
+  scale_color_manual(values = c('slategray', 'tomato4')) +
+  scale_fill_manual(values = c('slategray', 'tomato4')) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  facet_wrap(~protein,
+             scales = 'free_y',
+             nrow=2) +
+  labs(fill = 'Condition',
+       color = 'Condition',
+       x = element_blank(),
+       y = "log10(pg/mL + 1)")
+```
+
+## Figure 5J
+
+Calculate expression values for each cluster
+
+```{python results='hide', fig_5j_get_data}
+# read in data
+df = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
+
+# filter out non-immune cells, doublets, and post-steroid samples
+filtered_df = df[df.obs['umap_name'] != '10. Doublets and RBC']
+filtered_df = filtered_df[filtered_df.obs['on_steroids'] != 'True']
+
+# filter for cases only
+filtered_df = filtered_df[filtered_df.obs['condition'] == 'myocarditis']
+
+# filter for genes of interest
+genes = pd.read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/drug_target_metadata.csv')
+gene_list = list(genes['Gene'].unique())
+filtered_df = filtered_df[:, gene_list].copy()
+
+# filter for genes appearing in more than 200 cells
+raw_X = filtered_df.get_matrix('raw.X')
+greater_than_200 = np.ravel((raw_X != 0).sum(axis=0) >= 200)
+raw_X = raw_X[:, greater_than_200].copy()
+filtered_df = filtered_df[:, greater_than_200].copy()
+
+# remove unused cluster categories
+filtered_df.obs['global_subcluster_name'] = filtered_df.obs['global_subcluster_name'].cat.remove_unused_categories()
+
+# filter for genes expressed in >5% of cells in at least one cluster
+perc_df = pd.DataFrame(columns=filtered_df.obs['global_subcluster_name'].cat.categories,
+                       index=filtered_df.var_names.values)
+for clust in perc_df.columns.values:
+    clust_cts = raw_X[filtered_df.obs['global_subcluster_name'] == clust].copy()
+    n_nonzero = (clust_cts != 0).sum(axis=0)
+    perc_nonzero = n_nonzero / clust_cts.shape[0]
+    perc_df[clust] = perc_nonzero.transpose()
+
+greater_than_5perc = (perc_df >= 0.05).sum(axis=1) > 0
+filtered_df = filtered_df[:, greater_than_5perc].copy()
+raw_X = raw_X[:, greater_than_5perc].copy()
+
+# get gene sums per each cluster
+sum_df = pd.DataFrame(columns=filtered_df.obs['global_subcluster_name'].cat.categories,
+                      index=filtered_df.var_names.values)
+for clust in sum_df.columns.values:
+    sum_df[clust] = raw_X[filtered_df.obs['global_subcluster_name'] == clust].sum(axis=0).transpose()
+
+# log normalize column counts
+per_100k = (sum_df * 100000) / sum_df.sum(axis=0)
+log100k_df = np.log1p(per_100k)
+
+# get z-score of genes across clusters
+gene_zscore_df = stats.zscore(log100k_df, axis=1)
+gene_zscore_df.to_csv('drug_target_heatmap_cts.csv')
+```
+
+```{r message = F, fig.width = 16, fig.height = 12, fig_5j_plot_heatmap}
+# read in data
+cts <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/drug_target_heatmap_cts.csv')
+meta <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/drug_target_metadata.csv')
+
+# create heatmap body matrix
+colnames(cts)[1] <- 'Gene'
+heatmap_df <- cts %>%
+  left_join(meta %>%
+              distinct(Gene, Group)) %>%
+  mutate(Group = factor(Group, levels =  c("Immune_Checkpoint", "Myocarditis_Tx", "Drug_Targets"))) %>%
+  arrange(Group, Gene)
+
+mtx <- heatmap_df %>%
+  select(!c('Gene', 'Group')) %>%
+  as.matrix()
+rownames(mtx) <- heatmap_df$Gene
+colnames(mtx) <- unlist(map(str_split(colnames(mtx), '\\. '), 2))
+
+# set column order (exclude non-immune clusters)
+col_order = c("h-CD4T: IL7R LTB", "h-CD8T: CD27 LAG3", "h-CD8T: CCL5 NKG7",
+              "h-CD8T: KLRG1 CX3CR1", "h-CD8T: cycling", "h-NK: KLRF1 FCER1G",
+              "h-cDC: CLEC9A CD1C", "h-MNP: S100A8-low C1QA-low", "h-MNP: LYVE1 C1QA",
+              "h-MNP: FCGR3A LILRB2", "h-MNP: S100A12 VCAN", "h-MNP: TREM2 APOC1", "h-pDC: LILRA4 IRF8",
+              "h-B: CD79A MS4A1", "h-Plasmablast: JCHAIN MZB1")
+lineage_order = c(rep('T/NK', 6),
+                  rep('Myeloid', 7),
+                  rep('B/Plasma', 2))
+mtx <- mtx[, col_order]
+
+# define cell color range
+heatmap_col_fun <- colorRamp2(c(floor(min(mtx)), 0, ceiling(max(mtx))),
+                              c("deepskyblue3", "white", "coral2"))
+
+# split rows by gene category
+row_split <- str_replace_all(heatmap_df$Group, "_", " ")
+row_split <- factor(row_split, levels = unique(row_split))
+
+# split columns by lineage
+column_split <- factor(lineage_order, levels = unique(lineage_order))
+
+# plot heatmap
+ht <- Heatmap(mtx,
+              name = 'Expression scaled across clusters',
+              col = heatmap_col_fun,
+              row_split = row_split,
+              column_split = column_split,
+              column_gap = unit(2, "mm"),
+              row_gap = unit(2, "mm"),
+              cluster_columns = FALSE,  column_names_side = "top",
+              show_column_names = T,
+              cluster_rows = FALSE, row_names_side = "left",
+              row_title_rot = 0,
+              row_title_gp=gpar(fontface='bold'),
+              column_title_gp=gpar(fontface='bold'),
+              border = TRUE,
+              heatmap_legend_param = list(direction = "horizontal",
+                                          title_position = 'topcenter'),
+              width = ncol(mtx)*unit(5, "mm"),
+              height = nrow(mtx)*unit(5, "mm"))
+
+draw(ht,
+     heatmap_legend_side = "bottom",
+     align_heatmap_legend = "heatmap_center")
+```

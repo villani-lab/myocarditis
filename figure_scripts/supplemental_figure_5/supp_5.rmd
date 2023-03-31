@@ -1,0 +1,193 @@
+---
+title: "Supplemental Figure 5"
+output: rmarkdown::github_document
+---
+
+## Setup
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(tidyverse)
+library(glue)
+library(rlang)
+library(parameters)
+library(ggforestplot)
+library(rmarkdown)
+library(knitr)
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('stacked_bar.R')
+source('blood_condition_abundance.R')
+source('blood_fatal_abundance.R')
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+```{python results = 'hide', read_data}
+blood_b = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_b.zarr')
+blood_cd4 = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd4.zarr')
+blood_cd4_adt = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd4_adt.zarr')
+```
+
+## Supplementary Figure 5A
+
+```{python supp_5a}
+python_functions.plot_umap(blood_cd4, 'Blood: CD4', python_functions.blood_cd4_pal, wspace=1, marker_multiplier=12)
+```
+
+
+## Supplementary Figure 5B
+
+```{python supp_5b}
+python_functions.make_gene_dotplot(blood_cd4.to_anndata(),
+                  cluster_order=['1. b-CD4T: TNFRSF4 CD40LG',
+                                 '2. b-CD4T: CCR7 CD45RA-protein',
+                                 '3. b-CD4T: HLA-DRb GZMA',
+                                 '4. b-CD4T: CCR7 NKG7',
+                                 '6. b-CD4T: KLRC1 LYAR',
+                                 '5. b-Treg: FOXP3 TIGIT'],
+             gene_order=['TNFRSF4', 'CD40LG', 'CCR7', 'HLA-DRB1', 'GZMA', 'NKG7',
+                         'TNFAIP3', 'KLRC1', 'LYAR', 'FOXP3', 'TIGIT'],
+             title='Blood: CD4')
+```
+
+
+## Supplementary Figure 5C
+
+```{r message = F, results = 'hold', supp_5c}
+# read in all blood cell metadata
+blood_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_global_obs.csv')
+condition_blood_obs_filtered <- condition_filter_df(blood_global_obs)
+
+# fit cluster level model
+condition_cluster_percents <- condition_get_percent_per_level(condition_blood_obs_filtered, level='cluster')
+condition_cluster_model <- condition_fit_model(condition_cluster_percents, level='cluster')
+condition_cluster_lineages <- condition_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
+
+# get get cd4 lineage level results
+cd4_order <- c('b-CD4T: TNFRSF4 CD40LG', 'b-CD4T: CCR7 CD45RA-protein', 'b-CD4T: HLA-DRb GZMA',
+               'b-CD4T: CCR7 NKG7', 'b-CD4T: KLRC1 LYAR', 'b-Treg: FOXP3 TIGIT')
+condition_cd4_percents <- condition_cluster_percents %>% filter(cluster_names %in% cd4_order)
+condition_cd4_percents <- set_factor_order(condition_cd4_percents , col_name = 'cluster_names', order = cd4_order)
+condition_cd4_model <- condition_cluster_model %>% filter(cluster_names %in% cd4_order)
+condition_cd4_model <- set_factor_order(condition_cd4_model , col_name = 'cluster_names', order = cd4_order)
+kable(condition_cd4_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(condition_coef, condition_se, condition_pval)))
+
+condition_plot_sample_perc(condition_cd4_percents, title='CD4')
+condition_plot_ci_interval(condition_cd4_model, 'CD4', level='cluster')
+```
+
+
+## Supplementary Figure 5D
+
+```{r message = F, results = 'hold', supp_5d}
+# read in all blood cell metadata
+fatal_blood_obs_filtered <- fatal_filter_df(blood_global_obs)
+
+# fit cluster level model
+fatal_cluster_percents <- fatal_get_percent_per_level(fatal_blood_obs_filtered, level='cluster')
+fatal_cluster_model <- fatal_fit_model(fatal_cluster_percents, level='cluster')
+fatal_cluster_lineages <- fatal_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
+
+# get get cd4 lineage level results
+fatal_cd4_percents <- fatal_cluster_percents %>% filter(cluster_names %in% cd4_order)
+fatal_cd4_percents <- set_factor_order(fatal_cd4_percents , col_name = 'cluster_names', order = cd4_order)
+fatal_cd4_model <- fatal_cluster_model %>% filter(cluster_names %in% cd4_order)
+fatal_cd4_model <- set_factor_order(fatal_cd4_model , col_name = 'cluster_names', order = cd4_order)
+kable(fatal_cd4_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
+
+fatal_plot_sample_perc(fatal_cd4_percents, title='CD4')
+fatal_plot_ci_interval(fatal_cd4_model, 'CD4', level='cluster')
+```
+
+## Supplementary Figure 5E
+
+```{python supp_5e}
+## plot cite-seq
+sup_fig5e_cite = ['CD45RA', 'CD45RO']
+python_functions.multi_hex_featureplot(blood_cd4_adt,
+                      sup_fig5e_cite,
+                      ncol=2,
+                      cmap='YlGn',
+                      gridsize=200)
+## plot gex
+supp_fig5e_gex = ['CCR7', 'TNFRSF4', 'HLA-DRB1', 'GZMA', 'FOXP3']
+python_functions.multi_hex_featureplot(blood_cd4,
+                      supp_fig5e_gex,
+                      ncol=3,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+```
+
+## Supplementary Figure 5F
+
+```{python supp_5f}
+python_functions.plot_umap(blood_b, 'Blood: B and Plasma', python_functions.blood_b_pal, wspace=.9, marker_multiplier=8)
+```
+
+## Supplementary Figure 5G
+
+```{python supp_5g}
+python_functions.make_gene_dotplot(blood_b.to_anndata(),
+             cluster_order=['1. b-B: CCR7 IL4R',
+                            '2. b-B: IGHD IL4Rlow',
+                            '3. b-B: TCL1A CD72',
+                            '4. b-B: AIM2 COCH',
+                            '5. b-B: FGR ZEB2',
+                            '6. b-Plasmablast: XBP1 JCHAIN'],
+             gene_order=['CCR7', 'IL4R', 'IGHD', 'TCL1A', 'CD72', 'AIM2', 'COCH',
+                         'FGR', 'ZEB2', 'XBP1', 'JCHAIN'],
+             title='Blood: B and Plasma')
+```
+
+
+## Supplemental Figure 5H
+
+```{r message = F, results = 'hold', supp_5h}
+# get get b lineage level results
+b_order <- c('b-B: CCR7 IL4R', 'b-B: IGHD IL4Rlow', 'b-B: TCL1A CD72',
+               'b-B: AIM2 COCH', 'b-B: FGR ZEB2', 'b-Plasmablast: XBP1 JCHAIN')
+condition_b_percents <- condition_cluster_percents %>% filter(cluster_names %in% b_order)
+condition_b_percents <- set_factor_order(condition_b_percents , col_name = 'cluster_names', order = b_order)
+condition_b_model <- condition_cluster_model %>% filter(cluster_names %in% b_order)
+condition_b_model <- set_factor_order(condition_b_model , col_name = 'cluster_names', order = b_order)
+kable(condition_b_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(condition_coef, condition_se, condition_pval)))
+
+condition_plot_sample_perc(condition_b_percents, title='B and Plasma')
+condition_plot_ci_interval(condition_b_model, 'B and Plasma', level='cluster')
+```
+
+## Supplemental Figure 5I
+
+```{r message = F, results = 'hold', supp_5i}
+# get get b lineage level results
+fatal_b_percents <- fatal_cluster_percents %>% filter(cluster_names %in% b_order)
+fatal_b_percents <- set_factor_order(fatal_b_percents , col_name = 'cluster_names', order = b_order)
+fatal_b_model <- fatal_cluster_model %>% filter(cluster_names %in% b_order)
+fatal_b_model <- set_factor_order(fatal_b_model , col_name = 'cluster_names', order = b_order)
+kable(fatal_b_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
+
+fatal_plot_sample_perc(fatal_b_percents, title='B and Plasma')
+fatal_plot_ci_interval(fatal_b_model, 'B and Plasma', level='cluster')
+```
