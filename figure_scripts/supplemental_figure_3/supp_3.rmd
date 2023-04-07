@@ -1,0 +1,196 @@
+---
+title: "Supplemental Figure 3"
+output: html_document
+---
+
+## Setup
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(tidyverse)
+library(glue)
+library(ggpubr)
+library(ggplot2)
+library(magrittr)
+
+```
+
+Read in the TCR data
+```{r tcr_info}
+bulk_tcr_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/all_productive_tcrs.csv",
+                        row.names = 1)
+blood_sc_info = read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/cell_info.csv",
+                     row.names = 1)
+tissue_sc_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/tissue_cell_info.csv",
+                             row.names = 1)
+tissue_sc_info <- tissue_sc_info[tissue_sc_info$TRB_cdr3 != "",]
+### Okay lets look at the overlap between tumor and myocarditis and tumor control in our subjects ###
+bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A17-341_A3", "myo" = "A17-341_A27"),
+                           "SIC_232" = list("tumor" = "A19-395_A8", "control" = "A19-395_A7", "myo" = "A19-395_A53-1"),
+                           "SIC_136" = list("tumor" = "A19-41_A10_Tumor", "control" = "A19-41_A10_Liver", "myo" = "A19-41_A33"),
+                           "SIC_17" = list("tumor" = "A18-122_A51", "control" = "A18-122_A52", "myo" = "A18-122_A41"),
+                           "SIC_175" = list("tumor" = "A19-230_A5", "control" = "T03054-11", "myo" = "A19-230_A48"),
+                           "SIC_266" = list("myo" = "A20-363_A18"),
+                           "SIC_264" = list("myo" = "A20-331_A1"),
+                           # These are controls
+                           "SIC_176" = list("myo" = "A19-213_A13"),
+                           "SIC_14" = list("myo" = "T01708-11"),
+                           "SIC_182" = list("myo" = "A19-240_A15"),
+                           "T01241" = list("myo" = "A16-303_A5")
+)
+
+```
+
+## Figure S3A
+
+```{r fig_S3A, message=FALSE, warning=FALSE}
+
+# This info was taken from the Adaptive immunoseq platform
+plot_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/perc_tcrb_of_nucleated_cells.csv")
+plot_df$perc <- plot_df$perc * 100
+plot_df$category[plot_df$category == "case"] <- "myocarditis"
+
+ggplot(plot_df, aes(x = category, y = perc, fill = category)) +
+  geom_boxplot(alpha = 0.8) +
+  geom_jitter(width = 0.3, pch = 21, size = 4) +
+  scale_fill_manual(values = c("#6f8090", "#8a3624")) +
+  scale_y_log10() +
+  annotation_logticks(side = "l", outside = TRUE) +
+  coord_cartesian(clip = "off") +
+  xlab("") +
+  ylab("% TCRB retreival of nucleated cells") +
+  theme_classic(base_size = 15) +
+  theme(legend.position = "none")
+
+```
+
+
+## Figure S3B
+
+```{r fig_s3b, message=FALSE, warning=FALSE, fig.width=10, fig.height = 8}
+blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info$donor))
+
+# Need to remove SIC_3, its healing myocarditis, so different
+blood_overlap_subjs <- blood_overlap_subjs[blood_overlap_subjs != "SIC_3"]
+
+# Don't include bulk healing
+healing_ids <- c("SIC_3", "SIC_175", "SIC_266", "SIC_232")
+
+myo_tcrs <- lapply(blood_overlap_subjs, function(s){
+  subj_tcrs <- c()
+  # See if they have bulk TCR
+  if(s %in% names(bulk_tissue_samples)){
+    if (!s %in% healing_ids){
+      bulk_samp <- bulk_tissue_samples[[s]]$myo
+      bulk_tcrs <- unique(bulk_tcr_df$amino_acid[bulk_tcr_df$sample == bulk_samp])
+      subj_tcrs <- c(subj_tcrs, bulk_tcrs)
+    }
+  }
+  # See if they have single cell TCR
+  if (s %in% unique(tissue_sc_info$donor)){
+    subj_sc <- tissue_sc_info[tissue_sc_info$donor == s,] %>%
+      dplyr::filter(TRB_cdr3 != "")
+    sc_tcrs <- unique(subj_sc$TRB_cdr3)
+    subj_tcrs <- c(subj_tcrs, sc_tcrs)
+  }
+  return(subj_tcrs)
+})
+names(myo_tcrs) <- blood_overlap_subjs
+
+
+n_tcrs <- lapply(myo_tcrs, function(x) length(x)) %>%
+  as.data.frame() %>%
+  t() %>%
+  `colnames<-`(c("n")) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "subj")
+
+bars <- ggplot(n_tcrs, aes(x = n, y = subj)) +
+  geom_bar(stat = "identity") +
+  scale_x_log10(breaks = c(1, 10, 100, 1000)) +
+  annotation_logticks(side = "b", outside = TRUE) +
+  coord_cartesian(clip = "off") +
+  ylab("") +
+  xlab("# unique CDR3s") +
+  theme_classic(base_size = 20) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        legend.position = "none")
+
+# Which datasets did each subject have?
+plot_df <- data.frame()
+for (s in blood_overlap_subjs){
+  if (!s %in% healing_ids){
+    bulk <- s %in% names(bulk_tissue_samples)
+  } else {
+    bulk <- FALSE
+  }
+  sc <- s %in% unique(tissue_sc_info$donor)
+  plot_df <- rbind(plot_df, data.frame("subj" = s, "bulk" = bulk, "single cell" = sc))
+}
+plot_df <- reshape2::melt(plot_df, id.vars = "subj")
+tiles <- ggplot(plot_df, aes(x = variable, y = subj, fill = value)) +
+  geom_tile(color = "black") +
+  scale_fill_manual(values = c("white", "#5A5A5A")) +
+  ylab("") + xlab("") +
+  # geom_rect(mapping = aes(xmin = variable, max - )) +
+  theme_minimal(base_size = 20) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        legend.position = "none")
+
+myo_exp_tcrs <- lapply(blood_overlap_subjs, function(s){
+  subj_tcrs <- c()
+  # See if they have bulk TCR
+  if(s %in% names(bulk_tissue_samples)){
+    bulk_samp <- bulk_tissue_samples[[s]]$myo
+    bulk_tcrs <- bulk_tcr_df[bulk_tcr_df$sample == bulk_samp,] %>%
+      dplyr::select(amino_acid, count_templates_reads) %>%
+      group_by(amino_acid) %>%
+      summarise(n = sum(count_templates_reads)) %>%
+      mutate(perc = n / sum(n) * 100)
+    bulk_exp <- bulk_tcrs$amino_acid[bulk_tcrs$perc > 0.5 & bulk_tcrs$n > 1]
+    subj_tcrs <- c(subj_tcrs, bulk_exp)
+  }
+  # See if they have single cell TCR
+  if (s %in% unique(tissue_sc_info$donor)){
+    subj_sc <- tissue_sc_info[tissue_sc_info$donor == s,] %>%
+      dplyr::filter(TRB_cdr3 != "") %>%
+      dplyr::select(TRB_cdr3) %>%
+      mutate("count" =  1) %>%
+      group_by(TRB_cdr3) %>%
+      summarise(n = sum(count)) %>%
+      mutate(perc = n / sum(n) * 100)
+    sc_exp <- subj_sc$TRB_cdr3[subj_sc$perc > 0.5 & subj_sc$n > 1]
+    subj_tcrs <- c(subj_tcrs, sc_exp)
+  }
+  return(unique(subj_tcrs))
+})
+names(myo_exp_tcrs) <- blood_overlap_subjs
+
+n_exp_tcrs <- lapply(myo_exp_tcrs, function(x) length(x)) %>%
+  as.data.frame() %>%
+  t() %>%
+  `colnames<-`(c("n")) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "subj")
+
+exp_bars <- ggplot(n_exp_tcrs, aes(x = n, y = subj)) +
+  geom_bar(stat = "identity") +
+  # scale_x_log10() +
+  # annotation_logticks(side = "b", outside = TRUE) +
+  # coord_cartesian(clip = "off") +
+  ylab("") +
+  xlab("# expanded CDR3s") +
+  theme_classic(base_size = 20)
+
+# Plot with everything combined
+ggarrange(plotlist = list(exp_bars, bars, tiles), nrow = 1, ncol = 3, widths = c(1,1, 0.3), align = "h")
+
+```
+
+## Figure S3C
+
+```{r fig_S3C}```
