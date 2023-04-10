@@ -1,6 +1,6 @@
 ---
 title: "Supplemental Figure 4"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 
@@ -16,14 +16,21 @@ library(ggforestplot)
 library(rmarkdown)
 library(knitr)
 library(scattermore)
+library(magrittr)
+library(alakazam)
+library(ggrepel)
+library(ggpubr)
 
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+setwd('../../functions')
+
 source('stacked_bar.R')
 source('blood_condition_abundance.R')
 source('blood_fatal_abundance.R')
+source('tcr_functions.R')
+
 ```
 
 Load Python packages
@@ -134,25 +141,25 @@ condition_plot_ci_interval(condition_cd8_model, 'CD4', level='cluster')
 ## Supplemental Figure 4C
 
 ```{r message = F, results = 'hold', supp_4c}
-# # read in all blood cell metadata
-# fatal_blood_obs_filtered <- fatal_filter_df(blood_global_obs)
-#
-# # fit cluster level model
-# fatal_cluster_percents <- fatal_get_percent_per_level(fatal_blood_obs_filtered, level='cluster')
-# fatal_cluster_model <- fatal_fit_model(fatal_cluster_percents, level='cluster')
-# fatal_cluster_lineages <- fatal_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
-#
-# # get get cd8 lineage level results
-# fatal_cd8_percents <- fatal_cluster_percents %>% filter(cluster_names %in% cd8_order)
-# fatal_cd8_percents <- set_factor_order(fatal_cd8_percents , col_name = 'cluster_names', order = cd8_order)
-# fatal_cd8_model <- fatal_cluster_model %>% filter(cluster_names %in% cd8_order)
-# fatal_cd8_model <- set_factor_order(fatal_cd8_model , col_name = 'cluster_names', order = cd8_order)
-# kable(fatal_cd8_model %>%
-#               select(!c(data, model)) %>%
-#               unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
-#
-# fatal_plot_sample_perc(fatal_cd8_percents, title='CD4')
-# fatal_plot_ci_interval(fatal_cd8_model, 'CD4', level='cluster')
+# read in all blood cell metadata
+fatal_blood_obs_filtered <- fatal_filter_df(blood_global_obs)
+
+# fit cluster level model
+fatal_cluster_percents <- fatal_get_percent_per_level(fatal_blood_obs_filtered, level='cluster')
+fatal_cluster_model <- fatal_fit_model(fatal_cluster_percents, level='cluster')
+fatal_cluster_lineages <- fatal_blood_obs_filtered %>% select(cluster_names, lineage_names) %>% distinct()
+
+# get get cd8 lineage level results
+fatal_cd8_percents <- fatal_cluster_percents %>% filter(cluster_names %in% cd8_order)
+fatal_cd8_percents <- set_factor_order(fatal_cd8_percents , col_name = 'cluster_names', order = cd8_order)
+fatal_cd8_model <- fatal_cluster_model %>% filter(cluster_names %in% cd8_order)
+fatal_cd8_model <- set_factor_order(fatal_cd8_model , col_name = 'cluster_names', order = cd8_order)
+kable(fatal_cd8_model %>%
+              select(!c(data, model)) %>%
+              unnest(cols = c(fatal_coef, fatal_se, fatal_pval)))
+
+fatal_plot_sample_perc(fatal_cd8_percents, title='CD4')
+fatal_plot_ci_interval(fatal_cd8_model, 'CD4', level='cluster')
 
 ```
 
@@ -251,15 +258,208 @@ ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
   theme(axis.ticks = element_blank(), axis.text = element_blank())
 ```
 
+
+## Supplemental Figure 4F
+
+```{r fig_S4F, message = FALSE, warning = FALSE}
+
+blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info$donor))
+# Need to remove healing myocarditis (for which we have bulk TCR for), its different
+healing_ids <- c("SIC_3", "SIC_175", "SIC_266")
+
+myo_exp_tcrs <- lapply(blood_overlap_subjs, function(s){
+  subj_tcrs <- c()
+  # See if they have bulk TCR
+  if(s %in% names(bulk_tissue_samples)){
+    if (!s %in% healing_ids){
+      bulk_samp <- bulk_tissue_samples[[s]]$myo
+      bulk_tcrs <- bulk_tcr_df[bulk_tcr_df$sample == bulk_samp,] %>%
+        dplyr::select(amino_acid, count_templates_reads) %>%
+        group_by(amino_acid) %>%
+        summarise(n = sum(count_templates_reads)) %>%
+        mutate(perc = n / sum(n) * 100)
+    bulk_exp <- bulk_tcrs$amino_acid[bulk_tcrs$perc > 0.5 & bulk_tcrs$n > 1]
+    subj_tcrs <- c(subj_tcrs, bulk_exp)
+    }
+
+  }
+  # See if they have single cell TCR
+  if (s %in% unique(tissue_sc_info$donor)){
+    subj_sc <- tissue_sc_info[tissue_sc_info$donor == s,] %>%
+      dplyr::filter(TRB_cdr3 != "") %>%
+      dplyr::select(TRB_cdr3) %>%
+      mutate("count" =  1) %>%
+      group_by(TRB_cdr3) %>%
+      summarise(n = sum(count)) %>%
+      mutate(perc = n / sum(n) * 100)
+    sc_exp <- subj_sc$TRB_cdr3[subj_sc$perc > 0.5 & subj_sc$n > 1]
+    subj_tcrs <- c(subj_tcrs, sc_exp)
+  }
+  return(unique(subj_tcrs))
+})
+names(myo_exp_tcrs) <- blood_overlap_subjs
+
+info_df <- blood_sc_info[blood_sc_info$donor %in% blood_overlap_subjs,]
+info_df$myo_clone <- "False"
+for (s in blood_overlap_subjs){
+  myo_clones <- myo_exp_tcrs[[s]]
+  info_df$myo_clone[info_df$donor == s & info_df$TRB_cdr3 %in% myo_clones] <- "True"
+}
+
+df <- tcr_assoc_func(info_df, cluster = info_df$leiden_labels, contrast = "myo_clone")
+
+new_names <- c("cluster1" = "2. b-NK",
+               "cluster2" = "1. b-CD8T",
+               "cluster3" = "3. b-CD8T",
+               "cluster4" = "4. b-CD8T",
+               "cluster5" = "5. b-NK",
+               "cluster6" = "6. b-CD8T",
+               "cluster7" = "7. b-CD8T",
+               "cluster8" = "8. b-CD8T/NK",
+               "cluster9" = "MNP/T doublets",
+               "cluster10" = "9. b-MAIT",
+               "cluster11" = "10.b-NK",
+               "cluster12" = "11. b-CD8T",
+               "cluster13" = "12. b-CD8T")
+df$cluster <- sapply(df$cluster, function(x) new_names[[x]])
+
+
+ggplot(df, aes(x = myo_clone.OR, y = -log10(model.pvalue))) +
+  geom_errorbarh(data = df[df$model.padj < 0.05 & df$myo_clone.OR > 1.42,],
+                 aes(xmax = myo_clone.OR.95pct.ci.upper, xmin = myo_clone.OR.95pct.ci.lower),
+                 color = "grey", height = 0) +
+  geom_point(data = df[df$model.padj > 0.05 | df$myo_clone.OR < 1.42,],
+             color = "grey") +
+  geom_point(data = df[df$model.padj < 0.05 & df$myo_clone.OR > 1.42,],
+             color = "red", size = 3) +
+  geom_text_repel(data = df[df$model.padj < 0.05 & df$myo_clone.OR > 1.42,],
+                  aes(label = cluster), size = 5, direction = "y") +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  xlab("OR") + ylab("-log10(p-value)") +
+  theme_classic(base_size = 20)
+
+```
+
+
+## Supplemental Figure 4G
+
+```{r fig_S4G, message = FALSE, warning = FALSE}
+
+# Only take cells with full TCR info
+cd8_info <- blood_sc_info[blood_sc_info$TRA_cdr3 != "" & blood_sc_info$TRB_cdr3 != "" &
+                             blood_sc_info$TRA_v_gene != "" & blood_sc_info$TRB_v_gene != "",]
+
+# Change the column name to be compatible
+colnames(cd8_info)[colnames(cd8_info) == "clone"] <- "clone_id"
+
+div_df <- cd8_info[,c("clone_id", "sample_id")]
+
+div <- alphaDiversity(div_df, group = "sample_id", nboot = 100, min_n = 100)
+
+# Add timepoint info
+timepoint_info <- cd8_info %>%
+  dplyr::select("sample_id", "timepoint_cat", "donor") %>%
+  distinct()
+
+div %<>%
+  left_join(timepoint_info, by = "sample_id")
+div$timepoint_cat <- factor(div$timepoint_cat)
+div$donor <- factor(div$donor)
+
+plot_df <- div[div$timepoint_cat %in% c("on_ici", "pre_steroid"),]
+
+ggplot(plot_df, aes_string(x = "q", y = "d", group = "sample_id", color = "timepoint_cat")) +
+  geom_line() +
+  # facet_wrap(~donor) +
+  scale_color_manual(values = c("blue", "red")) +
+  ggtitle("Hill diversity index") + baseTheme() +
+  xlab("q") + ylab("d") +
+  theme_classic(base_size = 20) +
+  theme(legend.title = element_blank())
+
+```
+
+## Supplemental Figure 4H
+
+```{r supp_4H, warning = FALSE, message = FALSE, fig.width = 12, fig.height = 12}
+
+subj_order <- c("SIC_232", "SIC_17", "SIC_175", "SIC_264", "SIC_136", "SIC_258", "SIC_48", "SIC_197",
+                "SIC_177", "SIC_164", "SIC_217", "SIC_153", "SIC_171")
+
+plot_list <- list()
+for (s in subj_order){
+  myo_clones <- myo_exp_tcrs[[s]]
+
+  plot_df <- blood_sc_info
+  plot_df$myo_clone <- ifelse(plot_df$donor == s & plot_df$TRB_cdr3 %in% myo_clones, TRUE, FALSE)
+
+  plot <- ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
+    geom_scattermore(data = plot_df[plot_df$myo_clone == FALSE,], color = "grey", size = 1) +
+    geom_point(data = plot_df[plot_df$myo_clone == TRUE,], color = "red", size = 2) +
+    xlab("") + ylab("") +
+    theme_classic(base_size = 20) +
+    ggtitle(s) +
+    theme(axis.ticks = element_blank(), axis.text = element_blank())
+  plot_list <- c(plot_list, list(plot))
+
+}
+figure <- ggarrange(plotlist = plot_list, ncol = 4, nrow = 4, common.legend = TRUE, legend = "right")
+figure
+
+```
+
+## Supplemental Figure 4I
+
+```{r supp_4I, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
+
+# This dataframe is the same as "tissue_sc_info",
+# but includes all cells (not just those tissue cells with a recovered TCR)
+tissue_cell_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/tissue_cell_info.csv",
+                             row.names = 1)
+
+
+# Make the associated UMAPs
+subj_list <- tissue_cell_info %>%
+  dplyr::filter(blood_clone == "True") %>%
+  dplyr::select(donor, blood_clone) %>%
+  group_by(donor) %>%
+  summarise(n=n()) %>%
+  dplyr::filter(n > 10) %>%
+  .$donor
+
+plot_list <- list()
+for (s in subj_list){
+  plot_df <- tissue_cell_info
+  plot_df$blood_clone <- ifelse(plot_df$donor == s & plot_df$blood_clone == "True", "TRUE", "FALSE")
+
+  plot <- ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
+    geom_point(data = plot_df[plot_df$blood_clone == "FALSE",], aes(fill = blood_clone), color = "grey", size = 1) +
+    geom_point(data = plot_df[plot_df$blood_clone == "TRUE",], pch = 21, aes(fill = blood_clone), size = 1.5) +
+    xlab("") + ylab("") +
+    scale_fill_manual(name = "Blood TCR", breaks = c("TRUE", "FALSE"),
+                      values = c("TRUE" = "red", "FALSE" = "grey")) +
+    theme_classic(base_size = 20) +
+    ggtitle(s) +
+    theme(axis.ticks = element_blank(), axis.text = element_blank())
+  plot_list <- c(plot_list, list(plot))
+
+}
+all_plots <- ggarrange(plotlist = plot_list, common.legend = TRUE)
+all_plots
+
+```
+
 ## Supplemental Figure 4J
 
 ```{python supp_4j}
-# supp_fig4j_genes = ['CXCR3', 'CX3CR1']
-# python_functions.multi_hex_featureplot(tissue_t,
-#                       supp_fig4j_genes,
-#                       ncol=2,
-#                       cmap=python_functions.blues_cmap,
-#                       gridsize=200)
+
+supp_fig4j_genes = ['CXCR3', 'CX3CR1']
+python_functions.multi_hex_featureplot(tissue_t,
+                      supp_fig4j_genes,
+                      ncol=2,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+
 ```
 
 
