@@ -57,15 +57,15 @@ Read in single-cell data
 tissue_nonimmune = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr')
 ```
 
-    ## 2023-03-31 15:20:30,178 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
-    ## 2023-03-31 15:20:30,179 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.65s.
+    ## 2023-04-10 14:49:06,674 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
+    ## 2023-04-10 14:49:06,674 - pegasusio.readwrite - INFO - Function 'read_input' finished in 1.88s.
 
 ``` python
 tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
 ```
 
-    ## 2023-03-31 15:20:31,096 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr' is loaded.
-    ## 2023-03-31 15:20:31,096 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.91s.
+    ## 2023-04-10 14:49:08,479 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr' is loaded.
+    ## 2023-04-10 14:49:08,479 - pegasusio.readwrite - INFO - Function 'read_input' finished in 1.78s.
 
 ## Figure 5A
 
@@ -406,9 +406,65 @@ fig_5f_genes = ['CXCL10', 'CXCL9', 'MDK', 'FLT3LG', 'STAT1']
 python_functions.multi_hexfp_by_condition(tissue_nonimmune, fig_5f_genes, cmap = python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|                                                    | 0/5 [00:00<?, ?it/s] 20%|########8                                   | 1/5 [00:01<00:04,  1.17s/it] 40%|#################6                          | 2/5 [00:02<00:03,  1.17s/it] 60%|##########################4                 | 3/5 [00:03<00:02,  1.14s/it] 80%|###################################2        | 4/5 [00:04<00:01,  1.13s/it]100%|############################################| 5/5 [00:05<00:00,  1.13s/it]100%|############################################| 5/5 [00:05<00:00,  1.14s/it]
+    ##   0%|                                                                                                                                                                 | 0/5 [00:00<?, ?it/s] 20%|##############################6                                                                                                                          | 1/5 [00:00<00:03,  1.00it/s] 40%|#############################################################2                                                                                           | 2/5 [00:01<00:02,  1.01it/s] 60%|###########################################################################################8                                                             | 3/5 [00:02<00:01,  1.02it/s] 80%|##########################################################################################################################4                              | 4/5 [00:03<00:00,  1.03it/s]100%|#########################################################################################################################################################| 5/5 [00:04<00:00,  1.03it/s]
 
 <img src="figure_5_files/figure-gfm/fig_5f-1.png" width="1152" />
+
+## Figure 5G
+
+``` r
+# Curated cell:cell interaction file.  How they were curated is outlined in the methods
+cell_cell_interaction_filtered = read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/cell_cell_interaction/cell_cell_interaction_supplemental_table.csv")
+
+# Latest cell cluster annotations...cellphonedb was run with old cluster names, need to fix
+cell_annotations = read.csv("/projects/home/nealpsmith/projects/myocarditis/data/tissue_cluster_annotations.csv", row.names = 1)
+cell_annotations$small_names <- sapply(cell_annotations$annotation, function(x) strsplit(x, ":")[[1]][1])
+new_names <- c(cell_annotations$New_name)
+names(new_names) <- cell_annotations$small_names
+
+main_clusts = unique(c(cell_cell_interaction_filtered$cluster_a))
+unique_clusts <- unique(c(cell_cell_interaction_filtered$cluster_a, cell_cell_interaction_filtered$cluster_b))
+
+heatmap_df <- data.frame(matrix(ncol = length(unique_clusts), nrow = length(main_clusts)),
+                         row.names = main_clusts)
+colnames(heatmap_df) <- unique_clusts
+
+for (c in main_clusts){
+  clean_df <- cell_cell_interaction_filtered[cell_cell_interaction_filtered$cluster_a == c,]
+
+  pair_counts <- clean_df %>%
+    dplyr::group_by(cluster_a, cluster_b) %>%
+    summarise(n_pair = n())
+
+  for (i in 1:nrow(pair_counts)){
+    r <- as.character(pair_counts[i,"cluster_a"])
+    c <- as.character(pair_counts[i,"cluster_b"])
+    count <- as.numeric(pair_counts[i,"n_pair"])
+    heatmap_df[r,c] <- count
+  }
+}
+
+heatmap_df[is.na(heatmap_df)] <- 0
+# Confirm this is true
+nrow(cell_cell_interaction_filtered) == sum(heatmap_df)
+```
+
+    ## [1] TRUE
+
+``` r
+# Adjust the names to be the most current ones
+colnames(heatmap_df) <- sapply(colnames(heatmap_df), function(x) new_names[[x]])
+rownames(heatmap_df) <- sapply(rownames(heatmap_df), function(x) new_names[[x]])
+
+# Now lets make the heatmap
+heatmap_col_fun = colorRamp2(c(min(heatmap_df), max(heatmap_df)), c("#fafafa", '#02024a'))
+
+hmap <- Heatmap(heatmap_df, name = "# interactions", col = heatmap_col_fun)
+
+draw(hmap)
+```
+
+![](figure_5_files/figure-gfm/fig_5g-3.png)<!-- -->
 
 ## Figure 5H
 
@@ -495,7 +551,7 @@ fig.tight_layout()
 plt.show()
 ```
 
-<img src="figure_5_files/figure-gfm/fig_5h-3.png" width="1440" />
+<img src="figure_5_files/figure-gfm/fig_5h-1.png" width="1440" />
 
 ## Figure 5I
 
@@ -560,7 +616,7 @@ ggplot(plot_df, aes(x = condition, y = value + 1, fill = condition)) +
        y = "log10(pg/mL + 1)")
 ```
 
-![](figure_5_files/figure-gfm/fig_5i-5.png)<!-- -->
+![](figure_5_files/figure-gfm/fig_5i-3.png)<!-- -->
 
 | protein      | mean\_case | std\_case | n\_case | mean\_control | std\_control | n\_control |  p\_value |
 | :----------- | ---------: | --------: | ------: | ------------: | -----------: | ---------: | --------: |
@@ -624,6 +680,7 @@ ggplot(plot_df, aes(x = condition, y = value + 1, fill = condition)) +
 | PDGF-AA      |  7.2625498 | 0.4149287 |      16 |     6.8714718 |    2.4434248 |         10 | 0.6275551 |
 | PDGF-AB/BB   |  9.8534586 | 0.2195944 |      16 |     9.5292300 |    1.2586629 |         10 | 0.4397492 |
 | RANTES       |  7.4055882 | 0.4235097 |      16 |     6.8356067 |    2.4265108 |         10 | 0.4798918 |
+| sCD40L       |  8.4292255 | 0.4433345 |      16 |     8.1623234 |    1.8579870 |         10 | 0.6651690 |
 | SCF          |  3.2519765 | 2.0302255 |      16 |     1.6751457 |    2.4194080 |         10 | 0.1043613 |
 | SDF-1α+β     |  8.8320183 | 0.5500243 |      16 |     8.6591937 |    0.5690661 |         10 | 0.4549002 |
 | TARC         |  4.5425314 | 0.5415717 |      16 |     4.6026783 |    0.9859257 |         10 | 0.8623928 |
@@ -634,7 +691,6 @@ ggplot(plot_df, aes(x = condition, y = value + 1, fill = condition)) +
 | TRAIL        |  3.7510727 | 0.4668613 |      16 |     3.7174592 |    0.5276374 |         10 | 0.8707802 |
 | TSLP         |  0.7325628 | 1.1914176 |      16 |     1.4436622 |    2.9711651 |         10 | 0.4859080 |
 | VEGF-A       |  5.2810634 | 0.6310147 |      16 |     5.1891024 |    1.8756073 |         10 | 0.8837901 |
-| sCD40L       |  8.4292255 | 0.4433345 |      16 |     8.1623234 |    1.8579870 |         10 | 0.6651690 |
 
 ## Figure 5J
 

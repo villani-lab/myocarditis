@@ -391,6 +391,58 @@ python_functions.multi_hexfp_by_condition(tissue_nonimmune, fig_5f_genes, cmap =
 ```
 
 
+## Figure 5G
+
+```{r fig_5g, message = FALSE, warning = FALSE, fig.height = 7, fig.width = 13}
+
+# Curated cell:cell interaction file.  How they were curated is outlined in the methods
+cell_cell_interaction_filtered = read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/cell_cell_interaction/cell_cell_interaction_supplemental_table.csv")
+
+# Latest cell cluster annotations...cellphonedb was run with old cluster names, need to fix
+cell_annotations = read.csv("/projects/home/nealpsmith/projects/myocarditis/data/tissue_cluster_annotations.csv", row.names = 1)
+cell_annotations$small_names <- sapply(cell_annotations$annotation, function(x) strsplit(x, ":")[[1]][1])
+new_names <- c(cell_annotations$New_name)
+names(new_names) <- cell_annotations$small_names
+
+main_clusts = unique(c(cell_cell_interaction_filtered$cluster_a))
+unique_clusts <- unique(c(cell_cell_interaction_filtered$cluster_a, cell_cell_interaction_filtered$cluster_b))
+
+heatmap_df <- data.frame(matrix(ncol = length(unique_clusts), nrow = length(main_clusts)),
+                         row.names = main_clusts)
+colnames(heatmap_df) <- unique_clusts
+
+for (c in main_clusts){
+  clean_df <- cell_cell_interaction_filtered[cell_cell_interaction_filtered$cluster_a == c,]
+
+  pair_counts <- clean_df %>%
+    dplyr::group_by(cluster_a, cluster_b) %>%
+    summarise(n_pair = n())
+
+  for (i in 1:nrow(pair_counts)){
+    r <- as.character(pair_counts[i,"cluster_a"])
+    c <- as.character(pair_counts[i,"cluster_b"])
+    count <- as.numeric(pair_counts[i,"n_pair"])
+    heatmap_df[r,c] <- count
+  }
+}
+
+heatmap_df[is.na(heatmap_df)] <- 0
+# Confirm this is true
+nrow(cell_cell_interaction_filtered) == sum(heatmap_df)
+
+# Adjust the names to be the most current ones
+colnames(heatmap_df) <- sapply(colnames(heatmap_df), function(x) new_names[[x]])
+rownames(heatmap_df) <- sapply(rownames(heatmap_df), function(x) new_names[[x]])
+
+# Now lets make the heatmap
+heatmap_col_fun = colorRamp2(c(min(heatmap_df), max(heatmap_df)), c("#fafafa", '#02024a'))
+
+hmap <- Heatmap(heatmap_df, name = "# interactions", col = heatmap_col_fun)
+
+draw(hmap)
+
+```
+
 ## Figure 5H
 
 ```{python fig_5h}
