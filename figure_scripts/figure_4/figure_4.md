@@ -1,4 +1,4 @@
-Figure 3
+Figure 4
 ================
 
 ## Setup
@@ -18,9 +18,10 @@ library(alakazam)
 library(magrittr)
 library(circlize)
 library(ComplexHeatmap)
+library(RColorBrewer)
 
-setwd('../../functions')
-source('tcr_functions.R')
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('/projects/home/nealpsmith/publication_githubs/myocarditis/functions/tcr_functions.R')
 ```
 
 Load Python packages
@@ -38,28 +39,25 @@ import python_functions
 Read in single-cell data
 
 ``` python
-blood_cd8_nk = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd8.zarr')
-```
-
-``` python
-blood_cd8_nk_adt = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd8_nk_adt.zarr')
-```
-
-``` python
-blood_cd8_nk
+# blood_cd8_nk = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd8.zarr')
+# blood_cd8_nk_adt = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/blood_cd8_nk_adt.zarr')
+# blood_cd8_nk
+blood_cd8_nk = pg.read_input("/projects/home/sramesh/myo_final/blood/cd8_v2/myo_blood_cd8_v2_res_2_1_v2_w_cite_complete_with_pb.zarr")
 ```
 
 ``` r
 bulk_tcr_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/all_productive_tcrs.csv",
                         row.names = 1)
-blood_sc_info = read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/cell_info.csv",
+blood_sc_info = read.csv("/projects/home/nealpsmith/projects/myocarditis/blood/updated/data/myo_blood_cd8_obs.csv",
                      row.names = 1)
+blood_sc_info$sample_id[blood_sc_info$sample_id == "SIC_258_784"] <- "SIC_258_787"
+
 tissue_sc_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/tissue_cell_info.csv",
                              row.names = 1)
 tissue_sc_info <- tissue_sc_info[tissue_sc_info$TRB_cdr3 != "",]
 ### Okay lets look at the overlap between tumor and myocarditis and tumor control in our subjects ###
 bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A17-341_A3", "myo" = "A17-341_A27"),
-                           "SIC_232" = list("tumor" = "A19-395_A8", "control" = "A19-395_A7", "myo" = "A19-395_A53-1"),
+                           # "SIC_232" = list("tumor" = "A19-395_A8", "control" = "A19-395_A7", "myo" = "A19-395_A53-1"),
                            "SIC_136" = list("tumor" = "A19-41_A10_Tumor", "control" = "A19-41_A10_Liver", "myo" = "A19-41_A33"),
                            "SIC_17" = list("tumor" = "A18-122_A51", "control" = "A18-122_A52", "myo" = "A18-122_A41"),
                            "SIC_175" = list("tumor" = "A19-230_A5", "control" = "T03054-11", "myo" = "A19-230_A48"),
@@ -68,23 +66,24 @@ bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A
                            # These are controls
                            "SIC_176" = list("myo" = "A19-213_A13"),
                            "SIC_14" = list("myo" = "T01708-11"),
-                           "SIC_182" = list("myo" = "A19-240_A15"),
+                           # "SIC_182" = list("myo" = "A19-240_A15"),
                            "T01241" = list("myo" = "A16-303_A5")
 )
 ```
 
-## Figure 3B
+## Figure 4B
 
 ``` r
-control_ids <- c("SIC_176", "SIC_14", "SIC_182", "T01241")
+control_ids <- c("SIC_176", "SIC_14", "T01241")
 healing_ids <- c("SIC_3", "SIC_175", "SIC_266")
 borderline_ids <- c("SIC_136")
 active <- c("SIC_264", "SIC_17")
+# micromets <- c("SIC_232", "SIC_136")
 
-meta_df <- data.frame("category" = c("control", "control", "control", "control",
+meta_df <- data.frame("category" = c("control", "control", "control",
                                      "healing", "healing", "healing",
                                      "borderline", "active", "active"),
-                      "id" = c("SIC_176", "SIC_14", "SIC_182", "T01241",
+                      "id" = c("SIC_176", "SIC_14", "T01241",
                                "SIC_3", "SIC_175", "SIC_266", "SIC_136", "SIC_264", "SIC_17"))
 
 heart_tcrs <- lapply(names(bulk_tissue_samples), function(s){
@@ -95,29 +94,32 @@ heart_tcrs <- lapply(names(bulk_tissue_samples), function(s){
   return(subj_tcrs)
 }) %>% do.call(rbind, .)
 
+
+
 colnames(heart_tcrs)[colnames(heart_tcrs) == "amino_acid"] <- "clone_id"
 # Only look at subjects with at least 200 TCRs
 div_df <- heart_tcrs[,c("clone_id", "id", "count_templates_reads")]
-div_df <- div_df[div_df$id != "SIC_232",] # They have tumors in their heart...different case
+# div_df <- div_df[div_df$id != "SIC_232",]
+
 div <- alphaDiversity(div_df, group = "id", nboot = 100, min_n = 100, copy = "count_templates_reads")
 ```
 
     ## [1] "MADE IT!"
-    ## # A tibble: 369 × 9
-    ## # Groups:   id [9]
+    ## # A tibble: 328 × 9
+    ## # Groups:   id [8]
     ##    id          q     d  d_sd d_lower d_upper     e e_lower e_upper
     ##    <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
-    ##  1 SIC_136   0    156.  5.61    145.    167. 1       0.929    1.07
-    ##  2 SIC_136   0.1  154.  5.84    143.    166. 0.991   0.917    1.06
-    ##  3 SIC_136   0.2  153.  6.09    141.    165. 0.981   0.905    1.06
-    ##  4 SIC_136   0.3  151.  6.36    139.    164. 0.971   0.891    1.05
-    ##  5 SIC_136   0.4  150.  6.64    137.    163. 0.961   0.877    1.04
-    ##  6 SIC_136   0.5  148.  6.94    134.    162. 0.949   0.862    1.04
-    ##  7 SIC_136   0.6  146.  7.26    132.    160. 0.937   0.846    1.03
-    ##  8 SIC_136   0.7  144.  7.60    129.    159. 0.925   0.829    1.02
-    ##  9 SIC_136   0.8  142.  7.96    127.    158. 0.912   0.812    1.01
-    ## 10 SIC_136   0.9  140.  8.33    124.    156. 0.898   0.793    1.00
-    ## # … with 359 more rows
+    ##  1 SIC_136   0    519.  11.6    496.    541. 1       0.956   1.04 
+    ##  2 SIC_136   0.1  507.  12.0    484.    530. 0.977   0.932   1.02 
+    ##  3 SIC_136   0.2  494.  12.4    470.    519. 0.953   0.906   1.00 
+    ##  4 SIC_136   0.3  481.  12.8    456.    506. 0.927   0.879   0.976
+    ##  5 SIC_136   0.4  467.  13.3    441.    493. 0.900   0.850   0.950
+    ##  6 SIC_136   0.5  452.  13.8    425.    479. 0.871   0.819   0.923
+    ##  7 SIC_136   0.6  436.  14.3    408.    464. 0.841   0.787   0.895
+    ##  8 SIC_136   0.7  420.  14.8    391.    449. 0.809   0.753   0.865
+    ##  9 SIC_136   0.8  402.  15.4    372.    432. 0.775   0.717   0.834
+    ## 10 SIC_136   0.9  384.  15.9    353.    416. 0.741   0.681   0.801
+    ## # … with 318 more rows
 
 ``` r
 # Add healing meta
@@ -134,9 +136,9 @@ ggplot(div, aes_string(x = "q", y = "d", group = "id", color = "category")) +
   theme(legend.title = element_blank())
 ```
 
-![](figure_3_files/figure-gfm/fig_3B-1.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_4B-1.png)<!-- -->
 
-## Figure 3C
+## Figure 4C
 
 ``` r
 fisher_res <- data.frame()
@@ -306,9 +308,9 @@ ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc, fill = sig_cat)) +
   theme(legend.title = element_blank())
 ```
 
-![](figure_3_files/figure-gfm/fig_3c-1.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_4c-1.png)<!-- -->
 
-\#\#Figure 3D
+\#\#Figure 4D
 
 ``` r
 fisher_res$subj <- factor(fisher_res$subj, levels = c("SIC_3", "SIC_17", "SIC_136", "SIC_175"))
@@ -324,34 +326,9 @@ ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc, fill = subj)) +
   theme(legend.title = element_blank())
 ```
 
-![](figure_3_files/figure-gfm/fig_3D-1.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_4D-1.png)<!-- -->
 
-## Figure 3E
-
-``` python
-python_functions.plot_umap(blood_cd8_nk, 'Blood: CD8 and NK', python_functions.blood_cd8_pal)
-```
-
-<img src="figure_3_files/figure-gfm/fig_3e-1.png" width="960" />
-
-## Figure 3F
-
-``` python
-
-python_functions.make_gene_dotplot(blood_cd8_nk.to_anndata(),
-             cluster_order=['1. b-CD8T: ZNF683 GNLY', '3. b-CD8T: CX3CR1 IKZF2', '4. b-CD8T: TCF7 ITGb',
-                            '6. b-CD8T: HLA-DRA RGS1', '7. b-CD8T: IL7R GZMK', '11. b-CD8T: cycling',
-                            '12. b-CD8T: CCL3 IFNG ', '8. b-CD8T/NK: MT-high', '9. b-MAIT: TRAV1-2 KLRb',
-                            '2. b-NK: SPON2 FCER1G', '5. b-NK: KIR2DL3 KLRC2', '10. b-NK: SPTSSB XCL1'],
-             gene_order=['ZNF683', 'GNLY', 'CX3CR1', 'IKZF2', 'TCF7', 'ITGB1', 'HLA-DRA',
-                         'RGS1', 'IL7R', 'GZMK', 'STMN1', 'CXCR3', 'CCL3', 'IFNG', 'TRAV1-2',
-                         'KLRB1', 'SPON2', 'FCER1G',  'KIR2DL3', 'KLRC2', 'SPTSSB', 'XCL1'],
-             title='CD8/NK')
-```
-
-<img src="figure_3_files/figure-gfm/fig_3f-3.png" width="1152" />
-
-## Figure 3G
+## Figure 4E
 
 ``` r
 subjs_oi <- c("SIC_175", "SIC_264", "SIC_48", "SIC_177")
@@ -404,14 +381,47 @@ figure <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2, common.legend = TR
 figure
 ```
 
-![](figure_3_files/figure-gfm/fig_3g-5.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_4e-1.png)<!-- -->
 
-## Figure 3H
+## Figure 4F
 
 ``` r
-blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info$donor))
-# Need to remove SIC_3, its healing myocarditis, so different
-blood_overlap_subjs <- blood_overlap_subjs[blood_overlap_subjs != "SIC_3"]
+# Blood TCR info
+bulk_tcr_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/all_productive_tcrs.csv",
+                        row.names = 1)
+# CD8
+blood_sc_info_cd8 = read.csv("/projects/home/nealpsmith/projects/myocarditis/blood/updated/data/myo_blood_cd8_obs.csv",
+                     row.names = 1)
+blood_sc_info_cd8$sample_id[blood_sc_info_cd8$sample_id == "SIC_258_784"] <- "SIC_258_787"
+blood_sc_info_cd8$t_cell_cluster <- paste("cd8_", blood_sc_info_cd8$leiden_labels, sep = "")
+
+# CD4
+blood_sc_info_cd4 = read.csv("/projects/home/nealpsmith/projects/myocarditis/blood/updated/data/myo_blood_cd4_obs.csv",
+                     row.names = 1)
+blood_sc_info_cd4$sample_id[blood_sc_info_cd4$sample_id == "SIC_258_784"] <- "SIC_258_787"
+blood_sc_info_cd4$t_cell_cluster <- paste("cd4_", blood_sc_info_cd4$leiden_labels, sep = "")
+
+# Make a combined dataframe
+all_blood_sc_info <- rbind(blood_sc_info_cd8, blood_sc_info_cd4)
+# Add timepoint info
+timepoint_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/blood/updated/data/myo_blood_timepoints.csv")
+
+blood_sc_info_cd8 %<>%
+  rownames_to_column("index") %>%
+  dplyr::left_join(timepoint_info, by = "sample_id") %>%
+  column_to_rownames("index")
+all_blood_sc_info %<>%
+  dplyr::left_join(timepoint_info, by = "sample_id")
+
+tissue_sc_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/tissue_cell_info.csv",
+                             row.names = 1)
+tissue_sc_info <- tissue_sc_info[tissue_sc_info$TRB_cdr3 != "",]
+
+blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info_cd8$donor))
+
+# Don't include bulk healing
+healing_ids <- c("SIC_3", "SIC_175", "SIC_266", "SIC_232")
+
 myo_exp_tcrs <- lapply(blood_overlap_subjs, function(s){
   subj_tcrs <- c()
   # See if they have bulk TCR
@@ -444,235 +454,168 @@ myo_exp_tcrs <- lapply(blood_overlap_subjs, function(s){
 })
 names(myo_exp_tcrs) <- blood_overlap_subjs
 
-association_dfs <- lapply(blood_overlap_subjs, function(s){
+info_df <- all_blood_sc_info[all_blood_sc_info$donor %in% blood_overlap_subjs,]
+info_df$myo_clone <- "False"
+for (s in blood_overlap_subjs){
   myo_clones <- myo_exp_tcrs[[s]]
-  info_df <- blood_sc_info[blood_sc_info$donor == s,]
-  info_df$myo_clone <- ifelse(info_df$donor == s & info_df$TRB_cdr3 %in% myo_clones, "True", "False")
-  if (nrow(info_df[info_df$myo_clone == "True",]) == 0){
-    return(0)
-  }
-  df <- tcr_assoc_func(info_df, cluster = info_df$leiden_labels, contrast = "myo_clone")
-  return(df)
-})
-names(association_dfs) <- blood_overlap_subjs
-association_dfs$SIC_199 <- NULL
-
-stacked_bar_df <- data.frame()
-n_overlap_df <- data.frame()
-subj_order <- c("SIC_232", "SIC_17", "SIC_175", "SIC_264", "SIC_136", "SIC_258", "SIC_48", "SIC_197",
-                "SIC_177", "SIC_164", "SIC_217", "SIC_153", "SIC_171")
-for (s in subj_order){
-  myo_clones <- myo_exp_tcrs[[s]]
-
-  plot_df <- blood_sc_info
-  plot_df$myo_clone <- ifelse(plot_df$donor == s & plot_df$TRB_cdr3 %in% myo_clones, TRUE, FALSE)
-
-  # Now get the info for the stacked bars
-  stacked_bar_info <- plot_df %>%
-    dplyr::filter(myo_clone == TRUE) %>%
-    dplyr::select(leiden_labels) %>%
-    group_by(leiden_labels) %>%
-    summarise(n = n()) %>%
-    mutate("perc" = n / sum(n) * 100) %>%
-    dplyr::mutate(donor = s)
-
-  stacked_bar_df <- rbind(stacked_bar_df, stacked_bar_info)
-
-  # Now the number of overlapping unique and total CDR3s
-  n_unique = plot_df %>%
-    dplyr::filter(myo_clone == TRUE) %>%
-    dplyr::select(TRB_cdr3) %>%
-    distinct() %>%
-    nrow()
-  n_total = plot_df %>%
-    dplyr::filter(myo_clone == TRUE) %>%
-    nrow()
-  n_overlap_df <- rbind(n_overlap_df, data.frame("unique_cdr3s" = n_unique, "total_cells" = n_total, "subj" = s))
+  info_df$myo_clone[info_df$donor == s & info_df$TRB_cdr3 %in% myo_clones] <- "True"
 }
+# info_df <- info_df[info_df$TRB_cdr3 != "",]
+info_df %<>% dplyr::filter(TRB_cdr3 != "", timepoint_cat != "pre_ici")
 
-heatmap_df <- lapply(names(association_dfs), function(n){
-  df = association_dfs[[n]]
-  ors <- df["myo_clone.OR"] %>%
-    `colnames<-`(c(n)) %>%
-    rownames_to_column(var = "cluster")
-  return(ors)
-}) %>%
-  reduce(full_join, by = "cluster") %>%
-  replace(is.na(.), 1) %>%
-  column_to_rownames("cluster") %>%
-  t()
-
-pval_df <- lapply(names(association_dfs), function(n){
-  df = association_dfs[[n]]
-  ors <- df["model.padj"] %>%
-    `colnames<-`(c(n)) %>%
-    rownames_to_column(var = "cluster")
-  return(ors)
-}) %>%
-  reduce(full_join, by = "cluster") %>%
-  replace(is.na(.), 1) %>%
-  column_to_rownames("cluster") %>%
-  t()
-
-# Lets remove the doublets
-heatmap_df <- heatmap_df %>%
-  as.data.frame() %>%
-  dplyr::select(-cluster9)
-
-pval_df <- pval_df %>%
-  as.data.frame() %>%
-  dplyr::select(-cluster9)
-
-# Adjust column names
-new_names <- c("cluster1" = "2. b-NK",
-"cluster2" = "1. b-CD8T",
-"cluster3" = "3. b-CD8T",
-"cluster4" = "4. b-CD8T",
-"cluster5" = "5. b-NK",
-"cluster6" = "6. b-CD8T",
-"cluster7" = "7. b-CD8T",
-"cluster8" = "8. b-CD8T/NK",
-"cluster9" = "MNP/T doublets",
-"cluster10" = "9. b-MAIT",
-"cluster11" = "10.b-NK",
-"cluster12" = "11. b-CD8T",
-"cluster13" = "12. b-CD8T")
-
-colnames(heatmap_df) <- sapply(colnames(heatmap_df), function(x) new_names[x])
-colnames(pval_df) <- sapply(colnames(pval_df), function(x) new_names[x])
-
-heatmap_col_fun = colorRamp2(c(min(heatmap_df), max(heatmap_df)), c("#FAFAFA", "red"))
-
-# Lets do the clustering
-clustering = hclust(dist(t(heatmap_df), method = "euclidean"), method = "ward.D2")
-col_hc <- as.dendrogram(clustering)
-
-clustering = hclust(dist(heatmap_df, method = "euclidean"), method = "ward.D2")
-row_hc <- as.dendrogram(clustering)
-
-# The stacked bar
-perc_df <- lapply(rownames(heatmap_df), function(s){
-  stacked_df = stacked_bar_df %>%
-    dplyr::filter(donor == s) %>%
-    dplyr::select(leiden_labels, perc) %>%
-    `colnames<-`(c("cluster", s))
-}) %>%
-  reduce(full_join, by = "cluster") %>%
+prop_df <- info_df %>%
+  dplyr::select(donor, myo_clone, t_cell_cluster) %>%
+  dplyr::filter(myo_clone == "True") %>%
+  dplyr::select(-myo_clone) %>%
+  group_by(donor, t_cell_cluster) %>%
+  summarise(n_cells = n()) %>%
+  ungroup() %>%
+  complete(donor, t_cell_cluster) %>%
   replace(is.na(.), 0) %>%
-  mutate(cluster = paste("cluster", cluster, sep = ""))  %>%
-  column_to_rownames("cluster") %>%
-  t()
-
-# How about the number of overlapping clones
-n_myo_clones <- n_overlap_df %>%
-  dplyr::select(subj, unique_cdr3s) %>%
-  dplyr::filter(unique_cdr3s > 0, subj != "SIC_199") %>%
-  column_to_rownames("subj")
-
-n_overlap_cells_df <- n_overlap_df %>%
-  dplyr::select(subj, total_cells) %>%
-  dplyr::filter(total_cells > 0, subj != "SIC_199") %>%
-  column_to_rownames("subj")
-
-
-clust_cols = list(cluster1 = "#C0BCDB",
-                  cluster2 = "#1C9F76",
-                  cluster3 = "#FCCEE5",
-                  cluster4 = "#BD83BE",
-                  cluster5 = "#C5EBFF",
-                  cluster6 = "#C52F60",
-                  cluster7 = "#D95E03",
-                  cluster8 = "#E7AC07",
-                  cluster9 = "#A8761E",
-                  cluster10 = "#757675",
-                  cluster11 = "#BDBDBC",
-                  cluster12 = "#4AA93A",
-                  cluster13 = "#597ABC")
-cols <- as.character(sapply(unique(colnames(perc_df)), function(x) clust_cols[[x]]))
-unique_breaks = c(1, 10, 50, 100)
-n_cell_breaks = c(1, 10, 100, 1000)
-
-colnames(heatmap_df) <- sapply(colnames(heatmap_df), function(x) sub("cluster", "", x))
-fatal_cases <- c("SIC_3", "SIC_17", "SIC_175", "SIC_232", "SIC_264")
-
-fatal_indx <- grep(paste(fatal_cases, sep = "", collapse = "$|"), rownames(heatmap_df))
-nonfatal_indx <- grep(paste(fatal_cases, sep = "", collapse = "$|"), rownames(heatmap_df), invert = TRUE)
-
-# Change the order of the rows in all of the dataframes
-heatmap_df <- heatmap_df[c(fatal_indx, nonfatal_indx),]
-pval_df <- pval_df[c(fatal_indx, nonfatal_indx),]
-perc_df <- perc_df[c(fatal_indx, nonfatal_indx),]
-n_myo_clones <- n_myo_clones[c(fatal_indx, nonfatal_indx),]
-n_overlap_cells_df <- n_overlap_cells_df[c(fatal_indx, nonfatal_indx),]
-
-right_anno = rowAnnotation("% shared TCRβs" = anno_barplot(perc_df, gp = gpar(fill = cols), border = FALSE,
-                                                        width = unit(6, "cm"), axis_param = list(gp = gpar(fontsize = 12))),
-                              "# unique TCRβs" = anno_barplot(log10(n_myo_clones), gp = gpar(fill = "grey"),
-                                                        border = FALSE,
-                                                        ylim = c(log10(1), log10(100)),
-                                                        axis_param = list(at = log10(unique_breaks), labels = unique_breaks),
-                                                        width = unit(3, "cm")),
-                              "# cells" = anno_barplot(log10(n_overlap_cells_df), gp = gpar(fill = "grey"),
-                                                       border = FALSE,
-                                                       ylim = c(log10(1), log10(1000)),
-                                                       axis_param = list(at = log10(n_cell_breaks), labels = n_cell_breaks),
-                                                       width = unit(3, "cm")), show_annotation_name = TRUE,
-                           gap = unit(2, "mm"), annotation_name_gp= gpar(fontsize = 13))
-
-split <- c()
-for(s in rownames(heatmap_df)){
-  if (s %in% fatal_cases) {
-    split <- c(split, "fatal")
-  } else {
-    split <- c(split, "non-fatal")
-  }
-}
-
-split <- factor(split, levels = c("fatal", "non-fatal"))
-
-subj_hmap <- Heatmap(heatmap_df, col = heatmap_col_fun, name = "OR",
-                cluster_columns = col_hc, cluster_rows = FALSE,
-                     split = split,row_gap = unit(3, "mm"),
-                     right_annotation = right_anno,
-                     column_title = "Cluster", column_title_side = "bottom",
-                     column_title_gp = gpar(fontsize = 20),
-                     column_names_rot = 90, column_names_gp = gpar(fontsize = 17),
-                     row_title_gp = gpar(fontsize = 20),
-                cell_fun = function(j, i, x, y, width, height, fill){
-                    if (pval_df[i, j] < 0.05 & heatmap_df[i, j] > 1){
-                      grid.circle(x, y, r = unit(1, "mm"), gp = gpar(fill = "light grey"))
-                    }
-                  })
-
-draw(subj_hmap, ht_gap = unit(c(6, 2), "mm"), heatmap_legend_side = "left")
+  group_by(donor) %>%
+  mutate(total_cells = sum(n_cells)) %>%
+  mutate(perc_exp_myo = n_cells / total_cells * 100) %>%
+  mutate(perc_plus_1 = perc_exp_myo + 1)
 ```
 
-![](figure_3_files/figure-gfm/fig_3h-1.png)<!-- -->
+    ## `summarise()` has grouped output by 'donor'. You can override using the
+    ## `.groups` argument.
 
-## Figure 3I
+``` r
+new_names <- c("cd8_1" = "1. b-NK: SPON2, FGFBP2",
+               "cd8_2" = "2. b-CD8: ZNF683, GZMB",
+               "cd8_3" = "3. b-CD8: CCL5, GNLY",
+               "cd8_4" = "4. b-CD8: GZMK, DUSP2",
+               "cd8_5" = "5. b-CD8: CCR7, CD45RA-prot",
+               "cd8_6" = "6. b-CD8: CX3CR1, TBX21",
+               "cd8_7" = "7. b-CD8: GZMK, TCF7",
+               "cd8_8" = "8. b-MAIT: TRAV1-2, KLRB1",
+               "cd8_9" = "9. b-CD8T/NK: MT-high",
+               "cd8_10" = "10. b-CD8: cycling",
+               "cd8_11" = "11. b-NK: XCL1, SPTSSB",
+               "cd8_12" = "13. Doublets",
+               "cd8_13" = "12. b-NK: cycling",
+               "cd4_1" = "1. b-CD4: TNFRSF4, CD40LG",
+               "cd4_2" = "2. b-CD4: CCR7, CD45RA-prot",
+               "cd4_3" = "3. b-CD4: GZMA, HLA-DRB1",
+               "cd4_4" = "4. b-CD4: Treg",
+               "cd4_5" = "5. b-CD4: GZMK, HLA-DRB1-low",
+               "cd4_6" = "6. b-CD4: MT-high",
+               "cd4_7" = "7. b-CD4: cycling",
+               "cd4_8" = "8. Doublets")
+prop_df$t_cell_cluster <- sapply(prop_df$t_cell_cluster, function(x) new_names[[x]])
+prop_df <- prop_df %>%
+  dplyr::filter(t_cell_cluster != "13. Doublets")
+
+fatal_cases <- c("SIC_3", "SIC_17", "SIC_175", "SIC_232", "SIC_264")
+
+prop_df$fatal <- ifelse(prop_df$donor %in% fatal_cases, "fatal", "non-fatal")
+# prop_df$t_cell_cluster <- factor(prop_df$t_cell_cluster)
+
+pval_df <- data.frame()
+
+for (cl in unique(prop_df$t_cell_cluster)){
+  dat <-  prop_df %>%
+    dplyr::filter(t_cell_cluster == cl)
+  dat$log_perc <- log1p(dat$perc_exp_myo)
+
+  summary(lm(log_perc ~ fatal, data = dat))
+  stat <- t.test(log1p(dat$perc_exp_myo[dat$fatal == "fatal"]), log1p(dat$perc_exp_myo[dat$fatal == "non-fatal"]))
+
+  pval_df <- rbind(pval_df, data.frame(t_cell_cluster = cl,
+                                       t_stat = stat$statistic,
+                                       p_value = stat$p.value))
+}
+pval_df$adj_p <- p.adjust(pval_df$p_value, method = "fdr")
+
+order <- pval_df %>%
+  arrange(p_value) %>%
+  .$t_cell_cluster
+prop_df$t_cell_cluster <- factor(prop_df$t_cell_cluster, levels = rev(order))
+ggplot(prop_df, aes(y = t_cell_cluster, x = perc_exp_myo, fill = fatal)) +
+  geom_boxplot(alpha = 0.7,outlier.shape = NA, position=position_dodge(1)) +
+  geom_point(pch = 21, position = position_jitterdodge(0.1)) +
+  scale_fill_manual(values = c("#e7a023","#999a99")) +
+  xlab("% of expanded myo clones") +
+  theme_classic(base_size = 20)
+```
+
+![](figure_4_files/figure-gfm/fig_4f-1.png)<!-- -->
+
+## Figure 4G
 
 ``` python
 # for adt data
-fig_3i_adt_genes = ['CD45RA', 'CD45RO']
-python_functions.multi_hex_featureplot(blood_cd8_nk_adt,
-                      fig_3i_adt_genes,
+fig_4g_adt_genes = ['cite_CD45RA', 'cite_CD45RO']
+python_functions.multi_hex_featureplot(blood_cd8_nk,
+                      fig_4g_adt_genes,
                       ncol=2,
                       cmap='YlGn',
                       gridsize=200)
 
 ## for gex data
-fig_3i_gex_genes = ['STMN1', 'CXCR3', 'CX3CR1', 'IFNG']
+fig_4g_gex_genes = ['CXCR3', 'MKI67']
 python_functions.multi_hex_featureplot(blood_cd8_nk,
-                      fig_3i_gex_genes,
+                      fig_4g_gex_genes,
                       ncol=2,
                       cmap=python_functions.blues_cmap,
                       gridsize=200)
 ```
 
-    ##   0%|                                                                                                                                                                 | 0/2 [00:00<?, ?it/s] 50%|############################################################################5                                                                            | 1/2 [00:00<00:00,  1.84it/s]100%|#########################################################################################################################################################| 2/2 [00:01<00:00,  1.76it/s]
+    ##   0%|                                                                                                                                                                 | 0/2 [00:00<?, ?it/s] 50%|############################################################################5                                                                            | 1/2 [00:01<00:01,  1.13s/it]100%|#########################################################################################################################################################| 2/2 [00:02<00:00,  1.09s/it]
 
-<img src="figure_3_files/figure-gfm/fig_3i-1.png" width="1152" />
+<img src="figure_4_files/figure-gfm/fig_4g-1.png" width="1152" />
 
-    ##   0%|                                                                                                                                                                 | 0/4 [00:00<?, ?it/s] 25%|######################################2                                                                                                                  | 1/4 [00:00<00:02,  1.30it/s] 50%|############################################################################5                                                                            | 2/4 [00:01<00:01,  1.27it/s] 75%|##################################################################################################################7                                      | 3/4 [00:02<00:00,  1.29it/s]100%|#########################################################################################################################################################| 4/4 [00:03<00:00,  1.25it/s]
+    ##   0%|                                                                                                                                                                 | 0/2 [00:00<?, ?it/s] 50%|############################################################################5                                                                            | 1/2 [00:01<00:01,  1.07s/it]100%|#########################################################################################################################################################| 2/2 [00:02<00:00,  1.05s/it]
 
-<img src="figure_3_files/figure-gfm/fig_3i-2.png" width="1152" />
+<img src="figure_4_files/figure-gfm/fig_4g-2.png" width="1152" />
+
+## Figure 4i
+
+``` r
+colors <- brewer.pal(n = 10, "Set1")
+```
+
+    ## Warning in brewer.pal(n = 10, "Set1"): n too large, allowed maximum for palette Set1 is 9
+    ## Returning the palette you asked for with that many colors
+
+``` r
+cd137_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/cd137_vals.csv", row.names = 1)
+# Make the lowest value 0
+# cd137_data[is.na(cd137_data)] <- 0
+cd137_data[cd137_data < 0] <- 0
+tcr_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/tcr_annotations.csv")
+
+donor_colors <- colors[1:length(unique(tcr_info$donor))]
+names(donor_colors) <- unique(tcr_info$donor)
+
+cd8_tcrs <- tcr_info[tcr_info$subset == "CD8",]
+heatmap_df_cd8 <- cd137_data[,cd8_tcrs$tcr]
+
+scatter_df <- cd137_data %>%
+  rownames_to_column("peptide") %>%
+  reshape2::melt(id.vars = "peptide") %>%
+  `colnames<-`(c("peptide", "tcr", "perc_cd137")) %>%
+  left_join(tcr_info, by = "tcr")
+scatter_df$peptide <- factor(scatter_df$peptide, levels = rev(rownames(heatmap_df_cd8)))
+
+scatter_df$pep_group <- ifelse(grepl("MYH", scatter_df$peptide), "Myosin",
+                               ifelse(grepl("TNNT", scatter_df$peptide), "TnT",
+                                       ifelse(grepl("TNNI", scatter_df$peptide), "TnI", "Control")))
+scatter_df$tcr[scatter_df$tcr == "myo_TCR"] <- "control TCR (Axlerod et al)"
+
+ggplot(scatter_df, aes(y = peptide, x = perc_cd137)) +
+  geom_jitter(data = scatter_df %>% dplyr::filter(!tcr %in% c("control TCR (Axlerod et al)", "UT")),
+              fill = "grey", pch = 21, width = 0, height = 0.25, alpha = 0.2) +
+  geom_point(data = scatter_df %>% dplyr::filter(tcr == "control TCR (Axlerod et al)"), pch = 21, fill = "red", size = 2) +
+  geom_point(data = scatter_df %>% dplyr::filter(tcr == "UT"), pch = 21, fill = "blue", size = 2) +
+  # geom_text_repel(data = scatter_df %>% dplyr::filter(perc_cd137 > 20), aes(label = tcr)) +
+  facet_grid(rows = "pep_group", space = "free_y", scales = "free_y") +
+  xlab("% CD137") +
+  ylab("peptide pool") +
+  theme_classic(base_size = 20)
+```
+
+    ## Warning: Removed 1 rows containing missing values (`geom_point()`).
+
+![](figure_4_files/figure-gfm/fig_4i-5.png)<!-- -->
