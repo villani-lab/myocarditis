@@ -1,0 +1,80 @@
+---
+title: "Figure 6"
+output: html_document
+---
+
+## Set up
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+# load packages
+library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(DESeq2)
+library(knitr)
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
+source('masc.R')
+source('plot_masc.R')
+source('tissue_troponin_abundance.R')
+source('blood_fatal_abundance.R')
+source('de.R')
+```
+
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/nealpsmith/publication_githubs/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+```{python results = 'hide', read_data}
+tissue_fibroblast = pg.read_input('/projects/myocarditis/data/heart/final_clusters/tissue_fibroblast.zarr')
+tissue_fibroblast.obs = tissue_fibroblast.obs.rename(columns = {"umap_numbers" : "umap_number"})
+
+```
+
+
+## Figure 6A
+
+```{python fig_6a}
+python_functions.plot_umap(tissue_fibroblast, 'Tissue: Fibroblast', python_functions.tissue_fibroblast_pal, wspace=0.9, marker_multiplier=6)
+```
+
+```{python fig_6b}
+
+python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
+             cluster_order=['6. Fibroblast: CXCL9, HLA-DRA',
+                            '1. Fibroblast: C3, EGR1low',
+                            '2. Myofibroblast_new: ACTA2, ID4',
+                            '3. Fibroblast: GPC3, EGR1high',
+                            '5. Fibroblast: POSTN, THBS4',
+                            '4. Fibroblast: CADM3, ACKR3',
+                            '7. Doublets'],
+             gene_order=["CXCL9", "HLA-DRA", "CCL5",
+                         "DCN", "ACTA2", "ID4", "GPX3",
+                         "EGR1", "POSTN", "F2R", "PCOLCE2", "IGFBP6"],
+             title='Heart Fibroblast')
+
+```

@@ -21,6 +21,7 @@ tissue_t_pal = ['#cf8c00', '#ff4040', '#0097ff', '#00d067', '#bdbdbd', '#8a2be2'
 tissue_nonimmune_pal = ['#a65628', '#f781bf', '#8dd3c7', '#bebada', '#fb8072', '#fdb462',
                         '#fccde5', '#bc80bd', '#ffed6f', '#c4eaff', '#d95f02', '#737373',
                         '#4ba93b', '#5779bb', '#927acc', '#bf3947', '#f48758', '#80b1d3']
+tissue_fibroblast_pal = ['#a65628', '#f781bf', '#8dd3c7', '#bebada', '#fb8072', '#80b1d3', '#fdb462']
 tissue_b_pal = ['#ff7373', '#f2b94f', '#80b1d3']
 blood_global_pal = ['#1B9E77', '#D95F02', '#7570B3', '#66A61E', '#E6AB02', '#E7298A']
 blood_mnp_pal = ['#03396c', '#b3e900', '#cf8c00', '#f781bf', '#8dd3c7', '#fb8072', '#80b1d3',
