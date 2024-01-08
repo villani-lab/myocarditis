@@ -1,4 +1,4 @@
-Figure 2
+Figure 3
 ================
 
 ## Set up
@@ -18,11 +18,14 @@ library(Matrix)
 library(glue)
 library(ggforestplot)
 library(ggbeeswarm)
+library(ggrepel)
 library(patchwork)
 library(lme4)
 library(ggstance)
 library(DESeq2)
 library(knitr)
+library(fgsea)
+library(ggpubr)
 
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
@@ -52,18 +55,18 @@ Read in single-cell data
 tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
 ```
 
-    ## 2023-03-31 15:25:08,374 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr' is loaded.
-    ## 2023-03-31 15:25:08,374 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.22s.
+    ## 2024-01-08 16:48:46,106 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr' is loaded.
+    ## 2024-01-08 16:48:46,106 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.24s.
 
-## Figure 2A
+## Figure 3A
 
 ``` python
 python_functions.plot_umap(tissue_t, 'Tissue: T and NK', python_functions.tissue_t_pal, marker_multiplier=6)
 ```
 
-<img src="figure_2_files/figure-gfm/fig_2a-1.png" width="960" />
+<img src="figure_3_files/figure-gfm/fig_3a-1.png" width="960" />
 
-## Figure 2B
+## Figure 3B
 
 ``` python
 python_functions.make_gene_dotplot(tissue_t.to_anndata(),
@@ -83,9 +86,9 @@ python_functions.make_gene_dotplot(tissue_t.to_anndata(),
              title='T/NK')
 ```
 
-<img src="figure_2_files/figure-gfm/fig_2b-3.png" width="1152" />
+<img src="figure_3_files/figure-gfm/fig_3b-3.png" width="1152" />
 
-## Figure 2C
+## Figure 3C
 
 ``` r
 tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
@@ -116,37 +119,22 @@ cluster_masc_formatted <- cluster_masc_res %>%
 cluster_masc_formatted['p.adj'] <- p.adjust(cluster_masc_formatted$model.pvalue, method = 'fdr')
 
 ## save results
-write_csv(cluster_masc_formatted, 'cluster_masc_res.csv')
+# write_csv(cluster_masc_formatted, 'cluster_masc_res.csv')
 
 ## plot results for T and NK lineage
 plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK')
 ```
 
-![](figure_2_files/figure-gfm/fig_2c-5.png)<!-- -->
+![](figure_3_files/figure-gfm/fig_3c-5.png)<!-- -->
 
-## Figure 2D
-
-``` python
-fig_2d_genes = ['GZMK', "CCL5", "ITGB7", "PDCD1", "CTLA4", "CXCR3", "CX3CR1", "STMN1"]
-python_functions.multi_hex_featureplot(tissue_t,
-                      fig_2d_genes,
-                      ncol=4,
-                      cmap=python_functions.blues_cmap,
-                      gridsize=200)
-```
-
-    ##   0%|                                                                                               | 0/8 [00:00<?, ?it/s] 12%|##########8                                                                            | 1/8 [00:00<00:02,  3.12it/s] 25%|#####################7                                                                 | 2/8 [00:00<00:01,  3.89it/s] 38%|################################6                                                      | 3/8 [00:00<00:01,  3.69it/s] 50%|###########################################5                                           | 4/8 [00:01<00:00,  4.05it/s] 62%|######################################################3                                | 5/8 [00:01<00:00,  3.83it/s] 75%|#################################################################2                     | 6/8 [00:01<00:00,  4.11it/s] 88%|############################################################################1          | 7/8 [00:01<00:00,  3.88it/s]100%|#######################################################################################| 8/8 [00:02<00:00,  4.13it/s]100%|#######################################################################################| 8/8 [00:02<00:00,  3.96it/s]
-
-<img src="figure_2_files/figure-gfm/fig_2d-1.png" width="2304" />
-
-## Figure 2E
+## Figure 3D
 
 ``` r
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv')
 ```
 
     ## Rows: 13 Columns: 3
-    ## ── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────
+    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     ## Delimiter: ","
     ## chr (1): donor
     ## dbl (2): nearest_troponin, days_from_collection
@@ -158,7 +146,7 @@ tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditi
 troponin_filtered_df <- troponin_filter_tissue(tissue_global_obs, tissue_troponin_metadata)
 ```
 
-    ## Joining with `by = join_by(donor)`
+    ## Joining, by = "donor"
 
 ``` r
 # fit linear model by troponin for DE clusters
@@ -175,8 +163,8 @@ troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, 
 ```
 
     ## `summarise()` has grouped output by 'donor'. You can override using the `.groups` argument.
-    ## Joining with `by = join_by(donor)`
-    ## Joining with `by = join_by(donor)`
+    ## Joining, by = "donor"
+    ## Joining, by = "donor"
 
 ``` r
 select_cluster_percs <- troponin_cluster_percs %>%
@@ -202,20 +190,20 @@ kable(select_cluster_model %>%
 ``` r
 troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-CD8T: cycling"),
                     select_cluster_percs %>% filter(cluster_names =="h-CD8T: cycling"),
-                    "h-CD8T: cycling", level='cluster', point_size = 2.2, type='simple')
+                   "h-CD8T: cycling", level='cluster', point_size = 2.2, type='simple')
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
     ## Warning: Removed 21 rows containing missing values (`geom_smooth()`).
 
-![](figure_2_files/figure-gfm/fig_2e-3.png)<!-- -->
+![](figure_3_files/figure-gfm/fig_3d-1.png)<!-- -->
 
-## Figure 2F
+## Figure 3E
 
 ``` python
 # get pseudobulk counts and metadata by donor for t and nk  clusters
-python_functions.get_pseudobulk_info(tissue_t, 'tissue_t')
+# python_functions.get_pseudobulk_info(tissue_t, 'tissue_t')
 
 # get pseudobulk counts and metadata by donor for t cells only
 tissue_t.obs['t_cell'] = tissue_t.obs['umap_name'].isin(['2. h-CD8T: CD27 LAG3',
@@ -224,7 +212,7 @@ tissue_t.obs['t_cell'] = tissue_t.obs['umap_name'].isin(['2. h-CD8T: CD27 LAG3',
                                                          '5. h-CD8T: KLRG1 CX3CR1',
                                                          '6. h-CD8T: cycling'])
 tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: 'other'})
-python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
+# python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
 ```
 
 ``` r
@@ -403,18 +391,286 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-![](figure_2_files/figure-gfm/fig_2f_heatmap-1.png)<!-- -->
+![](figure_3_files/figure-gfm/fig_3e_heatmap-1.png)<!-- -->
 
-## Figure 2G
+## Figure 3F
 
-``` python
-fig_2g_genes = ['LAG3', 'TOX', 'ITGA4', 'BGP5']
-python_functions.multi_hexfp_by_condition(tissue_t,
-                      fig_2g_genes,
-                      cmap=python_functions.blues_cmap,
-                      gridsize=200)
+``` r
+mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
+                row.names = 1)
+
+lin_assign <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/global_lineage_number_to_name_map.csv")
+
+lin_assign$clust <- paste("c", lin_assign$umap_number, sep = "")
+# trop_values <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv")
+
+meta_data <- data.frame(row.names = colnames(mtx))
+
+meta_data$clust <- sapply(rownames(meta_data), function(x) strsplit(x, "_")[[1]][3])
+meta_data$donor <- sub("_c10|_c[1-9]", "", rownames(meta_data))
+
+meta_data %<>%
+  rownames_to_column() %>%
+  dplyr::left_join(tissue_troponin_metadata, by = "donor") %>%
+  dplyr::left_join(lin_assign, by = "clust") %>%
+  column_to_rownames()
+
+
+if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv")){
+  all_res <- data.frame()
+  gset_res <- data.frame()
+  for (cl in unique(meta_data$umap_name)){
+    pdf(glue("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/{cl}_results.pdf"))
+    meta_temp <- meta_data %>%
+      dplyr::filter(umap_name == cl) %>%
+      na.omit() %>%
+      mutate(log_trop = log(nearest_troponin))
+
+    count_temp <- mtx[,rownames(meta_temp)]
+
+    n_samp <- rowSums(count_temp != 0)
+    count_temp <- count_temp[n_samp > round(nrow(meta_temp) / 2),]
+    # Okay now we can run DESeq
+    dds<- DESeqDataSetFromMatrix(countData = count_temp,
+                                colData = meta_temp,
+                                design = ~log_trop)
+    dds<- DESeq(dds)
+    res <- as.data.frame(results(dds))
+    res<- res[!is.na(res$padj),]
+    res$gene <- rownames(res)
+    res$cluster <- cl
+
+    if (nrow(res[res$padj < 0.1,]) > 20 ){
+        up_label <- res[res$padj < 0.1,] %>%
+          filter(log2FoldChange > 0) %>%
+          arrange(pvalue) %>%
+          top_n(-20, pvalue) %>%
+          .$gene
+        down_label <- res[res$padj < 0.1,] %>%
+          filter(log2FoldChange < 0) %>%
+          arrange(pvalue) %>%
+          top_n(-20, pvalue) %>%
+          .$gene
+        label_genes <- c(up_label, down_label)
+      } else if(nrow(res[res$padj < 0.1,]) > 0 ) {
+        label_genes <- res[res$padj < 0.1,]$gene
+      } else {
+        label_genes = c()
+      }
+    print(
+        ggplot(res, aes(x = log2FoldChange, y = -log10(pvalue))) +
+          geom_point(data = res[res$padj > 0.1,], color = "grey") +
+          geom_point(data = res[res$log2FoldChange > 0 & res$padj < 0.1,], color = "red") +
+          geom_point(data = res[res$log2FoldChange < 0 & res$padj < 0.1,], color = "blue") +
+          geom_text_repel(data = res[res$gene %in% label_genes,], aes(label = gene)) +
+          ggtitle("")+
+          theme_classic(base_size = 20)
+      )
+
+    ## Run GSEA ##
+    res2 <- res %>%
+      dplyr::select(gene, stat) %>%
+      na.omit() %>%
+      distinct() %>%
+      group_by(gene) %>%
+      summarize(stat=mean(stat)) %>%
+      dplyr::select(gene, stat) %>%
+      na.omit()
+
+    ranks <- deframe(res2)
+
+    gene_sets <- gmtPathways("/projects/home/nealpsmith/projects/kupper/all_data_analysis/data/msigdb_symbols.gmt")
+
+    sets <- c("KEGG", "HALLMARK", "BIOCARTA")
+    for (s in sets){
+      gsets <- gene_sets[grep(s, names(gene_sets))]
+
+      fgseaRes <- fgsea(pathways=gsets, stats=ranks, nperm=1000)
+      fgseaResTidy <- fgseaRes %>%
+      as_tibble() %>%
+      arrange(desc(NES))
+      fgseaResTidy$cluster <- cl
+      gset_res <- rbind(gset_res, fgseaResTidy)
+
+      # Make the GSEA plots
+     print(
+       ggplot(fgseaResTidy[fgseaResTidy$padj < 0.1,], aes(reorder(pathway, NES), NES)) +
+         coord_flip() +
+         geom_col() +
+         labs(x="Pathway", y="Normalized Enrichment Score",
+              title=paste("significant", s,"pathways", sep = " ")) +
+         theme_minimal()
+          )
+      }
+    dev.off()
+    all_res <- rbind(all_res, res)
+  }
+  write.csv(all_res, "/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv",
+            row.names = FALSE)
+  gset_res$leadingEdge <- as.character(gset_res$leadingEdge)
+  write.csv(gset_res, "/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv",
+            row.names = FALSE)
+
+} else {
+  gene_sets <- gmtPathways("/projects/home/nealpsmith/projects/kupper/all_data_analysis/data/msigdb_symbols.gmt")
+  all_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv")
+  gset_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv")
+}
+
+
+# Side-by-side bars
+n_degs <- all_res %>%
+  dplyr::filter(padj < 0.1, cluster != "10. Doublets and RBC") %>%
+  mutate(direction = ifelse(stat > 0, "positive", "negative")) %>%
+  group_by(cluster, direction) %>%
+  summarise(n_degs = n()) %>%
+  mutate(n_degs = ifelse(direction == "negative", -n_degs, n_degs))
 ```
 
-    ##   0%|                                                                                               | 0/4 [00:00<?, ?it/s] 25%|#####################7                                                                 | 1/4 [00:00<00:01,  2.51it/s] 50%|###########################################5                                           | 2/4 [00:00<00:00,  2.64it/s] 75%|#################################################################2                     | 3/4 [00:01<00:00,  2.57it/s]100%|#######################################################################################| 4/4 [00:01<00:00,  2.67it/s]100%|#######################################################################################| 4/4 [00:01<00:00,  2.63it/s]
+    ## `summarise()` has grouped output by 'cluster'. You can override using the
+    ## `.groups` argument.
 
-<img src="figure_2_files/figure-gfm/fig_2g-1.png" width="1152" />
+``` r
+order <- n_degs %>%
+  group_by(cluster) %>%
+  summarise(tot = sum(abs(n_degs))) %>%
+  arrange(desc(tot)) %>%
+  .$cluster
+n_degs$cluster <- factor(n_degs$cluster, levels = rev(order))
+
+
+ggplot(n_degs, aes(x = cluster, y = n_degs, group = direction, fill = direction)) +
+  geom_bar(stat = "identity") + coord_flip() +
+  scale_fill_manual(values = c("#0000FF", "#FF0000")) +
+  scale_y_continuous(labels = abs) +
+  ggtitle(glue("# of DEGs by troponin")) +
+  ylab("# of DE genes") + xlab("") +
+  theme_classic(base_size = 20)
+```
+
+![](figure_3_files/figure-gfm/fig_3f-1.png)<!-- -->
+
+``` r
+plot_data <- all_res %>%
+  dplyr::filter(cluster == "3. T and NK cells")
+
+label_up <- c("MKI67", "TOP2A", "BIRC5", "LAG3", "HLA-DRA", "HLA-DRB1", "KIR2DL4")
+label_down <- c("CX3CR1", "S1PR5", "CCL4", "KLF3", "KLRG1")
+label_genes <- c(label_up, label_down)
+ggplot(plot_data, aes(x = log2FoldChange, y = -log10(pvalue))) +
+          geom_point(data = plot_data[plot_data$padj > 0.1,], color = "grey") +
+          geom_point(data = plot_data[plot_data$log2FoldChange > 0 & plot_data$padj < 0.1,], pch = 21, fill = "red") +
+          geom_point(data = plot_data[plot_data$log2FoldChange < 0 & plot_data$padj < 0.1,], pch = 21, fill = "blue") +
+          geom_label_repel(data = plot_data[plot_data$gene %in% label_genes,], aes(label = gene)) +
+          ggtitle("")+
+          theme_classic(base_size = 20)
+```
+
+![](figure_3_files/figure-gfm/fig_3g-1.png)<!-- -->
+
+## Figure 3H
+
+``` r
+tcell_data <- all_res %>%
+  dplyr::filter(cluster == "3. T and NK cells")
+plot_gsets <- c("KEGG_CELL_CYCLE",
+                "HALLMARK_TNFA_SIGNALING_VIA_NFKB",
+                "HALLMARK_G2M_CHECKPOINT",
+                "HALLMARK_MTORC1_SIGNALING")
+
+plot_list <- list()
+for (gset in plot_gsets){
+  print(gset)
+  ranks <- tcell_data %>%
+    dplyr::select(gene, stat) %>%
+    na.omit() %>%
+    arrange(desc(stat))  %>%
+    deframe(.)
+
+  gset_list <- gene_sets[gset]
+
+  fgsea_res <- fgsea(gset_list, stats = ranks, nperm = 10000)
+
+  nes <- round(fgsea_res$NES[fgsea_res$pathway == gset], 3)
+  pval <- round(fgsea_res$pval[fgsea_res$pathway == gset], 3)
+  if (pval == 0) {
+    pval <- "< 0.001"
+  }
+  n_genes <- fgsea_res$size[fgsea_res$pathway == gset]
+
+  rnk <- rank(-ranks)
+  ord <- order(rnk)
+
+  statsAdj <- ranks[ord]
+  statsAdj <- sign(statsAdj) * (abs(statsAdj) ^ 1)
+  statsAdj <- statsAdj / max(abs(statsAdj))
+
+  pathway <- unname(as.vector(na.omit(match(gset_list[[gset]], names(statsAdj)))))
+  pathway <- sort(pathway)
+
+  gseaRes <- calcGseaStat(statsAdj, selectedStats = pathway,
+                            returnAllExtremes = TRUE)
+
+  bottoms <- gseaRes$bottoms
+  tops <- gseaRes$tops
+
+  n <- length(statsAdj)
+  xs <- as.vector(rbind(pathway - 1, pathway))
+  ys <- as.vector(rbind(bottoms, tops))
+  toPlot <- data.frame(x=c(0, xs, n + 1), y=c(0, ys, 0))
+
+  diff <- (max(tops) - min(bottoms)) / 8
+
+  x=y=NULL
+
+  p <- ggplot(toPlot, aes(x = x, y = y)) +
+    # geom_point(color="blue", size=0.1) +
+    geom_line(color="blue") +
+    geom_hline(yintercept=0, colour="black") +
+    geom_segment(data=data.frame(x=pathway),
+                     mapping=aes(x=x, y=-0.15,
+                                 xend=x, yend=-0.25),
+                     size=0.4) +
+    scale_y_continuous(limits = c(-0.5, 1), expand = c(0.05,0.05)) +
+    xlab("Rank") + ylab("Enrichment score") +
+    geom_text(aes(label = "")) +
+    annotate("text", label = glue("NES : {nes}"), x = length(ranks) - 1000, y  =0.9) +
+    annotate("text", label = glue("p-value : {pval}"), x = length(ranks) - 1000, y = 0.8) +
+    annotate("text", label = glue("# genes : {n_genes}"), x = length(ranks) - 1000, y = 0.7) +
+    ggtitle(glue("{gset}")) +
+    theme_classic(base_size = 12)
+  plot_list <- c(plot_list, list(p))
+
+}
+```
+
+    ## [1] "KEGG_CELL_CYCLE"
+
+    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
+    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
+    ## you need to remove the nperm argument in the fgsea function call.
+
+    ## [1] "HALLMARK_TNFA_SIGNALING_VIA_NFKB"
+
+    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
+    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
+    ## you need to remove the nperm argument in the fgsea function call.
+
+    ## [1] "HALLMARK_G2M_CHECKPOINT"
+
+    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
+    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
+    ## you need to remove the nperm argument in the fgsea function call.
+
+    ## [1] "HALLMARK_MTORC1_SIGNALING"
+
+    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
+    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
+    ## you need to remove the nperm argument in the fgsea function call.
+
+``` r
+plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
+plots
+```
+
+![](figure_3_files/figure-gfm/fig_3h-1.png)<!-- -->
