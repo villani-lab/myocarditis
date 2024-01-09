@@ -1,4 +1,4 @@
-Supplemental Figure 3
+Supplemental Figure 4
 ================
 
 ## Setup
@@ -11,6 +11,7 @@ library(glue)
 library(ggpubr)
 library(ggplot2)
 library(magrittr)
+library(ggrepel)
 ```
 
 Read in the TCR data
@@ -34,18 +35,17 @@ bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A
                            # These are controls
                            "SIC_176" = list("myo" = "A19-213_A13"),
                            "SIC_14" = list("myo" = "T01708-11"),
-                           "SIC_182" = list("myo" = "A19-240_A15"),
+                           # "SIC_182" = list("myo" = "A19-240_A15"),
                            "T01241" = list("myo" = "A16-303_A5")
 )
 ```
 
-## Figure S3A
+## Supplemental figure 4A
 
 ``` r
-# This info was taken from the Adaptive immunoseq platform
 plot_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/perc_tcrb_of_nucleated_cells.csv")
 plot_df$perc <- plot_df$perc * 100
-plot_df$category[plot_df$category == "case"] <- "myocarditis"
+plot_df$category[plot_df$category == "case"] <- "irMyocarditis"
 
 ggplot(plot_df, aes(x = category, y = perc, fill = category)) +
   geom_boxplot(alpha = 0.8) +
@@ -60,9 +60,9 @@ ggplot(plot_df, aes(x = category, y = perc, fill = category)) +
   theme(legend.position = "none")
 ```
 
-![](supp_3_files/figure-gfm/fig_S3A-1.png)<!-- -->
+![](supp_4_files/figure-gfm/fig_S4A-1.png)<!-- -->
 
-## Figure S3B
+## Supplemental figure 4B
 
 ``` r
 blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info$donor))
@@ -187,9 +187,9 @@ exp_bars <- ggplot(n_exp_tcrs, aes(x = n, y = subj)) +
 ggarrange(plotlist = list(exp_bars, bars, tiles), nrow = 1, ncol = 3, widths = c(1,1, 0.3), align = "h")
 ```
 
-![](supp_3_files/figure-gfm/fig_s3b-1.png)<!-- -->
+![](supp_4_files/figure-gfm/fig_s4b-1.png)<!-- -->
 
-## Figure S3C
+## Supplemental figure 4C
 
 ``` r
 dset_df <- data.frame()
@@ -256,9 +256,9 @@ ggplot(plot_df, aes(y = donor, x = perc, fill = perc)) +
   theme(legend.position = "none")
 ```
 
-![](supp_3_files/figure-gfm/fig_S3C-1.png)<!-- -->
+![](supp_4_files/figure-gfm/fig_S4C-1.png)<!-- -->
 
-## Figure S3D
+## Supplemental figure 4D
 
 ``` r
 fisher_res <- data.frame()
@@ -427,33 +427,12 @@ n_enriched_df <- data.frame()
 for (subj in order){
   plot_df <- fisher_res[fisher_res$subj == subj,]
   pheno <- pheno_list[[subj]]
-  # if (subj == "SIC_232"){
-  #   xlab = "Prop. tumor"
-  # } else {
-  #   xlab = ""
-  # }
-  # xlab = "Prop. tumor"
   if (subj == "SIC_175"){
       xlab = "Prop. tumor"
     } else {
       xlab = ""
     }
-  # plot_df$tum_enriched <- ifelse(plot_df$tum_enriched == TRUE, "TRUE", "FALSE")
-  # plot_df$myo_enriched <- ifelse(plot_df$myo_enriched == TRUE, "TRUE", "FALSE")
 
-  # plot_df$enriched <- apply(plot_df, 1, function(df){
-  #   if (df[["myo_enriched"]] == TRUE){
-  #     if (df[["tum_enriched"]] == TRUE){
-  #       return("enriched in both")
-  #     } else {
-  #       return("myo enriched")
-  #     }
-  #   } else if (df[["tum_enriched"]] == "TRUE"){
-  #     return("tumor enriched")
-  #   } else {
-  #     return("not enriched")
-  #   }
-  # })
   plot_df$enriched <- plot_df$sig_cat
   count_df <- data.frame("subj" = subj,
              "n_tumor" = nrow(plot_df[plot_df$enriched == "tumor enriched",]),
@@ -475,25 +454,13 @@ for (subj in order){
                                                    "enriched in both" = 5, "not enriched" = 3)) +
       scale_x_continuous(limits = c(0, xlimit)) +
       # xlab("prop. tumor") +
-      xlab(xlab) +
+      xlab("Prop. tumor") +
       ylab("Prop. control") +
       ggtitle(glue("{subj} : {pheno}")) +
       theme_classic(base_size = 30) +
       guides(fill = guide_legend(override.aes = list(size=8))) +
     theme(plot.title = element_text(size=30, face = "bold"))
 
-
-  # if (subj == "SIC_232"){
-  #   xlab = "Prop. myocarditis"
-  # } else {
-  #   xlab = ""
-  # }
-  # xlab = "Prop. myocarditis"
-  if (subj == "SIC_175"){
-    xlab = "Prop. myocarditis"
-  } else {
-    xlab = ""
-  }
   myo_ctl <- ggplot(plot_df, aes(x = perc_myo, y = perc_control, fill = enriched, size = enriched)) +
        geom_point(data = plot_df[plot_df$enriched == "not enriched",], pch = 21) +
       geom_point(data = plot_df[plot_df$enriched != "not enriched",], pch = 21) +
@@ -503,24 +470,36 @@ for (subj in order){
       scale_size_manual(guide = "none", values = c("myo enriched" = 5, "tumor enriched" = 5,
                                                    "enriched in both" = 5, "not enriched" = 3)) +
       scale_x_continuous(limits = c(0, xlimit)) +
-      xlab(xlab) +
-      ylab("") +
-      # ggtitle(subj) +
+      xlab("Prop. myocarditis") +
+      ylab("Prop. control") +
       theme_classic(base_size = 30) +
-      guides(fill = guide_legend(override.aes = list(size=8))) #+
-      # theme(legend.key.size = unit(12, 'cm'))
+      guides(fill = guide_legend(override.aes = list(size=8)))
 
-  plot_list <- c(plot_list, list(ctl_tumor, myo_ctl))
+  myo_tum <- ggplot(plot_df, aes(x = perc_myo, y = perc_tumor, fill = enriched, size = enriched)) +
+       geom_point(data = plot_df[plot_df$enriched == "not enriched",], pch = 21) +
+      geom_point(data = plot_df[plot_df$enriched != "not enriched",], pch = 21) +
+      geom_abline(slope = 1, size = 2, linetype = "dashed") +
+       scale_fill_manual(name = "", values = c("myo enriched" = '#7CAE00', "tumor enriched" = '#C77CFF',
+                                               "enriched in both" = '#F8766D', "not enriched" = "grey")) +
+      scale_size_manual(guide = "none", values = c("myo enriched" = 5, "tumor enriched" = 5,
+                                                   "enriched in both" = 5, "not enriched" = 3)) +
+      scale_x_continuous(limits = c(0, xlimit)) +
+      xlab("Prop. myocarditis") +
+      ylab("Prop. tumor") +
+      theme_classic(base_size = 30) +
+      guides(fill = guide_legend(override.aes = list(size=8)))
+
+  plot_list <- c(plot_list, list(ctl_tumor, myo_ctl, myo_tum))
 
 }
 
-figure <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 4, common.legend = TRUE, legend = "top", align = "hv")
+figure <- ggarrange(plotlist = plot_list, ncol = 3, nrow = 4, common.legend = TRUE, legend = "top", align = "hv")
 figure
 ```
 
-![](supp_3_files/figure-gfm/fig_S3D-1.png)<!-- -->
+![](supp_4_files/figure-gfm/fig_S4D-1.png)<!-- -->
 
-## Figure S3E
+## Supplemental figure 4E
 
 ``` r
 plot_list = list()
@@ -562,4 +541,176 @@ for (subj in unique(fisher_res$subj)){
 ggarrange(plotlist = plot_list, common.legend = TRUE, legend.grob = leg, legend = "right")
 ```
 
-![](supp_3_files/figure-gfm/fig_S3E-1.png)<!-- -->
+![](supp_4_files/figure-gfm/fig_S4E-1.png)<!-- -->
+
+## Supplemental figure 4G
+
+``` r
+adaptive_to_imgt <- read.csv("/projects/home/nealpsmith/data/useful/adaptive_to_imgt_v_genes.csv")
+adaptive_to_imgt_human <- adaptive_to_imgt[adaptive_to_imgt$species == "human",]
+adaptive_to_imgt_v <- adaptive_to_imgt_human[grepl("TCRBV", adaptive_to_imgt_human$adaptive),] %>%
+  `colnames<-`(c("adaptive", "imgt_v", "species"))
+adaptive_to_imgt_j <- adaptive_to_imgt_human[grepl("TCRBJ", adaptive_to_imgt_human$adaptive),] %>%
+    `colnames<-`(c("adaptive", "imgt_j", "species"))
+productive_tcr_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/all_productive_tcrs.csv", row.names = 1)
+productive_tcr_df %<>%
+  left_join(adaptive_to_imgt_v, by = c("v_gene_name" = "adaptive")) %>%
+  left_join(adaptive_to_imgt_j, by = c("j_gene_name" = "adaptive"))
+
+productive_tcr_df$simple_v_gene <- sapply(productive_tcr_df$imgt_v, function(x) strsplit(x, "*", fixed = TRUE)[[1]][1])
+productive_tcr_df$simple_j_gene <- sapply(productive_tcr_df$imgt_j, function(x) strsplit(x, "*", fixed = TRUE)[[1]][1])
+
+case_control_subjs <- c("SIC_3", "SIC_136", "SIC_17", "SIC_175")
+motif_perc_df <- data.frame()
+n_tcrs_in_groups <- data.frame()
+gliph_list <- list()
+for (subj in case_control_subjs){
+  gliph_groups <- read.csv(glue("/projects/home/nealpsmith/projects/myocarditis/gliph/data/gliph_output/gliph_results_{subj}.csv"))
+
+  group_split <- split(gliph_groups, gliph_groups$type)
+
+  # Need to get the global ones
+  # Global ones all the same length, "motif" only can have differing lengths
+  names(group_split) <- sapply(names(group_split), function(x) gsub("motif.* ", "", x))
+
+  gliph_keep <- sapply(group_split, function(x) length(unique(x$TcRb))) > 2
+
+  gliph_filtered <- group_split[gliph_keep]
+  gliph_list[[subj]] <- gliph_filtered
+  n_tcr_count <- sapply(gliph_filtered, function(x) length(unique(x$TcRb))) %>% as.data.frame(row.names = names(.)) %>%
+    `colnames<-`(c("n_unique_tcrs"))
+  n_tcr_count$subj <- subj
+  n_tcrs_in_groups <- rbind(n_tcrs_in_groups, n_tcr_count)
+
+  # Calculate the prop of clones in all 3 compartments that have the motif
+  myo_samp <- bulk_tissue_samples[[subj]]$myo
+  control_samp <- bulk_tissue_samples[[subj]]$control
+  tumor_samp <- bulk_tissue_samples[[subj]]$tumor
+
+  subj_data <-  productive_tcr_df %>%
+    dplyr::filter(id == subj)
+
+  subj_by_aa <- subj_data %>%
+    dplyr::select(sample, tissue, amino_acid, simple_v_gene, simple_j_gene, count_templates_reads) %>%
+    group_by(sample, tissue, amino_acid, simple_v_gene, simple_j_gene) %>%
+    summarise("n_count_aa" = sum(count_templates_reads)) %>%
+    group_by(sample) %>%
+    dplyr::mutate("perc_of_samp" = n_count_aa / sum(n_count_aa)) # Lets get the proportion of each TCR AA seq in sample
+  myo_dat <- subj_by_aa %>%
+      dplyr::filter(sample == myo_samp) %>%
+      dplyr::filter(!is.na(simple_v_gene)) %>%
+      dplyr::select(amino_acid, simple_v_gene, simple_j_gene, n_count_aa,perc_of_samp)
+
+  tumor_dat <- subj_by_aa %>%
+    dplyr::filter(sample == tumor_samp) %>%
+    dplyr::filter(!is.na(simple_v_gene)) %>%
+    dplyr::select(amino_acid, simple_v_gene, simple_j_gene, n_count_aa, perc_of_samp)
+
+  control_dat <- subj_by_aa %>%
+    dplyr::filter(sample == control_samp) %>%
+    dplyr::filter(!is.na(simple_v_gene)) %>%
+    dplyr::select(amino_acid, simple_v_gene, simple_j_gene, n_count_aa, perc_of_samp)
+
+  # Iterate through the motifs
+  percs <- lapply(names(gliph_filtered), function(gg){
+    gg_dat <- gliph_filtered[[gg]]
+    tcrs <- unique(gg_dat$TcRb)
+    myo_perc <- myo_dat %>%
+      dplyr::filter(amino_acid %in% tcrs) %>%
+      .$perc_of_samp %>%
+      sum() * 100
+    tumor_perc <- tumor_dat %>%
+      dplyr::filter(amino_acid %in% tcrs) %>%
+      .$perc_of_samp %>%
+      sum() * 100
+    control_perc <- control_dat %>%
+      dplyr::filter(amino_acid %in% tcrs) %>%
+      .$perc_of_samp %>%
+      sum() * 100
+    df <- data.frame("myo_perc" = myo_perc,
+                     "tumor_perc" = tumor_perc,
+                     "control_perc" = control_perc,
+                     "motif" = gg)
+  }) %>%
+      do.call(rbind, .)
+  percs$subj <- subj
+
+  motif_perc_df <- rbind(motif_perc_df, percs)
+}
+```
+
+    ## `summarise()` has grouped output by 'sample', 'tissue', 'amino_acid', 'simple_v_gene'. You can override using the `.groups` argument.
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## `summarise()` has grouped output by 'sample', 'tissue', 'amino_acid', 'simple_v_gene'. You can override using the `.groups` argument.
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## `summarise()` has grouped output by 'sample', 'tissue', 'amino_acid', 'simple_v_gene'. You can override using the `.groups` argument.
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## `summarise()` has grouped output by 'sample', 'tissue', 'amino_acid', 'simple_v_gene'. You can override using the `.groups` argument.
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+    ## Adding missing grouping variables: `sample`
+
+``` r
+fisher_res$in_gliph <- apply(fisher_res, 1, function(df){
+  subj <- df[["subj"]]
+  seq <- df[["amino_acid"]]
+  gliph_groups <- read.csv(glue("/projects/home/nealpsmith/projects/myocarditis/gliph/data/gliph_output/gliph_results_{subj}.csv"))
+  group_split <- split(gliph_groups, gliph_groups$type)
+
+  # Need to get the global ones
+  # Global ones all the same length, "motif" only can have differing lengths
+  names(group_split) <- sapply(names(group_split), function(x) gsub("motif.* ", "", x))
+
+  gliph_keep <- sapply(group_split, function(x) length(unique(x$TcRb))) > 2
+
+  gliph_filtered <- group_split[gliph_keep]
+
+  gliph_tcrs <- lapply(gliph_filtered, function(x) x$TcRb) %>%
+    unlist(., use.names = FALSE)
+  in_gliph <- seq %in% gliph_tcrs
+  return(in_gliph)
+})
+
+ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc)) +
+  geom_point(data = fisher_res %>% dplyr::filter(in_gliph == FALSE), pch = 21, size = 3, aes(fill = "grey")) +
+  geom_point(data = fisher_res %>% dplyr::filter(in_gliph == TRUE), pch = 21, size = 4, aes(fill = "red")) +
+  scale_fill_manual(values = c("grey", "red"), labels = c("False", "True"), name = "in GLIPH group") +
+  xlab("% Myocarditis : % control") +
+  ylab("% Tumor : % control") +
+  ggtitle("Expanded TCRs (figure 3B)") +
+  theme_classic(base_size = 20)
+```
+
+![](supp_4_files/figure-gfm/fig_s4g-1.png)<!-- -->
+
+``` r
+motif_perc_df$myo_to_ctrl <- motif_perc_df$myo_perc / motif_perc_df$control_perc
+motif_perc_df$tum_to_ctrl <- motif_perc_df$tumor_perc / motif_perc_df$control_perc
+
+motif_perc_df$myo_to_ctrl[motif_perc_df$myo_to_ctrl == "Inf"] <- 90
+motif_perc_df$tum_to_ctrl[motif_perc_df$tum_to_ctrl == "Inf"] <- 90
+
+motif_perc_df[is.na(motif_perc_df)] <- 0
+
+plot_df <- motif_perc_df %>%
+  dplyr::filter(myo_perc > 0.5 | tumor_perc > 0.5)
+
+plot_df$motif_clean <- sapply(plot_df$motif, function(x) strsplit(x, "-")[[1]][2])
+ggplot(plot_df, aes(x = myo_to_ctrl, y = tum_to_ctrl, fill = subj)) +
+  geom_point(pch = 21, size= 3,
+             # position = position_jitterdodge(jitter.width = 1, jitter.height = 1)
+  ) +
+  xlab("% myocarditis : % control") +
+  ylab("% tumor : % control") +
+  ggtitle("GLIPH groups") +
+  geom_label_repel(data = plot_df %>% dplyr::filter(myo_to_ctrl > 10 | tum_to_ctrl > 10), aes(label = motif_clean), show.legend = FALSE) +
+  theme_classic(base_size = 20)
+```
+
+![](supp_4_files/figure-gfm/fig_s4h-1.png)<!-- -->
