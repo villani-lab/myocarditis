@@ -148,7 +148,8 @@ def hex_plot(df, title, n_genes=True, gridsize=200, cmap='YlOrRd',
                    y=y,
                    C=data,
                    cmap=cmap,
-                   gridsize=gridsize)
+                   gridsize=gridsize,
+                   edgecolors = "none")
     cb = fig.colorbar(hb, ax=ax, shrink=.75, aspect=10)
     cb.ax.set_title(col, loc='left', fontsize=14)
     ax.set_ylabel('UMAP2', fontsize=18)
@@ -187,7 +188,8 @@ def hex_featureplot(df, gene, gridsize=200, cmap='YlOrRd',
                    y=y,
                    C=norm_counts,
                    cmap=cmap,
-                   gridsize=gridsize)
+                   gridsize=gridsize,
+                   edgecolors = "none")
     ax.annotate(f'{ncells:,} ({pcells:.1%}) cells',
                 xy=(0.01, 0), xycoords='axes fraction',
                 fontsize=10,
@@ -239,7 +241,8 @@ def multi_hex_featureplot(df, genes, ncol, cmap='YlOrRd', gridsize=120, panel_si
                             y=y,
                             C=norm_counts,
                             cmap=cmap,
-                            gridsize=gridsize)
+                            gridsize=gridsize,
+                            edgecolors = "none")
 
         # add percent expression
         ax[num].annotate(f'{ncells:,} ({pcells:.1%}) cells',
@@ -330,7 +333,8 @@ def multi_hexfp_by_condition(df, genes, cmap='YlOrRd', gridsize=120, panel_size=
                                         cmap=cmap,
                                         gridsize=gridsize,
                                         vmin=0,
-                                        vmax=cb_max)
+                                        vmax=cb_max,
+                                        edgecolors = "none")
             cb = fig.colorbar(hb, ax=ax[num * 2 + i], shrink=.75, aspect=10)
             cb.ax.set_title('logCPM', loc='left', fontsize=14)
             if i == 0:

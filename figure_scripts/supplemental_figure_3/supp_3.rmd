@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 2"
+title: "Supplemental Figure 3"
 output: rmarkdown::github_document
 ---
 
@@ -30,15 +30,17 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import sys
-sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+sys.path.append("/projects/home/nealpsmith/publication_githubs/myocarditis/functions")
 import python_functions
 ```
 
 Read in single-cell data
 
 ```{python results='hide', read_data}
+
 tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
-tissue_b = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_b.zarr')
+tissue_cd4 = pg.read_input("/projects/home/ikernin/projects/myocarditis/tissue/cd4_subclustering/cd4_subclustering_harmony_0_9.zarr")
+
 ```
 
 Read in TCR data
@@ -48,9 +50,37 @@ tissue_cell_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tis
                              row.names = 1)
 ```
 
-## Supplemental Figure 2A
+## Supplemental Figure 3A
 
-```{python results='hold', supp_2a}
+```{python supp_3a}
+
+supp_3a_genes = ['GZMK', "CCL5", "ITGB7", "PDCD1", "CTLA4", "CXCR3", "CX3CR1", "STMN1"]
+python_functions.multi_hex_featureplot(tissue_t,
+                      supp_3a_genes,
+                      ncol=4,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+
+```
+
+## Supplemental figure 3B
+
+```{python supp_3b}
+
+supp_3b_genes = ["SELL", "CCR7", "FOXP3", "TBX21", "GATA3", "RORA", "CXCR3", "CXCL13", "PDCD1"]
+
+python_functions.multi_hex_featureplot(tissue_cd4,
+                      supp_3b_genes,
+                      ncol=4,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+
+
+```
+
+## Supplemental Figure 3c
+
+```{python results='hold', supp_3c}
 tissue_t.obs['Condition'] = [x.capitalize() for x in tissue_t.obs['condition']]
 tissue_t_anndata = tissue_t.to_anndata()
 sc.tl.embedding_density(tissue_t_anndata, groupby='Condition')
@@ -58,22 +88,32 @@ sc.pl.embedding_density(tissue_t_anndata, basis='umap', key=f'umap_density_Condi
 ```
 
 
-## Supplemental Figure 2B
+## Supplemental Figure 3d
 
-```{python results='hold', supp_2b_get_data}
+```{python results='hold', supp_3d_get_data}
 stacked_bar_df = python_functions.get_stacked_bar_df(tissue_t, 't')
 stacked_bar_order = tissue_t.obs['umap_name'].cat.categories.values
 ```
 
-```{r supp_2b_plot}
+```{r supp_3d_plot}
 stacked_bar_order = py$stacked_bar_order[!str_detect(py$stacked_bar_order, 'Doublets')]
 plot_clust_perc_by_donor(py$stacked_bar_df, 't', cluster_order = stacked_bar_order)
 ```
 
+## Supplemental Figure 3E
 
-## Supplemental Figure 2C
+```{python supp_3e}
 
-```{r supp_2C, message = FALSE, warning = FALSE, fig.height = 20, fig.width = 20}
+supp_3e_genes = ['LAG3', 'TOX', 'ITGA4', 'GBP5']
+python_functions.multi_hexfp_by_condition(tissue_t,
+                      supp_3e_genes,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
+```
+
+## Supplemental Figure 3F
+
+```{r supp_3f, message = FALSE, warning = FALSE, fig.height = 20, fig.width = 20}
 tissue_cell_info$samp_ster <- paste(tissue_cell_info$donor, tissue_cell_info$on_steroids, sep = "_")
 # Re-calculate expaded clones by sample
 tcr_props <- tissue_cell_info %>%
@@ -138,9 +178,9 @@ figure <- annotate_figure(all_plots, left = textGrob("UMAP2", rot = 90, vjust = 
 figure
 ```
 
-# Supplemental Figure 2D
+# Supplemental Figure 3G
 
-```{r supp_2D, message = FALSE, warning = FALSE}
+```{r supp_3g, message = FALSE, warning = FALSE}
 
 all_exp_clones <- unique(c(expanded_clones_post, expanded_clones_pre))
 plot_df <- tissue_cell_info
@@ -154,16 +194,10 @@ ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
 
 ```
 
-## Supplemental Figure 2E
+## Supplemental Figure 3H
 
-```{python}
+```{python fig_3h}
 python_functions.hex_featureplot(tissue_t, 'STMN1', cmap=python_functions.blues_cmap)
 ```
 
-
-## Supplemental Figure 2F
-
-```{python}
-python_functions.plot_umap(tissue_b, 'Tissue: B and Plasma', python_functions.tissue_b_pal, marker_multiplier=5)
-```
 
