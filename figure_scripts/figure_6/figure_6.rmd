@@ -24,6 +24,8 @@ library(lme4)
 library(ggstance)
 library(DESeq2)
 library(knitr)
+library(fgsea)
+library(ggpubr)
 
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
@@ -62,19 +64,224 @@ tissue_fibroblast.obs = tissue_fibroblast.obs.rename(columns = {"umap_numbers" :
 python_functions.plot_umap(tissue_fibroblast, 'Tissue: Fibroblast', python_functions.tissue_fibroblast_pal, wspace=0.9, marker_multiplier=6)
 ```
 
+## Figure 6B
+
 ```{python fig_6b}
 
-python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
-             cluster_order=['6. Fibroblast: CXCL9, HLA-DRA',
-                            '1. Fibroblast: C3, EGR1low',
-                            '2. Myofibroblast_new: ACTA2, ID4',
-                            '3. Fibroblast: GPC3, EGR1high',
-                            '5. Fibroblast: POSTN, THBS4',
-                            '4. Fibroblast: CADM3, ACKR3',
-                            '7. Doublets'],
-             gene_order=["CXCL9", "HLA-DRA", "CCL5",
-                         "DCN", "ACTA2", "ID4", "GPX3",
-                         "EGR1", "POSTN", "F2R", "PCOLCE2", "IGFBP6"],
-             title='Heart Fibroblast')
+# python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
+#              cluster_order=['6. Fibroblast: CXCL9, HLA-DRA',
+#                             '1. Fibroblast: C3, EGR1low',
+#                             '2. Myofibroblast_new: ACTA2, ID4',
+#                             '3. Fibroblast: GPC3, EGR1high',
+#                             '5. Fibroblast: POSTN, THBS4',
+#                             '4. Fibroblast: CADM3, ACKR3',
+#                             '7. Doublets'],
+#              gene_order=["CXCL9", "HLA-DRA", "CCL5",
+#                          "DCN", "ACTA2", "ID4", "GPX3",
+#                          "EGR1", "POSTN", "F2R", "PCOLCE2", "IGFBP6"],
+#              title='Heart Fibroblast')
+
+```
+
+
+## Figure 6H
+
+```{r fig_6h, fig.width = 10, fig.height = 10}
+
+mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
+                row.names = 1)
+
+lin_assign <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/global_lineage_number_to_name_map.csv")
+
+lin_assign$clust <- paste("c", lin_assign$umap_number, sep = "")
+trop_values <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv")
+
+meta_data <- data.frame(row.names = colnames(mtx))
+
+meta_data$clust <- sapply(rownames(meta_data), function(x) strsplit(x, "_")[[1]][3])
+meta_data$donor <- sub("_c10|_c[1-9]", "", rownames(meta_data))
+
+meta_data %<>%
+  rownames_to_column() %>%
+  dplyr::left_join(trop_values, by = "donor") %>%
+  dplyr::left_join(lin_assign, by = "clust") %>%
+  column_to_rownames()
+
+if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv")){
+  all_res <- data.frame()
+  gset_res <- data.frame()
+  for (cl in unique(meta_data$umap_name)){
+    pdf(glue("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/{cl}_results.pdf"))
+    meta_temp <- meta_data %>%
+      dplyr::filter(umap_name == cl) %>%
+      na.omit() %>%
+      mutate(log_trop = log(nearest_troponin))
+
+    count_temp <- mtx[,rownames(meta_temp)]
+
+    n_samp <- rowSums(count_temp != 0)
+    count_temp <- count_temp[n_samp > round(nrow(meta_temp) / 2),]
+    # Okay now we can run DESeq
+    dds<- DESeqDataSetFromMatrix(countData = count_temp,
+                                colData = meta_temp,
+                                design = ~log_trop)
+    dds<- DESeq(dds)
+    res <- as.data.frame(results(dds))
+    res<- res[!is.na(res$padj),]
+    res$gene <- rownames(res)
+    res$cluster <- cl
+
+    if (nrow(res[res$padj < 0.1,]) > 20 ){
+        up_label <- res[res$padj < 0.1,] %>%
+          filter(log2FoldChange > 0) %>%
+          arrange(pvalue) %>%
+          top_n(-20, pvalue) %>%
+          .$gene
+        down_label <- res[res$padj < 0.1,] %>%
+          filter(log2FoldChange < 0) %>%
+          arrange(pvalue) %>%
+          top_n(-20, pvalue) %>%
+          .$gene
+        label_genes <- c(up_label, down_label)
+      } else if(nrow(res[res$padj < 0.1,]) > 0 ) {
+        label_genes <- res[res$padj < 0.1,]$gene
+      } else {
+        label_genes = c()
+      }
+    print(
+        ggplot(res, aes(x = log2FoldChange, y = -log10(pvalue))) +
+          geom_point(data = res[res$padj > 0.1,], color = "grey") +
+          geom_point(data = res[res$log2FoldChange > 0 & res$padj < 0.1,], color = "red") +
+          geom_point(data = res[res$log2FoldChange < 0 & res$padj < 0.1,], color = "blue") +
+          geom_text_repel(data = res[res$gene %in% label_genes,], aes(label = gene)) +
+          ggtitle("")+
+          theme_classic(base_size = 20)
+      )
+
+
+    ## Run GSEA ##
+    res2 <- res %>%
+      dplyr::select(gene, stat) %>%
+      na.omit() %>%
+      distinct() %>%
+      group_by(gene) %>%
+      summarize(stat=mean(stat)) %>%
+      dplyr::select(gene, stat) %>%
+      na.omit()
+
+    ranks <- deframe(res2)
+
+    gene_sets <- gmtPathways("/projects/home/nealpsmith/projects/kupper/all_data_analysis/data/msigdb_symbols.gmt")
+
+    sets <- c("KEGG", "HALLMARK", "BIOCARTA")
+    for (s in sets){
+      gsets <- gene_sets[grep(s, names(gene_sets))]
+
+      fgseaRes <- fgsea(pathways=gsets, stats=ranks, nperm=1000)
+      fgseaResTidy <- fgseaRes %>%
+      as_tibble() %>%
+      arrange(desc(NES))
+      fgseaResTidy$cluster <- cl
+      gset_res <- rbind(gset_res, fgseaResTidy)
+
+      # Make the GSEA plots
+     print(
+       ggplot(fgseaResTidy[fgseaResTidy$padj < 0.1,], aes(reorder(pathway, NES), NES)) +
+         coord_flip() +
+         geom_col() +
+         labs(x="Pathway", y="Normalized Enrichment Score",
+              title=paste("significant", s,"pathways", sep = " ")) +
+         theme_minimal()
+          )
+      }
+    dev.off()
+    all_res <- rbind(all_res, res)
+  }
+  write.csv(all_res, "/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv",
+            row.names = FALSE)
+  gset_res$leadingEdge <- as.character(gset_res$leadingEdge)
+  write.csv(gset_res, "/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv",
+            row.names = FALSE)
+
+} else {
+  gene_sets <- gmtPathways("/projects/home/nealpsmith/projects/kupper/all_data_analysis/data/msigdb_symbols.gmt")
+  all_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv")
+  gset_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv")
+}
+
+plot_gsets <- c("KEGG_CHEMOKINE_SIGNALING_PATHWAY", "KEGG_ALLOGRAFT_REJECTION",
+                "HALLMARK_INTERFERON_GAMMA_RESPONSE", "KEGG_VIRAL_MYOCARDITIS")
+
+fib_data <- all_res %>%
+  dplyr::filter(cluster == "5. Fibroblasts")
+
+plot_list <- list()
+for (gset in plot_gsets){
+  print(gset)
+  ranks <- fib_data %>%
+    dplyr::select(gene, stat) %>%
+    na.omit() %>%
+    arrange(desc(stat))  %>%
+    deframe(.)
+
+  gset_list <- gene_sets[gset]
+
+  fgsea_res <- fgsea(gset_list, stats = ranks, nperm = 10000)
+
+  nes <- round(fgsea_res$NES[fgsea_res$pathway == gset], 3)
+  pval <- round(fgsea_res$pval[fgsea_res$pathway == gset], 3)
+  if (pval == 0) {
+    pval <- "< 0.001"
+  }
+  n_genes <- fgsea_res$size[fgsea_res$pathway == gset]
+
+  rnk <- rank(-ranks)
+  ord <- order(rnk)
+
+  statsAdj <- ranks[ord]
+  statsAdj <- sign(statsAdj) * (abs(statsAdj) ^ 1)
+  statsAdj <- statsAdj / max(abs(statsAdj))
+
+  pathway <- unname(as.vector(na.omit(match(gset_list[[gset]], names(statsAdj)))))
+  pathway <- sort(pathway)
+
+  gseaRes <- calcGseaStat(statsAdj, selectedStats = pathway,
+                            returnAllExtremes = TRUE)
+
+  bottoms <- gseaRes$bottoms
+  tops <- gseaRes$tops
+
+  n <- length(statsAdj)
+  xs <- as.vector(rbind(pathway - 1, pathway))
+  ys <- as.vector(rbind(bottoms, tops))
+  toPlot <- data.frame(x=c(0, xs, n + 1), y=c(0, ys, 0))
+
+  diff <- (max(tops) - min(bottoms)) / 8
+
+  x=y=NULL
+
+  p <- ggplot(toPlot, aes(x = x, y = y)) +
+    # geom_point(color="blue", size=0.1) +
+    geom_line(color="blue") +
+    geom_hline(yintercept=0, colour="black") +
+    geom_segment(data=data.frame(x=pathway),
+                     mapping=aes(x=x, y=-0.15,
+                                 xend=x, yend=-0.25),
+                     size=0.4) +
+    scale_y_continuous(expand = c(0.05,0.05)) +
+    xlab("Rank") + ylab("Enrichment score") +
+    geom_text(aes(label = "")) +
+    annotate("text", label = glue("NES : {nes}"), x = length(ranks) - 1000, y  =0.9) +
+    annotate("text", label = glue("p-value : {pval}"), x = length(ranks) - 1000, y = 0.8) +
+    annotate("text", label = glue("# genes : {n_genes}"), x = length(ranks) - 1000, y = 0.7) +
+    ggtitle(glue("{gset}")) +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(size=8))
+  plot_list <- c(plot_list, list(p))
+
+}
+
+plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
+plots
 
 ```
