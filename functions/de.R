@@ -28,14 +28,18 @@ read_meta <- function(meta_filepath){
 
 
 # Run DE analysis
-run_de_by_condition <- function(counts_filepath, meta_filepath, save_name, cell_cutoff=5){
+run_de_by_comp_var <- function(counts_filepath, meta_filepath, save_name, comp_var_contrast_vec,
+                                deseq_formula=NULL, cell_cutoff=5){
   # get datasets
   counts <- read_counts(counts_filepath)
   meta <- read_meta(meta_filepath)
   
   # filter for samples in metadata
   counts <- dplyr::select(counts, rownames(meta))
-  
+
+  # get comparison variable
+  comp_var <- comp_var_contrast_vec[1]
+
   # create dataframe to hold all results for all clusters
   all_res <- data.frame(baseMean=numeric(), log2FoldChange=numeric(), lfcSE=numeric(), 
                         stat=numeric(), pvalue=numeric(), padj=numeric(), 
@@ -55,7 +59,10 @@ run_de_by_condition <- function(counts_filepath, meta_filepath, save_name, cell_
     # filtering for sample/clusters that have more than cell_cutoff cells
     meta_cluster <- meta_cluster[meta_cluster$n_cells >= cell_cutoff, ]
     tot_cells <- sum(meta_cluster$n_cells)
-    
+
+    # skip if design variable has only one level
+    if (length(unique(meta_cluster[,comp_var])) == 1) {next}
+
     # filter the count matrix with sample/clusters that have more than cell_cutoff cells
     counts_cluster <- counts_cluster[,rownames(meta_cluster)]
     
@@ -70,13 +77,18 @@ run_de_by_condition <- function(counts_filepath, meta_filepath, save_name, cell_
     
     # make sure count column names match metadata rownames for DESeq2
     stopifnot(colnames(counts_cluster) == rownames(meta_cluster))
-    
+
+    # get formula
+    if (is.null(deseq_formula)) {
+      deseq_formula <- formula(glue("~ {comp_var}"))
+    }
+
     # run DESeq2
     dds <- DESeqDataSetFromMatrix(countData = counts_cluster,
                                   colData = meta_cluster,
-                                  design = ~ condition)
+                                  design = deseq_formula)
     dds <- DESeq(dds)
-    res <- as.data.frame(results(dds, contrast=c("condition", "myocarditis", "control")))
+    res <- as.data.frame(results(dds, contrast=comp_var_contrast_vec))
     res <- res[!is.na(res$padj),]
     
     # just for the volcano plot
@@ -87,7 +99,7 @@ run_de_by_condition <- function(counts_filepath, meta_filepath, save_name, cell_
     all_res <- rbind(all_res, res)
   }
   print('saving results...')
-  write_csv(all_res, glue('{save_name}_de_by_condition_all_results.csv'))
+  write_csv(all_res, glue('{save_name}_de_by_{comp_var}_all_results.csv'))
   
   return(all_res)
 }
