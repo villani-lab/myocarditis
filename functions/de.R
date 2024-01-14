@@ -28,11 +28,8 @@ read_meta <- function(meta_filepath){
 
 
 # Run DE analysis
-run_de_by_comp_var <- function(counts_filepath, meta_filepath, save_name, comp_var_contrast_vec,
+run_de_by_comp_var <- function(counts, meta, save_name, comp_var_contrast_vec,
                                 deseq_formula=NULL, cell_cutoff=5){
-  # get datasets
-  counts <- read_counts(counts_filepath)
-  meta <- read_meta(meta_filepath)
   
   # filter for samples in metadata
   counts <- dplyr::select(counts, rownames(meta))
