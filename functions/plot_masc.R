@@ -8,11 +8,15 @@ masc_filter <- function(df){
 }
 
 
-odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
+odds_ratio_and_box_plot <- function(abundance, masc_res, comp_var, group, plot_title, colors, row_order=F) {
   
   # arrange results by p-value
-  masc_res <- masc_res %>% 
-    arrange(desc(model.pvalue)) %>% 
+  if (!row_order) {
+    masc_res <- masc_res %>%
+      arrange(desc(model.pvalue))
+  }
+  # rows already arranged
+  masc_res <- masc_res %>%
     mutate(group = !!sym(group),
            group = factor(group, levels = group))
   abundance <- abundance %>%
@@ -28,17 +32,15 @@ odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
   }
   
   # create odds ratio plot
-  orp <- ggplot(masc_res, aes(x = conditionmyocarditis.OR, y = group)) +
+  orp <- ggplot(masc_res, aes(x = OR, y = group)) +
     geom_stripes(odd = "#ffffff00", even = "#33333333") +
-    ggplot2::geom_errorbarh(aes(xmax = conditionmyocarditis.OR.95pct.ci.upper, height = 0,
-                                xmin = conditionmyocarditis.OR.95pct.ci.lower)) +
+    ggplot2::geom_errorbarh(aes(xmax = OR.95pct.ci.upper, height = 0,
+                                xmin = OR.95pct.ci.lower)) +
     geom_point(size = 3) +
     geom_label(data = masc_res,
                mapping = aes(x =  0,
                              hjust =  0, y = group,
-                             label = if_else(model.pvalue > 0.001, 
-                                             format(round(model.pvalue, 3), nsmall=2),
-                                             str_replace(format(signif(model.pvalue, 1), nsmall=1), '-0', '-'))),
+                             label = signif(model.pvalue, 3)),
                size = 5, color = 'black', alpha = 1,
                fill = fill_vec,
                label.size = 0, label.padding = unit(0.2, 'lines')) +
@@ -46,7 +48,7 @@ odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
     scale_x_log10(labels = function(x) signif(x, 1)) +
     annotation_logticks(side = 'b') +
     theme_forest(base_size = 18) +
-    theme(panel.border = element_rect(colour = "black", fill = NA, size = 1), legend.position = 'top',
+    theme(panel.border = element_rect(colour = "black", fill = NA, linewidth = 1), legend.position = 'top',
           legend.margin=margin(0,0,0,0), legend.text = element_text(size = 12), legend.title = element_text(size = 12)) +
     labs(x = "Odds Ratio", y = "", color = "p-value < 0.05")
   
@@ -55,17 +57,17 @@ odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
   bp <- ggplot(abundance, aes(x = percent, y = group)) +
     geom_stripes(odd = "#ffffff00", even = "#33333333") +
     scale_x_continuous(trans = 'log10', limits = c(1, 100)) +
-    geom_boxploth(outlier.shape = NA, aes(fill = condition)) +
-    scale_fill_manual(values = c('slategray', 'tomato4')) +
-    geom_point(aes(fill = condition,), size = 2, alpha = 0.9, stroke = 0.3,
-               position = position_quasirandom(dodge.width = -0.8, groupOnX = F),
+    geom_boxploth(outlier.shape = NA, aes(fill = !!as.symbol(comp_var))) +
+    scale_fill_manual(values = colors) +
+    geom_point(aes(fill = !!as.symbol(comp_var),), size = 2, alpha = 0.9, stroke = 0.3,
+               position = position_quasirandom(dodge.width = -0.8, orientation = 'y'),
                shape = 21) +
     annotation_logticks(side = 'b') +
     theme_forest(base_size = 18) +
-    theme(axis.text.y = element_blank(), panel.border = element_rect(colour = "black", fill = NA, size = 1),
+    theme(axis.text.y = element_blank(), panel.border = element_rect(colour = "black", fill = NA, linewidth = 1),
           legend.margin=margin(0,0,0,0), legend.position = 'top',
           legend.text = element_text(size = 12), legend.title = element_text(size = 12)) +
-    labs(y = '', x = 'Percent + 1', fill = 'Condition')
+    labs(y = '', x = 'Percent + 1', fill = '')
   
   
   # put plots together and format
