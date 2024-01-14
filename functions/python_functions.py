@@ -23,12 +23,12 @@ tissue_nonimmune_pal = ['#a65628', '#f781bf', '#8dd3c7', '#bebada', '#fb8072', '
                         '#4ba93b', '#5779bb', '#927acc', '#bf3947', '#f48758', '#80b1d3']
 tissue_fibroblast_pal = ['#a65628', '#f781bf', '#8dd3c7', '#bebada', '#fb8072', '#80b1d3', '#fdb462']
 tissue_b_pal = ['#ff7373', '#f2b94f', '#80b1d3']
-blood_global_pal = ['#1B9E77', '#D95F02', '#7570B3', '#66A61E', '#E6AB02', '#E7298A']
+blood_global_pal = ['#1B9E77', '#D95F02', '#7570B3', '#66A61E', '#A6761D', '#E6AB02', '#E7298A']
 blood_mnp_pal = ['#03396c', '#b3e900', '#cf8c00', '#f781bf', '#8dd3c7', '#fb8072', '#80b1d3',
                  '#7f80cd', '#000000', '#969696', '#cca3bf', '#4b7487', '#e7298a']
-blood_cd8_pal = ['#1b9e77', '#bebada', '#fccde5', '#bc80bd', '#c4eaff', '#c42e60',
-                 '#d95f02', '#e6ab02', '#737373', '#bdbdbd', '#4ba93b', '#5779bb', '#a6761d']
-blood_cd4_pal = ['#a65628', '#fdb462', '#ffed6f', '#0097ff', '#97ee3f', '#ff6f69']
+blood_cd8_pal = ['#edba00', '#8d86bb', '#f49ec4', '#90278f', '#8cd7f8', '#a12934', '#bf242a', '#cc702d',
+                 '#000000', '#7b7b7b', '#00914c', '#2e3192', '#682326']
+blood_cd4_pal = ['#266489', '#68B9C0', '#90D585', '#F3C151', '#F37F64', '#8F97A4', '#76846E', '#A65B69']
 blood_b_pal = ['#00d067', '#927acc', '#9f5b00', '#f2b94f', '#e43872', '#4d5c82', '#bf3947', '#8caed6']
 
 
