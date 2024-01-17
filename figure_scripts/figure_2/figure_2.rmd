@@ -1,0 +1,56 @@
+---
+title: "Figure 1"
+output: rmarkdown::github_document
+---
+
+## Set up
+
+
+Load R libraries
+```{r message=FALSE}
+# load packages
+library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(knitr)
+library(grid)
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+
+setwd('/projects/home/sramesh/github/myocarditis/functions')
+source('de.R')
+source('masc.R')
+source('plot_masc.R')
+# source('blood_abundance.R')
+```
+
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.append("/projects/home/sramesh/github/myocarditis/functions")
+import python_functions
+```
+
+Read in single-cell data
+```{python results = 'hide', read_data}
+all_blood = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
+```
+
+## Figure 2A
