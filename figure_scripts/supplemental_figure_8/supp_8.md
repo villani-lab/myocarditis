@@ -27,7 +27,7 @@ library(knitr)
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
 source('masc.R')
 source('plot_masc.R')
 source('de.R')
@@ -59,15 +59,15 @@ Read in single-cell data
 tissue_nonimmune = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr')
 ```
 
-    ## 2024-01-10 14:29:16,199 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
-    ## 2024-01-10 14:29:16,200 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.65s.
+    ## 2024-01-17 21:30:57,202 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
+    ## 2024-01-17 21:30:57,202 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.63s.
 
 ``` python
 tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr')
 ```
 
-    ## 2024-01-10 14:29:17,070 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr' is loaded.
-    ## 2024-01-10 14:29:17,070 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.87s.
+    ## 2024-01-17 21:30:58,046 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global.zarr' is loaded.
+    ## 2024-01-17 21:30:58,046 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.84s.
 
 ## Supplemental Figure 8A
 
@@ -140,7 +140,7 @@ python_functions.make_gene_dotplot(non_endothelial.to_anndata(),
 tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
 masc_filtered_df  <- masc_filter(tissue_global_obs)
 cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/cluster_masc_res.csv')
-plot_masc_by_cell_type(cluster_masc_res, masc_filtered_df, lineage='Nonimmune')
+plot_masc_by_cell_type(cluster_masc_res, masc_filtered_df, lineage='Nonimmune', comp_var = "condition")
 ```
 
 ![](supp_8_files/figure-gfm/fig_s8c-7.png)<!-- -->
@@ -153,7 +153,7 @@ supp_fig8d_genes = ['VWF', 'CA4', 'ACKR1', "HEY1", "ABCC9", "TAGLN", "MYH11", "A
 python_functions.multi_hex_featureplot(tissue_nonimmune, supp_fig8d_genes, ncol=3, cmap=python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|                                                                                                                                                                                                                | 0/10 [00:00<?, ?it/s] 10%|####################                                                                                                                                                                                    | 1/10 [00:00<00:06,  1.34it/s] 20%|########################################                                                                                                                                                                | 2/10 [00:01<00:05,  1.40it/s] 30%|############################################################                                                                                                                                            | 3/10 [00:02<00:04,  1.40it/s] 40%|################################################################################                                                                                                                        | 4/10 [00:02<00:04,  1.45it/s] 50%|####################################################################################################                                                                                                    | 5/10 [00:03<00:03,  1.43it/s] 60%|########################################################################################################################                                                                                | 6/10 [00:04<00:02,  1.47it/s] 70%|############################################################################################################################################                                                            | 7/10 [00:04<00:02,  1.45it/s] 80%|################################################################################################################################################################                                        | 8/10 [00:05<00:01,  1.48it/s] 90%|####################################################################################################################################################################################                    | 9/10 [00:06<00:00,  1.45it/s]100%|#######################################################################################################################################################################################################| 10/10 [00:06<00:00,  1.49it/s]
+    ##   0%|                                                                                                                                                                                                                | 0/10 [00:00<?, ?it/s] 10%|####################                                                                                                                                                                                    | 1/10 [00:00<00:06,  1.35it/s] 20%|########################################                                                                                                                                                                | 2/10 [00:01<00:05,  1.41it/s] 30%|############################################################                                                                                                                                            | 3/10 [00:02<00:04,  1.41it/s] 40%|################################################################################                                                                                                                        | 4/10 [00:02<00:04,  1.46it/s] 50%|####################################################################################################                                                                                                    | 5/10 [00:03<00:03,  1.44it/s] 60%|########################################################################################################################                                                                                | 6/10 [00:04<00:02,  1.48it/s] 70%|############################################################################################################################################                                                            | 7/10 [00:04<00:02,  1.46it/s] 80%|################################################################################################################################################################                                        | 8/10 [00:05<00:01,  1.49it/s] 90%|####################################################################################################################################################################################                    | 9/10 [00:06<00:00,  1.46it/s]100%|#######################################################################################################################################################################################################| 10/10 [00:06<00:00,  1.50it/s]
 
 <img src="supp_8_files/figure-gfm/fig_s8d-1.png" width="1728" />
 
@@ -191,8 +191,8 @@ sc.pl.embedding_density(tissue_nonimmune, basis='umap', key=f'umap_density_Condi
 tissue_nonimmune = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr')
 ```
 
-    ## 2024-01-10 14:30:11,273 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
-    ## 2024-01-10 14:30:11,273 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.62s.
+    ## 2024-01-17 21:31:52,417 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune.zarr' is loaded.
+    ## 2024-01-17 21:31:52,417 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.61s.
 
 ``` python
 stacked_bar_df = python_functions.get_stacked_bar_df(tissue_nonimmune, 'nonimmune')
@@ -221,9 +221,14 @@ python_functions.get_pseudobulk_info(tissue_nonimmune, 'tissue_nonimmune')
 ```
 
 ``` r
-nonimmune_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_pseudocounts.csv',
-                    meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_metainfo.csv',
-                    save_name = 'tissue_nonimmune')
+nonimmune_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_pseudocounts.csv')
+nonimmune_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_nonimmune_metainfo.csv')
+
+
+nonimmune_deres <- run_de_by_comp_var(counts = nonimmune_counts,
+                                       meta = nonimmune_meta,
+                                       save_name = 'tissue_nonimmune',
+                                       comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
 ``` r
