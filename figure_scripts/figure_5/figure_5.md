@@ -27,11 +27,10 @@ library(knitr)
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
 source('masc.R')
 source('plot_masc.R')
 source('tissue_troponin_abundance.R')
-source('blood_fatal_abundance.R')
 source('de.R')
 ```
 
@@ -43,7 +42,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import sys
-sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+sys.path.append("/projects/home/nealpsmith/publication_githubs/myocarditis/functions")
 import python_functions
 ```
 
@@ -96,7 +95,7 @@ python_functions.make_gene_dotplot(tissue_myeloid.to_anndata(),
 tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
 masc_filtered_df  <- masc_filter(tissue_global_obs)
 cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/cluster_masc_res.csv')
-plot_masc_by_cell_type(cluster_masc_res, masc_filtered_df, lineage='Myeloid')
+plot_masc_by_cell_type(cluster_masc_res, masc_filtered_df, lineage='Myeloid', comp_var = "condition")
 ```
 
 ![](figure_5_files/figure-gfm/fig_5c-5.png)<!-- -->
@@ -161,14 +160,21 @@ tissue_myeloid.obs['mnp_cell'] = tissue_myeloid.obs['mnp_cell'].replace({True: '
 ```
 
 ``` r
-# run DE analysis by condition
-myeloid_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid_pseudocounts.csv',
-                               meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid_metainfo.csv',
-                               save_name = 'tissue_myeloid')
+mnp_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid_pseudocounts.csv')
+mnp_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid_metainfo.csv')
 
-myeloid_grouped_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_mnp_grouped_pseudocounts.csv',
-                                       meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_mnp_grouped_metainfo.csv',
-                                       save_name = 'tissue_mnp_grouped')
+# run DE analysis by condition
+myeloid_deres <- run_de_by_comp_var(counts = mnp_counts,
+                                     meta = mnp_meta,
+                                     save_name = 'tissue_myeloid',
+                                     comp_var_contrast_vec = c('condition', "myocarditis", "control"))
+
+mnp_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_mnp_grouped_pseudocounts.csv')
+mnp_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_mnp_grouped_metainfo.csv')
+myeloid_grouped_deres <- run_de_by_comp_var(counts = mnp_counts,
+                                             meta = mnp_meta,
+                                             save_name = 'tissue_mnp_grouped',
+                                             comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
     ## [1] "Cluster 1"
@@ -344,6 +350,6 @@ fig_5g_genes = ['IFITM1', 'CXCL10', 'HLA-DQB2', 'STAT1']
 python_functions.multi_hexfp_by_condition(tissue_myeloid, fig_5g_genes, cmap = python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|                                                                                                                                                                 | 0/4 [00:00<?, ?it/s] 25%|######################################2                                                                                                                  | 1/4 [00:00<00:01,  2.48it/s] 50%|############################################################################5                                                                            | 2/4 [00:00<00:00,  2.56it/s] 75%|##################################################################################################################7                                      | 3/4 [00:01<00:00,  2.61it/s]100%|#########################################################################################################################################################| 4/4 [00:01<00:00,  2.47it/s]
+    ##   0%|                                                                                                                                                                                                                 | 0/4 [00:00<?, ?it/s] 25%|##################################################2                                                                                                                                                      | 1/4 [00:00<00:01,  2.55it/s] 50%|####################################################################################################5                                                                                                    | 2/4 [00:00<00:00,  2.62it/s] 75%|######################################################################################################################################################7                                                  | 3/4 [00:01<00:00,  2.66it/s]100%|#########################################################################################################################################################################################################| 4/4 [00:01<00:00,  2.69it/s]
 
 <img src="figure_5_files/figure-gfm/fig_5G-1.png" width="1152" />
