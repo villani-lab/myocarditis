@@ -30,7 +30,7 @@ library(ggpubr)
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
 source('masc.R')
 source('plot_masc.R')
 source('tissue_troponin_abundance.R')
@@ -55,8 +55,8 @@ Read in single-cell data
 tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
 ```
 
-    ## 2024-01-08 16:48:46,106 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr' is loaded.
-    ## 2024-01-08 16:48:46,106 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.24s.
+    ## 2024-01-17 20:57:17,505 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr' is loaded.
+    ## 2024-01-17 20:57:17,506 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.25s.
 
 ## Figure 3A
 
@@ -122,7 +122,7 @@ cluster_masc_formatted['p.adj'] <- p.adjust(cluster_masc_formatted$model.pvalue,
 # write_csv(cluster_masc_formatted, 'cluster_masc_res.csv')
 
 ## plot results for T and NK lineage
-plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK')
+plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK', comp_var = "condition")
 ```
 
 ![](figure_3_files/figure-gfm/fig_3c-5.png)<!-- -->
@@ -217,13 +217,21 @@ tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: '
 
 ``` r
 # run DE analysis by condition
-t_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv',
-                               meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv',
-                               save_name = 'tissue_t')
+t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv')
+t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv')
 
-t_grouped_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv',
-                                       meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv',
-                                       save_name = 'tissue_t_grouped')
+t_deres <- run_de_by_comp_var(counts = t_counts,
+                               meta = t_meta,
+                               save_name = 'tissue_t',
+                               comp_var_contrast_vec = c('condition', "myocarditis", "control"))
+
+t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv')
+t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv')
+
+t_grouped_deres <- run_de_by_comp_var(counts = t_counts,
+                                      meta = t_meta,
+                                      save_name = 'tissue_t_grouped',
+                                      comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
     ## [1] "Cluster 1"
@@ -649,6 +657,9 @@ for (gset in plot_gsets){
     ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
     ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
     ## you need to remove the nperm argument in the fgsea function call.
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
 
     ## [1] "HALLMARK_TNFA_SIGNALING_VIA_NFKB"
 

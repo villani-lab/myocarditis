@@ -1,6 +1,6 @@
 ---
 title: "Figure 3"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 ## Set up
@@ -116,48 +116,9 @@ cluster_masc_formatted['p.adj'] <- p.adjust(cluster_masc_formatted$model.pvalue,
 
 ## save results
 # write_csv(cluster_masc_formatted, 'cluster_masc_res.csv')
-plot_masc_by_cell_type <- function(cluster_masc_res, filtered_df, lineage, comp_var = "condition", filter_pdc=T) {
-
-  abundance <- filtered_df %>%
-    group_by(donor, global_subcluster_name, .drop = FALSE) %>%
-    summarize(count = n()) %>%
-    group_by(donor) %>%
-    mutate(percent = count/sum(count) * 100 + 1) %>%  # adding pseudocount
-    mutate(log10_percent = log10(percent)) %>%
-    filter(is.finite(log10_percent)) %>%
-    left_join(filtered_df %>%
-                select(c(donor, condition)) %>%
-                distinct(),
-              by='donor') %>%
-    mutate(cluster_names = unlist(map(str_split(global_subcluster_name, '\\. '), 2)))
-
-  # pdc CI is very large due to small sample size
-  if (filter_pdc) {
-    cluster_masc_res <- cluster_masc_res %>% filter(cluster_names != 'h-pDC: LILRA4 IRF8')
-    abundance <- abundance %>% filter(cluster_names != 'h-pDC: LILRA4 IRF8')
-  }
-
-  # subset to clusters in lineage
-  if (lineage == 'Nonimmune'){
-    clusters <- cluster_masc_res %>%
-    filter(!umap_name %in% c('3. T and NK cells', '4. Myeloid cells', '9. B and plasma cells', '7. Dendritic cells')) %>%
-    pull(cluster_names)
-  } else {
-    clusters <- cluster_masc_res %>%
-    filter(str_detect(umap_name, lineage)) %>%
-    pull(cluster_names)
-  }
-
-  odds_ratio_and_box_plot(abundance %>% filter(cluster_names %in% clusters),
-                          cluster_masc_res %>% filter(cluster_names %in% clusters),
-                          group = 'cluster_names',
-                          plot_title = lineage,
-                          comp_var = comp_var)
-
-}
 
 ## plot results for T and NK lineage
-plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK')
+plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK', comp_var = "condition")
 
 ```
 
@@ -211,15 +172,21 @@ tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: '
 
 ```{r message = F, results = 'hold', fig_3e_de_analysis}
 # run DE analysis by condition
-t_deres <- run_de_by_comp_var(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv',
-                               meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv',
-                               save_name = 'tissue_t',
-                               comp_var_contrast_vec = 'condition')
+t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv')
+t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv')
 
-t_grouped_deres <- run_de_by_comp_var(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv',
-                                      meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv',
+t_deres <- run_de_by_comp_var(counts = t_counts,
+                               meta = t_meta,
+                               save_name = 'tissue_t',
+                               comp_var_contrast_vec = c('condition', "myocarditis", "control"))
+
+t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv')
+t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv')
+
+t_grouped_deres <- run_de_by_comp_var(counts = t_counts,
+                                      meta = t_meta,
                                       save_name = 'tissue_t_grouped',
-                                      comp_var_contrast_vec = 'condition')
+                                      comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 
 ```
 
