@@ -1,6 +1,6 @@
 ---
 title: "Figure 3"
-output: rmarkdown::github_document
+output: html_document
 ---
 
 ## Set up
@@ -31,7 +31,7 @@ library(ggpubr)
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+setwd('//projects/home/nealpsmith/publication_githubs/myocarditis/functions')
 source('masc.R')
 source('plot_masc.R')
 source('tissue_troponin_abundance.R')
@@ -171,13 +171,15 @@ tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: '
 
 ```{r message = F, results = 'hold', fig_3e_de_analysis}
 # run DE analysis by condition
-t_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv',
+t_deres <- run_de_by_comp_var(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv',
                                meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv',
-                               save_name = 'tissue_t')
+                               save_name = 'tissue_t',
+                               comp_var_contrast_vec = 'condition')
 
-t_grouped_deres <- run_de_by_condition(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv',
-                                       meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv',
-                                       save_name = 'tissue_t_grouped')
+t_grouped_deres <- run_de_by_comp_var(counts_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv',
+                                      meta_filepath = '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv',
+                                      save_name = 'tissue_t_grouped',
+                                      comp_var_contrast_vec = 'condition')
 
 ```
 
