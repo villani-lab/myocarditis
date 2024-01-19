@@ -56,6 +56,7 @@ masc_helper <- function(obs,
 
   abundance <- create_abundance(obs, comp_var, group_var)
   abundance[,group_var] <- str_replace_all(abundance %>% pull(group_var), '_', ' ')
+  abundance[,comp_var] <- factor(abundance %>% pull(comp_var), levels=comp_var_contrast_vec[2:3])
 
   if (!is.null(group_subset)) {
     subset_masc_res <- masc_res %>% filter(!!as.symbol(group_var) %in% group_subset)
