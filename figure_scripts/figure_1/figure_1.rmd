@@ -18,6 +18,8 @@ library(ComplexHeatmap)
 library(circlize)
 library(Matrix)
 library(glue)
+library(fgsea)
+library(DESeq2)
 library(ggforestplot)
 library(ggbeeswarm)
 library(patchwork)
@@ -31,15 +33,18 @@ use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('de.R')
+source('gsea.R')
 source('masc.R')
 source('plot_masc.R')
-source('blood_fatal_abundance.R')
+source('blood_abundance.R')
 ```
 
 Load Python packages
 ```{python load_python_packages}
 import pegasus as pg
 import warnings
+import os
 warnings.filterwarnings('ignore')
 
 import sys
@@ -435,7 +440,7 @@ python_functions.plot_umap(blood_global, 'Blood: Global', python_functions.blood
 ```
 
 
-Figure 1D
+## Figure 1D
 
 ```{r message = F, results = 'hold', fig.width = 15, fig.height = 10, fig_1d}
 # read in tissue cell metadata
@@ -494,4 +499,159 @@ fatal_plot_ci_interval(fatal_lineage_model, 'Blood Global', level='lineage')
 ```
 
 
+## Figure 1I
 
+```{python message = F, results = 'hold', fig_1i}
+adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
+adata.obs['umap_name'] = adata.obs['lineage'].astype('category')
+lineage_order = adata.obs['lineage'].value_counts().index.to_list()
+lineage_order = [i for i in lineage_order if i != 'Doublets and RBCs'] + ['Doublets and RBCs']
+lineage_dict = dict(zip(lineage_order, range(1, len(lineage_order) + 1)))
+adata.obs['umap_number'] = adata.obs['umap_name'].map(lineage_dict).astype('category')
+python_functions.plot_umap(adata, '', python_functions.blood_global_pal)
+```
+
+## Figure 1J
+```{r message = F, results = 'hold', fig_1j}
+setwd('/projects/home/sramesh/github/myocarditis')
+
+### Read in obs matrix and cluster annotations
+obs <- read_csv(glue('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv'))
+cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
+
+## Figure 1J
+# run masc for case vs control by lineage (or read in file if it exists)
+if (!file.exists('output/masc_for_deg_case_control_by_cluster.csv')) {
+  lineage_masc_res <- run_masc(obs,
+                               c('deg_case_control', 'control', 'case'),
+                               'lineage',
+                               fixed_effects = c('sex', 'ici_type'))
+  write_csv(lineage_masc_res, 'output/masc_for_deg_case_control_by_lineage.csv')
+} else {
+  lineage_masc_res <- read_csv('output/masc_for_deg_case_control_by_lineage.csv')
+}
+
+masc_helper(obs,
+            c('deg_case_control', 'control', 'case'),
+            'lineage',
+            fixed_effects = c('sex', 'ici_type'),
+            group_subset=NULL,
+            masc_res=lineage_masc_res,
+            colors=c('tomato4', 'slategray'))
+
+```
+
+## Figure 1K
+
+```{python results = 'hide', make_blood_pb}
+os.chdir('/projects/home/sramesh/github/myocarditis')
+
+counts, meta = python_functions.blood_pb_info('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr',
+                                              'sample_id',
+                                              'lineage',
+                                              ['steroid_treatment', 'post_steroid_fatal', 'deg_case_control',
+                                              'condition', 'lineage', 'sex', 'ici_type', 'on_ici_vs_control'])
+counts.to_csv('output/pb_counts_by_sample_id_and_lineage.csv')
+meta.to_csv('output/pb_meta_by_sample_id_and_lineage.csv')
+```
+
+```{r message = F, results = 'hold', fig_1k}
+setwd('/projects/home/sramesh/github/myocarditis')
+
+#### first run de
+counts <- read_counts("output/pb_counts_by_sample_id_and_lineage.csv")
+meta <- read_meta("output/pb_meta_by_sample_id_and_lineage.csv")
+meta <- meta %>%
+  filter(deg_case_control != "NA") %>%
+  filter(!str_detect(lineage, "Doublet"))
+case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
+case_control_lineage_results <- run_de_by_comp_var(counts, meta, 'output/blood', case_control_contrast_vec,
+                                                   deseq_formula = formula("~ deg_case_control + sex + ici_type"))
+
+#### then run gsea on de results
+case_control_lineage_gsea <- run_gsea(case_control_lineage_results)
+write_csv(case_control_lineage_gsea, 'output/gsea_by_deg_case_control_by_lineage.csv')
+
+#### make heatmap
+pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
+              'KEGG_CELL_ADHESION_MOLECULES_CAMS', 'KEGG_DNA_REPLICATION', 'HALLMARK_INTERFERON_GAMMA_RESPONSE',
+              'KEGG_VIRAL_MYOCARDITIS')
+pathway_abbrevs <- c('KEGG: Allo', 'KEGG: AP', 'KEGG: CAMS', 'KEGG: DNA', 'HALLMARK: IFNG', 'KEGG: Viral Myo')
+abbrev_dict <- setNames(pathway_abbrevs, pathways)
+lineage_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
+
+heatmap_df <- case_control_lineage_gsea %>%
+  complete(pathway, cluster) %>%
+  replace_na(list(log2FoldChange = 0, padj = 1)) %>%
+  select(pathway, cluster, NES, padj) %>%
+  filter(pathway %in% pathways) %>%
+  mutate(cluster = str_replace_all(cluster, '_', ' ')) %>%
+  mutate(pathway = abbrev_dict[pathway])
+
+# Format main body:
+# get information for the main body's cells
+# not replacing NA values so they are colored gray in heatmap
+nes_mtx <- heatmap_df %>%
+  select(c(pathway, cluster, NES)) %>%
+  pivot_wider(names_from = cluster, values_from = NES) %>%
+  column_to_rownames('pathway') %>%
+  select(all_of(lineage_order)) %>%
+  as.matrix()
+nes_mtx <- nes_mtx[pathway_abbrevs,] %>% t()
+
+# define cell color range
+heatmap_col_fun <- colorRamp2(c(floor(min(nes_mtx, na.rm = T)), 0, ceiling(max(nes_mtx, na.rm = T))),
+                              brewer.pal(5, 'PiYG')[c(5,3,1)])
+
+# Main body annotation (FDR):
+# get fdr values
+# not replacing NA values so they are colored gray in heatmap
+fdr_mtx <- heatmap_df %>%
+  select(c(pathway, cluster, padj)) %>%
+  pivot_wider(names_from = cluster, values_from = padj) %>%
+  column_to_rownames('pathway') %>%
+  select(all_of(lineage_order)) %>%
+  as.matrix()
+fdr_mtx <- fdr_mtx[pathway_abbrevs,] %>% t()
+
+# make function for plotting fdr value (this function returns a function)
+fdr_func <- function(mtx) {
+  function(j, i, x, y, width, height, fill) {
+    if (!is.na(mtx[i, j]) & (mtx[i,j] < 0.1)) {
+      grid.circle(x = x, y = y, r = unit(1.5, 'mm'),
+                  gp = gpar(fill = 'black', col = NA))
+    }
+  }
+}
+
+# make sure columns are the same
+stopifnot(colnames(fdr_mtx) == colnames(nes_mtx))
+stopifnot(rownames(fdr_mtx) == rownames(nes_mtx))
+
+# Legends
+gsea_lgd <- Legend(col_fun = heatmap_col_fun, title = 'NES', direction = 'horizontal')
+fdr_lgd <- Legend(pch = 16, type = "points", labels = "FDR < 0.1")
+na_lgd <- Legend(labels = 'N/A', legend_gp = gpar(fill = 'grey'))
+pd <- packLegend(gsea_lgd, fdr_lgd, na_lgd, direction = 'horizontal')
+
+# Plot
+ht_gsea <- Heatmap(nes_mtx,
+                   col = heatmap_col_fun,
+                   cell_fun = fdr_func(fdr_mtx),
+                   column_order = colnames(nes_mtx),
+                   top_annotation = NULL, column_title = NULL,
+                   name = 'NES', show_heatmap_legend = FALSE,
+                   cluster_columns = FALSE, column_names_side = "top",
+                   show_column_names = T, column_names_rot = 45,
+                   cluster_rows = FALSE, row_names_side = "left",
+                   row_title_rot = 0, row_title_gp=gpar(fontface='bold'),
+                   row_gap = unit(2, "mm"), border = TRUE,
+                   width = ncol(nes_mtx)*unit(6, "mm"),
+                   height = nrow(nes_mtx)*unit(6, "mm"))
+
+draw(ht_gsea,
+     heatmap_legend_list = pd,
+     heatmap_legend_side = 'bottom',
+     merge_legends = FALSE)
+
+```
