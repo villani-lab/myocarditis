@@ -422,3 +422,36 @@ def get_pseudobulk_info(df, save_name, sample_col='donor', cluster_col='umap_num
     # put together meta dataframe
     meta_df = pd.DataFrame.from_dict(meta_dict, orient='index', columns=['n_cells', 'cluster', 'sample'] + cols)
     meta_df.to_csv(f'{save_name}_metainfo.csv')
+
+
+def blood_pb_info(adata_path, sample_label, cluster_label, cols):
+    adata = pg.read_input(adata_path)
+
+    adata.obs[cluster_label] = adata.obs[cluster_label].str.replace(' ', '_')
+
+    # Iterate across samples and clusters
+    gene_sum_dict = {}
+    cell_num_dict = {}
+    for samp in set(adata.obs[sample_label]):
+        for clust in set(adata.obs[cluster_label]):
+
+            dat = adata[(adata.obs[sample_label] == samp) & (adata.obs[cluster_label] == clust)].copy()
+            if dat.shape[0] == 0:
+                continue
+            # Add info to my dictionaries
+            key = f"{samp}_c{clust}"
+            samp_clust_dict = {'n_cells': dat.shape[0], 'cluster': clust, 'sample': samp}
+            for col in cols:
+                assert len(dat.obs[col].unique() == 1), f"{sample_label} does not have unique {col}"
+                samp_clust_dict[col] = dat.obs[col].iloc[0]
+            cell_num_dict[key] = samp_clust_dict
+
+            # Sum the counts
+            count_sum = np.array(dat.get_matrix('raw.X').sum(axis=0)).flatten()
+            gene_sum_dict[key] = count_sum
+
+    count_mtx = pd.DataFrame(gene_sum_dict, index=adata.var_names)
+
+    des_mtx = pd.DataFrame.from_dict(cell_num_dict, orient='index', columns=['n_cells', 'cluster', 'sample'] + cols)
+
+    return count_mtx, des_mtx
