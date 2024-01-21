@@ -27,6 +27,7 @@ run_gsea <- function(de_results) {
         arrange(desc(NES))
       fgseaResTidy$cluster <- clust
       fgseaResTidy$geneset <- geneset
+      fgseaResTidy$leadingEdge <- as.character(fgseaResTidy$leadingEdge)
       ret <- rbind(ret, fgseaResTidy)
 
     }
