@@ -27,8 +27,8 @@ library(lme4)
 library(ggstance)
 library(knitr)
 library(grid)
-
 library(reticulate)
+
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
 
@@ -501,7 +501,7 @@ fatal_plot_ci_interval(fatal_lineage_model, 'Blood Global', level='lineage')
 
 ## Figure 1I
 
-```{python message = F, results = 'hold', fig_1i}
+```{python results = 'hold', fig_1i}
 adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
 adata.obs['umap_name'] = adata.obs['lineage'].astype('category')
 lineage_order = adata.obs['lineage'].value_counts().index.to_list()
@@ -543,7 +543,7 @@ masc_helper(obs,
 
 ## Figure 1K
 
-```{python results = 'hide', make_blood_pb}
+```{python results = 'hold', fig_1k_python}
 os.chdir('/projects/home/sramesh/github/myocarditis')
 
 counts, meta = python_functions.blood_pb_info('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr',
@@ -555,7 +555,7 @@ counts.to_csv('output/pb_counts_by_sample_id_and_lineage.csv')
 meta.to_csv('output/pb_meta_by_sample_id_and_lineage.csv')
 ```
 
-```{r message = F, results = 'hold', fig_1k}
+```{r message = F, results = 'hold', fig_1k_r}
 setwd('/projects/home/sramesh/github/myocarditis')
 
 #### first run de
@@ -565,7 +565,7 @@ meta <- meta %>%
   filter(deg_case_control != "NA") %>%
   filter(!str_detect(lineage, "Doublet"))
 case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
-case_control_lineage_results <- run_de_by_comp_var(counts, meta, 'output/blood', case_control_contrast_vec,
+case_control_lineage_results <- run_de_by_comp_var(counts, meta, 'output/lineage', case_control_contrast_vec,
                                                    deseq_formula = formula("~ deg_case_control + sex + ici_type"))
 
 #### then run gsea on de results
