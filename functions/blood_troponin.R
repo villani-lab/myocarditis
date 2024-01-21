@@ -86,10 +86,10 @@ troponin_plot_model <- function(model_res, model_data, title,
       scale_x_log10() +
       facet_wrap(as.formula(glue("~ {level}_names")),
                  scales = "free_y") +
-      labs(x = "Nearest troponin",
-           y = paste("Proportion by all Donor Cells"),
+      labs(x = "Serum troponin T (ng/L)",
+           y = paste("Proportion of all cells"),
            title = title,
-           subtitle = glue("Log({str_to_title(level)} Proportion + 1) ~ Log(Nearest Troponin)"))
+           subtitle = glue("Log({str_to_title(level)} Proportion + 1) ~ Log(Serum troponin T (ng/L))"))
   } else if (type == 'detailed'){
     p <- model_data %>%
       ggplot(aes(x = nearest_troponin,
@@ -105,10 +105,10 @@ troponin_plot_model <- function(model_res, model_data, title,
       scale_x_log10() +
       facet_wrap(as.formula(glue("~ {level}_names")),
                  scales = "free_y") +
-      labs(x = "Nearest troponin",
-           y = paste("Proportion by all Donor Cells"),
+      labs(x = "Serum troponin T (ng/L)",
+           y = paste("Proportion of all cells"),
            title = title,
-           subtitle = glue("Log({str_to_title(level)} Proportion + 1) ~ Log(Nearest Troponin)"))
+           subtitle = glue("Log({str_to_title(level)} Proportion + 1) ~ Log(Serum troponin T (ng/L))"))
   }
 
   print(p)
