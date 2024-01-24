@@ -513,7 +513,7 @@ python_functions.plot_umap(adata, '', python_functions.blood_global_pal)
 
 ## Figure 1J
 ```{r message = F, results = 'hold', fig_1j}
-setwd('/projects/home/sramesh/github/myocarditis')
+wd <- '/projects/home/sramesh/github/myocarditis'
 
 ### Read in obs matrix and cluster annotations
 obs <- read_csv(glue('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv'))
@@ -521,14 +521,14 @@ cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/oth
 
 ## Figure 1J
 # run masc for case vs control by lineage (or read in file if it exists)
-if (!file.exists('output/masc_for_deg_case_control_by_cluster.csv')) {
+if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))) {
   lineage_masc_res <- run_masc(obs,
                                c('deg_case_control', 'control', 'case'),
                                'lineage',
                                fixed_effects = c('sex', 'ici_type'))
-  write_csv(lineage_masc_res, 'output/masc_for_deg_case_control_by_lineage.csv')
+  write_csv(lineage_masc_res, glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
 } else {
-  lineage_masc_res <- read_csv('output/masc_for_deg_case_control_by_lineage.csv')
+  lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
 }
 
 masc_helper(obs,
@@ -544,33 +544,42 @@ masc_helper(obs,
 ## Figure 1K
 
 ```{python results = 'hold', fig_1k_python}
-os.chdir('/projects/home/sramesh/github/myocarditis')
+wd = '/projects/home/sramesh/github/myocarditis'
 
 counts, meta = python_functions.blood_pb_info('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr',
                                               'sample_id',
                                               'lineage',
                                               ['steroid_treatment', 'post_steroid_fatal', 'deg_case_control',
                                               'condition', 'lineage', 'sex', 'ici_type', 'on_ici_vs_control'])
-counts.to_csv('output/pb_counts_by_sample_id_and_lineage.csv')
-meta.to_csv('output/pb_meta_by_sample_id_and_lineage.csv')
+counts.to_csv(f'{wd}/output/pb_counts_by_sample_id_and_lineage.csv')
+meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_lineage.csv')
 ```
 
 ```{r message = F, results = 'hold', fig_1k_r}
 setwd('/projects/home/sramesh/github/myocarditis')
 
 #### first run de
-counts <- read_counts("output/pb_counts_by_sample_id_and_lineage.csv")
-meta <- read_meta("output/pb_meta_by_sample_id_and_lineage.csv")
-meta <- meta %>%
-  filter(deg_case_control != "NA") %>%
-  filter(!str_detect(lineage, "Doublet"))
-case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
-case_control_lineage_results <- run_de_by_comp_var(counts, meta, 'output/lineage', case_control_contrast_vec,
-                                                   deseq_formula = formula("~ deg_case_control + sex + ici_type"))
+if (!file.exists(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))) {
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
+  meta <- meta %>%
+    filter(deg_case_control != "NA") %>%
+    filter(!str_detect(lineage, "Doublet"))
+  case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
+  case_control_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), case_control_contrast_vec,
+                                                     deseq_formula = formula("~ deg_case_control + sex + ici_type"))
+}
+else {
+    case_control_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))
+}
 
 #### then run gsea on de results
-case_control_lineage_gsea <- run_gsea(case_control_lineage_results)
-write_csv(case_control_lineage_gsea, 'output/gsea_by_deg_case_control_by_lineage.csv')
+if (!file.exists(glue('{wd}/output/gsea_by_deg_case_control_by_lineage.csv'))) {
+  case_control_lineage_gsea <- run_gsea(case_control_lineage_results)
+  write_csv(case_control_lineage_gsea, glue('{wd}/output/gsea_by_deg_case_control_by_lineage.csv'))
+} else {
+  case_control_lineage_gsea <- read_csv(glue('{wd}/output/gsea_by_deg_case_control_by_lineage.csv'))
+}
 
 #### make heatmap
 pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
