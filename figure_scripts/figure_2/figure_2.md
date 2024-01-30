@@ -61,8 +61,8 @@ cluster_annots = pd.read_excel('/projects/home/sramesh/myo_final/blood/other_stu
 name_dict = dict(zip(cluster_annots['lineage_cluster_mod'], cluster_annots['cluster_name_w_num']))
 ```
 
-    ## 2024-01-24 08:35:44,179 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
-    ## 2024-01-24 08:35:44,180 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.61s.
+    ## 2024-01-30 13:25:18,510 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
+    ## 2024-01-30 13:25:18,510 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.50s.
 
 ``` r
 ### Read in obs matrix and cluster annotations
@@ -76,15 +76,15 @@ cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/oth
 cd8 = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad')
 cd8.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 cd8.obs[['umap_number', 'umap_name']] = cd8.obs['cluster_name_w_num'].str.split('\. ', expand=True)
-cd8.obs['umap_number'] = cd8.obs['umap_number'].astype('category')
+cd8.obs['umap_number'] = cd8.obs['umap_number'].astype(int).astype('category')
 cd8.obs['umap_name'] = cd8.obs['umap_name'].astype('category')
-pyfun.plot_umap(cd8, 'Blood: CD8 T and NK Cells', pyfun.blood_cd8_pal)
+pyfun.plot_umap(cd8, 'Blood: CD8 T and NK Cells', pyfun.blood_cd8_pal, wspace=1)
 ```
 
-    ## 2024-01-24 08:36:01,560 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad' is loaded.
-    ## 2024-01-24 08:36:01,560 - pegasusio.readwrite - INFO - Function 'read_input' finished in 12.79s.
+    ## 2024-01-30 13:25:36,072 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad' is loaded.
+    ## 2024-01-30 13:25:36,072 - pegasusio.readwrite - INFO - Function 'read_input' finished in 12.50s.
 
-<img src="figure_2_files/figure-gfm/fig_2a-1.png" width="960" />
+<img src="figure_2_files/figure-gfm/fig_2a-1.png" width="1056" />
 
 ## Figure 2B
 
@@ -148,13 +148,13 @@ masc_helper(obs,
 cd4 = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad')
 cd4.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 cd4.obs[['umap_number', 'umap_name']] = adata.obs['cluster_name_w_num'].str.split('\. ', expand=True)
-cd4.obs['umap_number'] = cd4.obs['umap_number'].astype('category')
+cd4.obs['umap_number'] = cd4.obs['umap_number'].astype(int).astype('category')
 cd4.obs['umap_name'] = cd4.obs['umap_name'].astype('category')
 pyfun.plot_umap(cd4, 'Blood: CD4 T Cells', pyfun.blood_cd4_pal)
 ```
 
-    ## 2024-01-24 08:36:14,795 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad' is loaded.
-    ## 2024-01-24 08:36:14,795 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.00s.
+    ## 2024-01-30 13:25:48,438 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad' is loaded.
+    ## 2024-01-30 13:25:48,438 - pegasusio.readwrite - INFO - Function 'read_input' finished in 3.94s.
 
 <img src="figure_2_files/figure-gfm/fig_2d-1.png" width="960" />
 
@@ -202,13 +202,13 @@ masc_helper(obs,
 mnp = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad')
 mnp.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 mnp.obs[['umap_number', 'umap_name']] = adata.obs['cluster_name_w_num'].str.split('\. ', expand=True)
-mnp.obs['umap_number'] = mnp.obs['umap_number'].astype('category')
+mnp.obs['umap_number'] = mnp.obs['umap_number'].astype(int).astype('category')
 mnp.obs['umap_name'] = mnp.obs['umap_name'].astype('category')
 pyfun.plot_umap(mnp, 'Blood: MNP Cells', pyfun.blood_mnp_pal)
 ```
 
-    ## 2024-01-24 08:36:34,488 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad' is loaded.
-    ## 2024-01-24 08:36:34,488 - pegasusio.readwrite - INFO - Function 'read_input' finished in 14.68s.
+    ## 2024-01-30 13:26:08,021 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad' is loaded.
+    ## 2024-01-30 13:26:08,021 - pegasusio.readwrite - INFO - Function 'read_input' finished in 14.46s.
 
 <img src="figure_2_files/figure-gfm/fig_2g-1.png" width="960" />
 

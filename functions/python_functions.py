@@ -40,8 +40,9 @@ def plot_umap(df, title, color_palette,
     # get number of cells per cluster
     n_cells = pd.DataFrame(df.obs[['umap_number', 'umap_name']].value_counts()).reset_index()
     n_cells.columns = ['umap_number', 'umap_name', 'n_cells']
+    n_cells['umap_num_name'] = n_cells['umap_number'].astype(str) + '. ' + n_cells['umap_name'].astype(str)
     n_cells = n_cells.sort_values('umap_number')
-    dict_n_cells = dict(zip(n_cells['umap_name'], n_cells['n_cells']))
+    dict_n_cells = dict(zip(n_cells['umap_num_name'], n_cells['n_cells']))
 
     # create labels for legend
     labels = []
