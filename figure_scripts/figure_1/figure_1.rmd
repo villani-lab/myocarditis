@@ -512,7 +512,7 @@ python_functions.plot_umap(adata, '', python_functions.blood_global_pal)
 ```
 
 ## Figure 1J
-```{r message = F, results = 'hold', fig_1j}
+```{r message = F, results = 'hold', fig.width = 14, fig.height = 7, fig_1j}
 wd <- '/projects/home/sramesh/github/myocarditis'
 
 ### Read in obs matrix and cluster annotations
@@ -531,13 +531,15 @@ if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))) 
   lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
 }
 
+lineage_masc_res$lineage <- str_replace_all(lineage_masc_res$lineage, '_', ' ')
+
 masc_helper(obs,
             c('deg_case_control', 'control', 'case'),
             'lineage',
             fixed_effects = c('sex', 'ici_type'),
             group_subset=NULL,
             masc_res=lineage_masc_res,
-            colors=c('tomato4', 'slategray'))
+            colors=c('slategray', 'tomato4'))
 
 ```
 
@@ -555,7 +557,7 @@ counts.to_csv(f'{wd}/output/pb_counts_by_sample_id_and_lineage.csv')
 meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_lineage.csv')
 ```
 
-```{r message = F, results = 'hold', fig_1k_r}
+```{r message = F, results = 'hold', fig.width = 7, fig.height = 7, fig_1k_r}
 setwd('/projects/home/sramesh/github/myocarditis')
 
 #### first run de

@@ -1,5 +1,5 @@
 ---
-title: "Figure 1"
+title: "Figure 2"
 output: rmarkdown::github_document
 ---
 
@@ -116,7 +116,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = cd8_clusters,
             masc_res = cluster_masc_res,
-            colors = c('tomato4', 'slategray'))
+            colors = c('slategray', 'tomato4'))
 ```
 
 ## Figure 2D
@@ -150,7 +150,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = cd4_clusters,
             masc_res = cluster_masc_res,
-            colors = c('tomato4', 'slategray'))
+            colors = c('slategray', 'tomato4'))
 ```
 
 ## Figure 2G
@@ -195,7 +195,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = mnp_clusters,
             masc_res = mnp_cluster_masc_res,
-            colors = c('tomato4', 'slategray'),
+            colors = c('slategray', 'tomato4'),
             row_order = T)
 ```
 
@@ -253,8 +253,8 @@ if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or 
 ```{r message = F, results = 'hold', fig.width = 15, fig.height = 8, fig_2k_r}
 #### first run de
 if (!file.exists(glue('{wd}/output/cluster_de_by_deg_case_control_all_results.csv'))) {
-  counts <- read_counts("pb_counts_by_sample_id_and_cluster.csv")
-  meta <- read_meta("pb_meta_by_sample_id_and_cluster.csv")
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_cluster.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_cluster.csv"))
   meta <- meta %>%
     filter(deg_case_control != "NA") %>%
     filter(!str_detect(lineage, "Doublet"))

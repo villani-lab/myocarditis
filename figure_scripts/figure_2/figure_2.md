@@ -1,4 +1,4 @@
-Figure 1
+Figure 2
 ================
 
 ## Set up
@@ -61,8 +61,8 @@ cluster_annots = pd.read_excel('/projects/home/sramesh/myo_final/blood/other_stu
 name_dict = dict(zip(cluster_annots['lineage_cluster_mod'], cluster_annots['cluster_name_w_num']))
 ```
 
-    ## 2024-01-30 13:25:18,510 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
-    ## 2024-01-30 13:25:18,510 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.50s.
+    ## 2024-02-05 12:02:56,935 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
+    ## 2024-02-05 12:02:56,936 - pegasusio.readwrite - INFO - Function 'read_input' finished in 5.53s.
 
 ``` r
 ### Read in obs matrix and cluster annotations
@@ -81,8 +81,8 @@ cd8.obs['umap_name'] = cd8.obs['umap_name'].astype('category')
 pyfun.plot_umap(cd8, 'Blood: CD8 T and NK Cells', pyfun.blood_cd8_pal, wspace=1)
 ```
 
-    ## 2024-01-30 13:25:36,072 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad' is loaded.
-    ## 2024-01-30 13:25:36,072 - pegasusio.readwrite - INFO - Function 'read_input' finished in 12.50s.
+    ## 2024-02-05 12:03:18,234 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad' is loaded.
+    ## 2024-02-05 12:03:18,234 - pegasusio.readwrite - INFO - Function 'read_input' finished in 14.67s.
 
 <img src="figure_2_files/figure-gfm/fig_2a-1.png" width="1056" />
 
@@ -129,7 +129,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = cd8_clusters,
             masc_res = cluster_masc_res,
-            colors = c('tomato4', 'slategray'))
+            colors = c('slategray', 'tomato4'))
 ```
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
@@ -153,8 +153,8 @@ cd4.obs['umap_name'] = cd4.obs['umap_name'].astype('category')
 pyfun.plot_umap(cd4, 'Blood: CD4 T Cells', pyfun.blood_cd4_pal)
 ```
 
-    ## 2024-01-30 13:25:48,438 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad' is loaded.
-    ## 2024-01-30 13:25:48,438 - pegasusio.readwrite - INFO - Function 'read_input' finished in 3.94s.
+    ## 2024-02-05 12:03:34,769 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad' is loaded.
+    ## 2024-02-05 12:03:34,769 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.30s.
 
 <img src="figure_2_files/figure-gfm/fig_2d-1.png" width="960" />
 
@@ -183,7 +183,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = cd4_clusters,
             masc_res = cluster_masc_res,
-            colors = c('tomato4', 'slategray'))
+            colors = c('slategray', 'tomato4'))
 ```
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
@@ -207,8 +207,8 @@ mnp.obs['umap_name'] = mnp.obs['umap_name'].astype('category')
 pyfun.plot_umap(mnp, 'Blood: MNP Cells', pyfun.blood_mnp_pal)
 ```
 
-    ## 2024-01-30 13:26:08,021 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad' is loaded.
-    ## 2024-01-30 13:26:08,021 - pegasusio.readwrite - INFO - Function 'read_input' finished in 14.46s.
+    ## 2024-02-05 12:03:56,526 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad' is loaded.
+    ## 2024-02-05 12:03:56,526 - pegasusio.readwrite - INFO - Function 'read_input' finished in 15.37s.
 
 <img src="figure_2_files/figure-gfm/fig_2g-1.png" width="960" />
 
@@ -248,7 +248,7 @@ masc_helper(obs,
             fixed_effects = c('sex', 'ici_type'),
             group_subset = mnp_clusters,
             masc_res = mnp_cluster_masc_res,
-            colors = c('tomato4', 'slategray'),
+            colors = c('slategray', 'tomato4'),
             row_order = T)
 ```
 
@@ -326,8 +326,8 @@ if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or 
 ``` r
 #### first run de
 if (!file.exists(glue('{wd}/output/cluster_de_by_deg_case_control_all_results.csv'))) {
-  counts <- read_counts("pb_counts_by_sample_id_and_cluster.csv")
-  meta <- read_meta("pb_meta_by_sample_id_and_cluster.csv")
+  counts <- read_counts("{wd}/output/pb_counts_by_sample_id_and_cluster.csv")
+  meta <- read_meta("{wd}/output/pb_meta_by_sample_id_and_cluster.csv")
   meta <- meta %>%
     filter(deg_case_control != "NA") %>%
     filter(!str_detect(lineage, "Doublet"))
