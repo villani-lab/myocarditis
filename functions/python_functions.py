@@ -15,7 +15,7 @@ blues_cmap = clr.LinearSegmentedColormap.from_list('gene_cmap', ["#e0e0e1", '#45
 
 # umap cluster colors
 tissue_global_pal = ['#ff0029', '#377eb8', '#66a61e', '#984ea3', '#00d2d5',
-                     '#af8d00', '#7f80cd', '#b3e900', '#c42e60', '#ff7f00']
+        '#ff7f00', '#af8d00', '#7f80cd', '#b3e900', '#c42e60', '#ef83b5']
 tissue_mnp_pal = ['#1b9e77', '#e7298a', '#a6761d', '#252525', '#f43600', '#356F83', '#eff26e', '#80b1d3']
 tissue_t_pal = ['#cf8c00', '#ff4040', '#0097ff', '#00d067', '#bdbdbd', '#8a2be2', '#80b1d3']
 tissue_nonimmune_pal = ['#a65628', '#f781bf', '#8dd3c7', '#bebada', '#fb8072', '#fdb462',

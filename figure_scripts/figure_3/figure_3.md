@@ -30,17 +30,19 @@ library(ggpubr)
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
-setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
 source('masc.R')
-source('plot_masc.R')
-source('tissue_troponin_abundance.R')
 source('de.R')
+source('tissue_plot_masc.R')
+source('tissue_gsea.R')
+source('tissue_troponin_abundance.R')
 ```
 
 Load Python packages
 
 ``` python
 import pegasus as pg
+import os
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -52,11 +54,12 @@ import python_functions
 Read in single-cell data
 
 ``` python
-tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr')
+tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_t.zarr')
 ```
 
-    ## 2024-01-17 20:57:17,505 - pegasusio.readwrite - INFO - zarr file '/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t.zarr' is loaded.
-    ## 2024-01-17 20:57:17,506 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.25s.
+``` r
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+```
 
 ## Figure 3A
 
@@ -70,18 +73,19 @@ python_functions.plot_umap(tissue_t, 'Tissue: T and NK', python_functions.tissue
 
 ``` python
 python_functions.make_gene_dotplot(tissue_t.to_anndata(),
-             cluster_order=['4. h-CD8T: CCL5 NKG7',
-                            '3. h-CD4T: IL7R LTB',
-                            '2. h-CD8T: CD27 LAG3',
-                            '6. h-CD8T: cycling',
-                            '1. h-NK: KLRF1 FCER1G',
-                            '5. h-CD8T: KLRG1 CX3CR1'],
-             gene_order=['CD8A', 'CCL5', 'NKG7',  # 4. h-CD8T markers
-                         'CD4', 'IL7R', 'LTB',  # 3. h-CD4T markers
-                         'CD27', 'LAG3', 'PDCD1',  # 2. h-CD8T markers
-                         'STMN1', 'TOP2A',  # 6. h-CD8T markers
-                         'KLRF1', 'FCER1G',  # 1. h-NK markers
-                         'KLRG1', 'CX3CR1', 'GZMH'  # 5. h-CD8T markers
+             cluster_order=['CD8 T 2: CCL5, NKG7',
+                            'CD4 T: IL7R, LTB',
+                            'CD8 T 1: CD27, LAG3',
+                            'CD8 T 4: STMN1, TOP2A',
+                            'NK: KLRF1, FCER1G',
+                            'CD8 T 3: KLRG1, CX3CR1'
+                            ],
+             gene_order=['CD8A', 'CCL5', 'NKG7',  # CD8_2 markers
+                         'CD4', 'IL7R', 'LTB',  # CD4 markers
+                         'CD27', 'LAG3', 'PDCD1',  # CD8_1 markers
+                         'STMN1', 'TOP2A',  # CD8_4 markers
+                         'KLRF1', 'FCER1G',  # NK markers
+                         'KLRG1', 'CX3CR1', 'GZMH'  # CD8_3 markers
                          ],
              title='T/NK')
 ```
@@ -91,38 +95,42 @@ python_functions.make_gene_dotplot(tissue_t.to_anndata(),
 ## Figure 3C
 
 ``` r
-tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
-masc_filtered_df  <- masc_filter(tissue_global_obs)
+# filter
+masc_df <- masc_filter(tissue_obs)
+
+# get global cluster numbers
+global_number_map <- masc_df %>%
+  group_by(lineage_subcluster_name, umap_name) %>%
+  summarize(n_cells_clust = n()) %>%
+  arrange(desc(n_cells_clust)) %>%
+  ungroup() %>%
+  mutate(global_subcluster_number = rank(n_cells_clust))
+
+# add global cluster numbers to obs
+masc_df <- masc_df %>%
+  left_join(global_number_map %>% dplyr::select(lineage_subcluster_name, global_subcluster_number))
 
 ## run MASC for subclusters
-cluster_masc_res <- MASC(masc_filtered_df,
-                 cluster = masc_filtered_df$global_subcluster_number,
-                 contrast = "condition",
-                 random_effects = "donor",
-                 fixed_effects = "",
-                 verbose = TRUE, save_models = FALSE)
+cluster_masc_res <- MASC(masc_df,
+                         cluster = masc_df$global_subcluster_number,
+                         contrast = "condition",
+                         random_effects = "donor",
+                         fixed_effects = "",
+                         verbose = TRUE, save_models = FALSE)
 
 ## add cluster names to results
 cluster_masc_formatted <- cluster_masc_res %>%
   as_tibble() %>%
-  mutate(cluster_number = unlist(map( str_split(cluster, 'cluster'), 2)),
+  mutate(cluster_number = unlist(map(str_split(cluster, 'cluster'), 2)),
          cluster_number = as.numeric(cluster_number)) %>%
-  left_join(masc_filtered_df %>%
-              select(umap_name, umap_number, global_subcluster_name, global_subcluster_number) %>%
-              distinct(),
-            by = c('cluster_number' = 'global_subcluster_number')) %>%
-  mutate(cluster_names = unlist(map(str_split(global_subcluster_name, '\\. '), 2))) %>%
-  relocate(umap_name, cluster_names, cluster_number) %>%
-  select(!c(cluster, global_subcluster_name))
+  left_join(global_number_map, by = c('cluster_number' = "global_subcluster_number"))
 
 ## FDR adjust p-values
 cluster_masc_formatted['p.adj'] <- p.adjust(cluster_masc_formatted$model.pvalue, method = 'fdr')
+write_csv(cluster_masc_formatted, '/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
 
-## save results
-# write_csv(cluster_masc_formatted, 'cluster_masc_res.csv')
-
-## plot results for T and NK lineage
-plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and NK', comp_var = "condition")
+# plot masc results
+plot_masc_by_cell_type(cluster_masc_formatted, masc_df, lineage='T and NK')
 ```
 
 ![](figure_3_files/figure-gfm/fig_3c-5.png)<!-- -->
@@ -130,25 +138,9 @@ plot_masc_by_cell_type(cluster_masc_formatted, masc_filtered_df, lineage='T and 
 ## Figure 3D
 
 ``` r
-tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv')
-```
+tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
+troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
 
-    ## Rows: 13 Columns: 3
-    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (1): donor
-    ## dbl (2): nearest_troponin, days_from_collection
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-troponin_filtered_df <- troponin_filter_tissue(tissue_global_obs, tissue_troponin_metadata)
-```
-
-    ## Joining, by = "donor"
-
-``` r
 # fit linear model by troponin for DE clusters
 select_clusters <- c("h-NK: KLRF1 FCER1G",
                      "h-CD4T: IL7R LTB",
@@ -160,99 +152,83 @@ select_clusters <- c("h-NK: KLRF1 FCER1G",
                     "h-cDC: CLEC9A CD1C",
                     "Fibroblasts: DCN LUM")
 troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
-```
-
-    ## `summarise()` has grouped output by 'donor'. You can override using the `.groups` argument.
-    ## Joining, by = "donor"
-    ## Joining, by = "donor"
-
-``` r
 select_cluster_percs <- troponin_cluster_percs %>%
         filter(cluster_names %in% select_clusters)
 select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
 kable(select_cluster_model %>%
-              select(!c(data, model)) %>%
+              dplyr::select(!c(data, model)) %>%
               unnest(cols = c(trop_coef, trop_se, trop_pval)))
-```
 
-| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
-| :------------------------- | ----------: | --------: | ---------: | --------: |
-| Fibroblasts: DCN LUM       |   0.0161216 | 0.0162256 |  0.3438558 | 0.6189405 |
-| h-CD4T: IL7R LTB           |   0.0001064 | 0.0061510 |  0.9865381 | 0.9865381 |
-| h-CD8T: CCL5 NKG7          |   0.0039344 | 0.0104176 |  0.7135667 | 0.9050230 |
-| h-CD8T: CD27 LAG3          |   0.0049633 | 0.0063341 |  0.4514475 | 0.6771712 |
-| h-CD8T: cycling            |   0.0058375 | 0.0020689 |  0.0181105 | 0.0814970 |
-| h-cDC: CLEC9A CD1C         |   0.0019211 | 0.0006323 |  0.0125033 | 0.0814970 |
-| h-MNP: FCGR3A LILRB2       |   0.0021302 | 0.0083788 |  0.8044649 | 0.9050230 |
-| h-MNP: S100A8-low C1QA-low |   0.0112636 | 0.0082623 |  0.2027089 | 0.4560950 |
-| h-NK: KLRF1 FCER1G         | \-0.0054666 | 0.0030911 |  0.1074143 | 0.3222428 |
-
-``` r
 troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-CD8T: cycling"),
                     select_cluster_percs %>% filter(cluster_names =="h-CD8T: cycling"),
                    "h-CD8T: cycling", level='cluster', point_size = 2.2, type='simple')
 ```
 
-    ## `geom_smooth()` using formula = 'y ~ x'
-
-    ## Warning: Removed 21 rows containing missing values (`geom_smooth()`).
-
 ![](figure_3_files/figure-gfm/fig_3d-1.png)<!-- -->
+
+| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
+| :------------------------- | ----------: | --------: | ---------: | --------: |
+| h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
+| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.9073854 |
+| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.7211231 |
+| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0730168 |
+| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0730168 |
+| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.9073854 |
+| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3874531 |
+| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2903079 |
 
 ## Figure 3E
 
 ``` python
-# get pseudobulk counts and metadata by donor for t and nk  clusters
-# python_functions.get_pseudobulk_info(tissue_t, 'tissue_t')
+os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
 
-# get pseudobulk counts and metadata by donor for t cells only
-tissue_t.obs['t_cell'] = tissue_t.obs['umap_name'].isin(['2. h-CD8T: CD27 LAG3',
-                                                         '3. h-CD4T: IL7R LTB',
-                                                         '4. h-CD8T: CCL5 NKG7',
-                                                         '5. h-CD8T: KLRG1 CX3CR1',
-                                                         '6. h-CD8T: cycling'])
+# get pseudobulk values for DE analysis
+python_functions.get_pseudobulk_info(tissue_t, 'tissue_t')
+tissue_t.obs['t_cell'] = tissue_t.obs['umap_name'].isin(['CD8 T 1: CD27, LAG3',
+                                                         'CD4 T: IL7R, LTB',
+                                                         'CD8 T 2: CCL5, NKG7',
+                                                         'CD8 T 3: KLRG1, CX3CR1',
+                                                         'CD8 T 4: STMN1, TOP2A'])
 tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: 'other'})
-# python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
+python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
 ```
 
 ``` r
-# run DE analysis by condition
-t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_pseudocounts.csv')
-t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_metainfo.csv')
+setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis')
 
-t_deres <- run_de_by_comp_var(counts = t_counts,
-                               meta = t_meta,
+# run DE analysis by condition
+tissue_t_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_pseudocounts.csv')
+tissue_t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_metainfo.csv')
+tissue_t_deres <- run_de_by_comp_var(counts = tissue_t_cts,
+                               meta = tissue_t_meta,
                                save_name = 'tissue_t',
                                comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 
-t_counts <- read_counts('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_pseudocounts.csv')
-t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_t_grouped_metainfo.csv')
-
-t_grouped_deres <- run_de_by_comp_var(counts = t_counts,
-                                      meta = t_meta,
-                                      save_name = 'tissue_t_grouped',
-                                      comp_var_contrast_vec = c('condition', "myocarditis", "control"))
+tissue_t_grouped_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_grouped_pseudocounts.csv')
+tissue_t_grouped_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_grouped_metainfo.csv')
+tissue_t_grouped_deres <- run_de_by_comp_var(counts = tissue_t_grouped_cts,
+                               meta = tissue_t_grouped_meta,
+                               save_name = 'tissue_t_grouped',
+                               comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
-    ## [1] "Cluster 1"
-    ## [1] "Cluster 2"
-    ## [1] "Cluster 3"
-    ## [1] "Cluster 4"
-    ## [1] "Cluster 5"
-    ## [1] "Cluster 6"
-    ## [1] "Cluster 7"
-    ## [1] "saving results..."
-    ## [1] "Cluster all_t"
-    ## [1] "Cluster other"
-    ## [1] "saving results..."
-
 ``` r
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+
 # combine de results and meta data for heatmap
-t_full_deres <- bind_rows(t_deres %>%
+t_full_deres <- bind_rows(tissue_t_deres %>%
                                mutate(cluster = as.character(cluster)),
-                             t_grouped_deres)
-t_clusters <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/t_cluster_map.csv') # cluster number to name map
-t_genes <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/t_heatmap_genes.csv') # genes to include in heatmap
+                             tissue_t_grouped_deres)
+t_clusters <- tissue_obs %>%
+  filter(umap_name == 'T and NK cells') %>%
+  dplyr::select(lineage_subcluster_name, lineage_subcluster_number) %>%
+  distinct() %>%
+  dplyr::rename('cluster_name' = 'lineage_subcluster_name') %>%
+  dplyr::rename('cluster_number' = 'lineage_subcluster_number') %>%
+  add_row(cluster_name = 'all_t', cluster_number = 'all_t') %>%
+    add_row(cluster_name = 'other', cluster_number = 'other') %>%
+  add_row(cluster_name = 'Doublets/RBCs', cluster_number = '7')
+t_genes <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis/t_heatmap_genes.csv') # genes to include in heatmap
 t_heatmap_df <- get_heatmap_data(t_full_deres, t_genes, t_clusters)
 
 heatmap_df <- t_heatmap_df %>%
@@ -261,8 +237,7 @@ heatmap_df <- t_heatmap_df %>%
     cluster == 'all_t' ~ 'All T',
     TRUE ~ cluster
   )) %>%
-  select(!cluster_name)
-
+  dplyr::select(!cluster_name)
 
 # Format main body --------------------------------------------------------
 
@@ -280,10 +255,10 @@ heatmap_df <- heatmap_df %>%
 
 # get information for the main body's cells
 heatmap_mtx <- heatmap_df %>%
-  select(starts_with("log2FoldChange")) %>%
+  dplyr::select(starts_with("log2FoldChange")) %>%
   replace(is.na(.), 0) %>%
   rename_with(~str_remove(., "log2FoldChange_")) %>%
-  select(order(colnames(.))) %>%
+  dplyr::select(order(colnames(.))) %>%
   as.matrix()
 rownames(heatmap_mtx) <- heatmap_df$gene_symbol
 
@@ -301,10 +276,10 @@ heatmap_mtx_lineage <- heatmap_mtx[, str_detect(colnames(heatmap_mtx), 'All'), d
 
 # get fdr values
 fdr_mtx <- heatmap_df %>%
-  select(starts_with('padj')) %>%
+  dplyr::select(starts_with('padj')) %>%
   replace(is.na(.), Inf) %>%
   rename_with(~str_remove(., "padj_")) %>%
-  select(order(colnames(.))) %>%
+  dplyr::select(order(colnames(.))) %>%
   as.matrix()
 
 # make sure columns the same
@@ -399,7 +374,68 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-![](figure_3_files/figure-gfm/fig_3e_heatmap-1.png)<!-- -->
+![](figure_3_files/figure-gfm/fig_3e_de_heatmap-1.png)<!-- -->
+
+``` r
+# filter out doublets
+filtered_t_deres <- t_full_deres %>%
+        left_join(t_clusters,
+                  by = c('cluster' = 'cluster_number')) %>%
+        filter(!str_detect(str_to_lower(cluster_name), 'doublets')) %>%
+        dplyr::rename('cluster_names' = 'cluster_name') %>%
+  mutate(cluster_names =
+           case_when(
+           str_detect(cluster_names, ':') ~ str_c(cluster, cluster_names, sep = '. '),
+           TRUE ~ cluster_names)
+  )
+
+# read in gsea pathways
+pathways <- gmtPathways("/projects/home/ikernin/projects/myocarditis/updated_datasets/msigdb_symbols.gmt")
+
+# run gsea
+setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/gsea')
+run_gsea_by_cluster(filtered_t_deres, 'tissue_t_gsea')
+t_gsea_res <- gsea_combine_xlsx('/projects/home/ikernin/projects/myocarditis/updated_datasets/gsea/tissue_t_gsea_all_gsea.xlsx')
+
+# plot gsea
+t_pathways <- c(
+        "HALLMARK:INTERFERON_GAMMA_RESPONSE",
+        "KEGG:ALLOGRAFT_REJECTION",
+        "KEGG:CELL_ADHESION_MOLECULES_CAMS",
+        "KEGG:DNA_REPLICATION",
+        "KEGG:T_CELL_RECEPTOR_SIGNALING_PATHWAY",
+        "KEGG:VIRAL_MYOCARDITIS"
+                )
+t_cluster_order <- c("all",
+                     "3. h-CD4T",
+                     "2. h-CD8T",
+                     "4. h-CD8T",
+                     "5. h-CD8T",
+                     "6. h-CD8T",
+                     "1. h-NK")
+# pre-process data
+t_plot_df <- t_gsea_res %>%
+  mutate(pathway_name = str_c(geneset, pathway_name, sep=':')) %>%
+  filter(pathway_name %in% t_pathways,
+         cluster_name %in% t_cluster_order) %>%
+  mutate(cluster_name = factor(cluster_name),
+         pathway_name = factor(pathway_name)) %>%
+  complete(cluster_name, pathway_name)
+
+# make heatmap
+setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/figures')
+plot_heatmap(t_plot_df,
+             cluster_order = t_cluster_order,
+             col_order = t_pathways,
+             't_gsea.pdf',
+             split = T)
+```
+
+``` r
+knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/t_gsea.pdf")
+```
+
+![](../../../../projects/myocarditis/updated_datasets/figures/t_gsea.pdf)<!-- -->
 
 ## Figure 3F
 
@@ -533,12 +569,7 @@ n_degs <- all_res %>%
   group_by(cluster, direction) %>%
   summarise(n_degs = n()) %>%
   mutate(n_degs = ifelse(direction == "negative", -n_degs, n_degs))
-```
 
-    ## `summarise()` has grouped output by 'cluster'. You can override using the
-    ## `.groups` argument.
-
-``` r
 order <- n_degs %>%
   group_by(cluster) %>%
   summarise(tot = sum(abs(n_degs))) %>%
@@ -557,6 +588,8 @@ ggplot(n_degs, aes(x = cluster, y = n_degs, group = direction, fill = direction)
 ```
 
 ![](figure_3_files/figure-gfm/fig_3f-1.png)<!-- -->
+
+## Figure 3G
 
 ``` r
 plot_data <- all_res %>%
@@ -650,38 +683,14 @@ for (gset in plot_gsets){
   plot_list <- c(plot_list, list(p))
 
 }
-```
 
-    ## [1] "KEGG_CELL_CYCLE"
-
-    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
-    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
-    ## you need to remove the nperm argument in the fgsea function call.
-
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
-
-    ## [1] "HALLMARK_TNFA_SIGNALING_VIA_NFKB"
-
-    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
-    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
-    ## you need to remove the nperm argument in the fgsea function call.
-
-    ## [1] "HALLMARK_G2M_CHECKPOINT"
-
-    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
-    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
-    ## you need to remove the nperm argument in the fgsea function call.
-
-    ## [1] "HALLMARK_MTORC1_SIGNALING"
-
-    ## Warning in fgsea(gset_list, stats = ranks, nperm = 10000): You are trying to run
-    ## fgseaSimple. It is recommended to use fgseaMultilevel. To run fgseaMultilevel,
-    ## you need to remove the nperm argument in the fgsea function call.
-
-``` r
 plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
 plots
 ```
 
 ![](figure_3_files/figure-gfm/fig_3h-1.png)<!-- -->
+
+    ## [1] "KEGG_CELL_CYCLE"
+    ## [1] "HALLMARK_TNFA_SIGNALING_VIA_NFKB"
+    ## [1] "HALLMARK_G2M_CHECKPOINT"
+    ## [1] "HALLMARK_MTORC1_SIGNALING"

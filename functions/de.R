@@ -105,12 +105,13 @@ get_heatmap_data <- function(de_results, heatmap_genes, cluster_map){
   # filter de results for select heatmap genes and add umap names
   de_results %>%
     mutate(cluster = as.character(cluster)) %>%
-    select(gene_symbol, cluster, log2FoldChange, padj) %>%
+    dplyr::select(gene_symbol, cluster, log2FoldChange, padj) %>%
     inner_join(heatmap_genes, by = 'gene_symbol') %>%
     left_join(cluster_map %>% 
                 mutate(cluster_number = as.character(cluster_number)),
               by = c('cluster' = 'cluster_number')) %>%
     filter(!cluster_name %in% c('Doublets/RBCs', 'other')) %>%
+    mutate(cluster_name = factor(cluster_name)) %>%
     complete(gene_symbol, cluster_name) %>%
     arrange(gene_symbol)
 }

@@ -4,8 +4,8 @@ troponin_filter_tissue <- function(df, meta){
     filter(on_steroids == 'False') %>%
     filter(days_from_collection <= 3) %>%
     filter(!donor %in% c('SIC_182', 'SIC_333')) %>%
-    mutate(lineage_names = unlist(map(str_split(umap_name, '\\. '), 2)),
-           cluster_names = unlist(map(str_split(global_subcluster_name, '\\. '), 2)))
+    mutate(lineage_names = umap_name,
+           cluster_names = lineage_subcluster_name)
 }
 
 
@@ -13,7 +13,7 @@ troponin_filter_tissue <- function(df, meta){
 troponin_get_percents_per_level <- function(df, level = 'cluster'){
   # get donor troponin info
   troponin_donor <- df %>%
-    select(donor, nearest_troponin) %>%
+    dplyr::select(donor, nearest_troponin) %>%
     distinct()
   
   # get total number of donor cells
@@ -74,7 +74,7 @@ troponin_plot_model <- function(model_res, model_data, title,
   
   # format columns for printing
   model_annot <- model_res %>%
-    select(!!sym(glue("{level}_names")), trop_coef, trop_se, trop_pval, padj) %>%
+    dplyr::select(!!sym(glue("{level}_names")), trop_coef, trop_se, trop_pval, padj) %>%
     mutate(
       trop_coef = round(as.numeric(trop_coef), 2),
       trop_se = round(as.numeric(trop_se), 2),
