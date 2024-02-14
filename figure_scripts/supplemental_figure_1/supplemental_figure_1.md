@@ -24,6 +24,7 @@ library(lme4)
 library(ggstance)
 library(knitr)
 library(grid)
+library(readxl)
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
 source('de.R')
@@ -185,7 +186,88 @@ print(p_1c)
 
 ![](supplemental_figure_1_files/figure-gfm/supp_1c-1.png)<!-- -->
 
+## Supplemental Figure 1D
+
+``` r
+abund_data <- read_excel("/projects/home/nealpsmith/projects/myocarditis/data/updated_supplemental_tables/abundance_analysis_aggregated.xlsx",
+                         sheet = "masc_res")
+
+tissue_data <- abund_data %>%
+  dplyr::filter(tissue == "heart")
+
+withmets <- tissue_data %>%
+  dplyr::filter(contrast == "irMyocarditis vs. control") %>%
+  dplyr::select(cluster, OR) %>%
+  `colnames<-`(c("cluster", "OR_mets"))
+
+nomets <- tissue_data %>%
+  dplyr::filter(contrast == "irMyocarditis vs. control without heart metastasis") %>%
+  dplyr::select(cluster, OR) %>%
+  `colnames<-`(c("cluster", "OR_nomets"))
+
+plot_df <- left_join(withmets, nomets, by = "cluster") %>%
+  dplyr::filter(cluster != "h-pDC: LILRA4 IRF8")
+
+ggplot(plot_df, aes(x = OR_mets, y = OR_nomets)) +
+  geom_point(size = 3) +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_abline() +
+  geom_vline(xintercept = 1) +
+  geom_hline(yintercept = 1) +
+  ylab("OR : without cardiac metastases") +
+  xlab("OR : all samples") +
+  theme_classic(base_size = 20)
+```
+
+![](supplemental_figure_1_files/figure-gfm/supp_1d-1.png)<!-- -->
+
 ## Supplemental Figure 1E
+
+``` r
+all_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/supplemental_tables/all_degs_concatenated.csv")
+tcell_no_mm <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/t_no_micromets_de_by_condition_all_results.csv")
+tcell_no_mm$X <- NULL
+tcell_no_mm$cluster <- NULL
+colnames(tcell_no_mm) <- c(paste("no_mm", colnames(tcell_no_mm)[1:6], sep = "_"), "gene_symbol", "cluster")
+
+
+### MNP ###
+mnp_no_mm <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/myeloid_no_micromets_de_by_condition_all_results.csv")
+mnp_no_mm$X <- NULL
+mnp_no_mm$cluster <- NULL
+colnames(mnp_no_mm) <- c(paste("no_mm", colnames(mnp_no_mm)[1:6], sep = "_"), "gene_symbol", "cluster")
+
+### Non-immune ###
+nonimmune_no_mm <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/nonimmune_no_micromets_de_by_condition_all_results.csv")
+nonimmune_no_mm$X <- NULL
+nonimmune_no_mm$cluster <- NULL
+colnames(nonimmune_no_mm) <- c(paste("no_mm", colnames(nonimmune_no_mm)[1:6], sep = "_"), "gene_symbol", "cluster")
+
+### How about one for all DEGs ###
+no_mm_data_all <- rbind(tcell_no_mm, mnp_no_mm, nonimmune_no_mm)
+
+plot_degs_all <- all_data %>%
+  dplyr::filter(tissue == "heart", padj < 0.1) %>%
+  dplyr::left_join(no_mm_data_all, by = c("gene_symbol", "cluster"))
+
+ggplot(plot_degs_all, aes(x = log2FoldChange, y = no_mm_log2FoldChange)) +
+  # geom_point(data = plot_degs_all %>% dplyr::filter(label == ""), color = "grey") +
+  geom_point(data = plot_degs_all, fill = "black", pch = 21, size = 3) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  geom_abline() +
+  ylab("log2FC : without cardiac metastases") +
+  xlab("log2FC : with cardiac metastases") +
+  # geom_text_repel(aes(label = label), min.segment.length = 0.1, max.overlaps = 100) +
+  theme_classic(base_size = 20)
+```
+
+    ## Warning: Removed 154 rows containing missing values (`geom_point()`).
+
+![](supplemental_figure_1_files/figure-gfm/supp_1e-1.png)<!-- -->
+
+## Supplemental Figure 1F
 
 ``` r
 # read in serum values per sample
@@ -274,7 +356,7 @@ p_1e <- ggplot(ext_1e_df, aes(x = condition, y = value + 1, fill = condition)) +
 print(p_1e)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1e-1.png)<!-- -->
+![](supplemental_figure_1_files/figure-gfm/supp_1f-1.png)<!-- -->
 
 | protein      | mean\_case | std\_case | n\_case | mean\_control | std\_control | n\_control |  p\_value |     t\_stat |      log2FC |
 | :----------- | ---------: | --------: | ------: | ------------: | -----------: | ---------: | --------: | ----------: | ----------: |
@@ -352,6 +434,35 @@ print(p_1e)
 
 ## Supplemental Figure 1G
 
+``` r
+serum_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/updated_supplemental_tables/all_serum_stats.csv")
+
+withmets <- serum_data %>%
+  dplyr::filter(contrast == "irMyocarditis vs. control with mets") %>%
+  dplyr::select(protein, t_statistic) %>%
+  `colnames<-`(c("protein", "t_stat_mets"))
+
+nomets <- serum_data %>%
+  dplyr::filter(contrast == "irMyocarditis vs. control without mets") %>%
+  dplyr::select(protein, t_statistic) %>%
+  `colnames<-`(c("protein", "t_stat_nomets"))
+
+plot_df <- left_join(withmets, nomets, by = "protein")
+
+ggplot(plot_df, aes(x = -t_stat_mets, y = -t_stat_nomets)) +
+  geom_point(size = 3) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  geom_abline() +
+  ylab("T-statistic : without cardiac metastases") +
+  xlab("T-statistic : all samples") +
+  theme_classic(base_size = 20)
+```
+
+![](supplemental_figure_1_files/figure-gfm/supp_1g-1.png)<!-- -->
+
+## Supplemental Figure 1h
+
 ``` python
 cluster_order = ['pDCs', 'B and plasma', 'cDCs', 'CD4', 'MNP', 'CD8 and NK']
 gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 'CLEC9A', 'CD4', 'CD3D', 'IL7R', 'LYZ',
@@ -359,9 +470,9 @@ gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 
 pyfun.make_gene_dotplot(adata.to_anndata(), cluster_order, gene_order, 'All cells', figsize=(5, 4), names='lineage')
 ```
 
-<img src="supplemental_figure_1_files/figure-gfm/supp_1g-1.png" width="1152" />
+<img src="supplemental_figure_1_files/figure-gfm/supp_1h-1.png" width="1152" />
 
-## Supplemental Figure 1H
+## Supplemental Figure 1I
 
 ``` r
 # run masc for pre- vs post-steroid by lineage (or read in file if it exists)
@@ -383,9 +494,9 @@ masc_helper(obs,
             colors = c('darkolivegreen4', 'darkolivegreen2'))
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1h-3.png)<!-- -->
+![](supplemental_figure_1_files/figure-gfm/supp_1I-3.png)<!-- -->
 
-## Supplemental Figure 1I
+## Supplemental Figure 1J
 
 ``` r
 #### first run de
@@ -437,9 +548,9 @@ ggplot(df, aes(x = up, y = cluster)) +
        y = element_blank())
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1i-1.png)<!-- -->
+![](supplemental_figure_1_files/figure-gfm/supp_1j-1.png)<!-- -->
 
-## Supplemental Figure 1J
+## Supplemental Figure 1k
 
 ``` python
 bcells = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad')
@@ -450,12 +561,12 @@ bcells.obs['umap_name'] = bcells.obs['umap_name'].astype('category')
 pyfun.plot_umap(bcells, 'Blood: B and Plasma Cells', pyfun.blood_b_pal, marker_multiplier=13)
 ```
 
-    ## 2024-02-13 21:05:00,354 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad' is loaded.
-    ## 2024-02-13 21:05:00,354 - pegasusio.readwrite - INFO - Function 'read_input' finished in 2.06s.
+    ## 2024-02-14 16:38:27,500 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad' is loaded.
+    ## 2024-02-14 16:38:27,500 - pegasusio.readwrite - INFO - Function 'read_input' finished in 2.08s.
 
-<img src="supplemental_figure_1_files/figure-gfm/supp_1j-1.png" width="960" />
+<img src="supplemental_figure_1_files/figure-gfm/supp_1k-1.png" width="960" />
 
-## Supplemental Figure 1K
+## Supplemental Figure 1L
 
 ``` python
 cluster_order = [f'bcells_{i}' for i in [4, 5, 3, 2, 6, 1]]
@@ -465,9 +576,9 @@ pyfun.make_gene_dotplot(bcells.to_anndata(), cluster_order, gene_order, 'B and p
                         names='cluster_name_w_num')
 ```
 
-<img src="supplemental_figure_1_files/figure-gfm/supp_1k-3.png" width="1152" />
+<img src="supplemental_figure_1_files/figure-gfm/supp_1l-3.png" width="1152" />
 
-## Supplemental Figure 1L
+## Supplemental Figure 1M
 
 ``` r
 # run masc for case vs control by cluster (or read in file if it exists)
@@ -500,4 +611,4 @@ masc_helper(obs,
             colors = c('slategray', 'tomato4'))
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1L-5.png)<!-- -->
+![](supplemental_figure_1_files/figure-gfm/supp_1m-5.png)<!-- -->
