@@ -10,7 +10,7 @@ create_abundance <- function(obs, comp_var, group_var) {
     mutate(log10_percent = log10(percent)) %>%
     filter(is.finite(log10_percent)) %>%
     left_join(obs %>%
-                select(c(sample_id, !!as.symbol(comp_var))) %>%
+                dplyr::select(c(sample_id, !!as.symbol(comp_var))) %>%
                 distinct(),
               by='sample_id') %>%
     mutate(cluster = !!as.symbol(group_var))

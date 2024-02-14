@@ -1,0 +1,396 @@
+---
+title: "Supplemental Figure 1"
+output: rmarkdown::github_document
+---
+
+
+## Set up
+
+Load R libraries
+```{r message=FALSE, load_r_libraries}
+library(reticulate)
+library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(fgsea)
+library(ggforestplot)
+library(ggbeeswarm)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(knitr)
+library(grid)
+
+setwd('/projects/home/ikernin/github_code/myocarditis/functions')
+source('de.R')
+source('gsea.R')
+source('masc.R')
+source('plot_masc.R')
+source('blood_abundance.R')
+source('blood_troponin.R')
+
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+wd = '/projects/home/sramesh/github/myocarditis'
+```
+
+Load Python packages
+```{python message=FALSE, load_python_packages}
+import pandas as pd
+import pegasus as pg
+import os
+import sys
+import warnings
+
+sys.path.append("/projects/home/ikernin/github_code/myocarditis/functions")
+import python_functions
+
+sys.path.append("/projects/home/sramesh/github/myocarditis/functions")
+import python_functions as pyfun
+
+wd = '/projects/home/sramesh/github/myocarditis'
+warnings.filterwarnings('ignore')
+```
+
+Read in single-cell data and cluster names
+```{python message = F, results = F, python_read_data}
+# read tissue data
+tissue_global = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_all_with_dcs.zarr')
+
+# read blood data
+adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
+cluster_annots = pd.read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
+name_dict = dict(zip(cluster_annots['lineage_cluster_mod'], cluster_annots['cluster_name_w_num']))
+```
+
+```{r message = F, results = 'hold', read_data_r}
+# read tissue data
+tissue_global_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+
+# read blood data
+obs <- read_csv('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv')
+cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
+```
+
+## Supplemental Figure 1A
+
+```{python supp_1a}
+python_functions.make_gene_dotplot(tissue_global.to_anndata(),
+             cluster_order=['Endothelial cells', 'cDC', 'pDC',
+                            'Myeloid cells', 'B and plasma cells',
+                            'T and NK cells', 'Cardiomyocytes', 'Mural cells',
+                            'Fibroblasts',
+                            'Neuronal cells'
+                            ],
+             gene_order=['VWF', 'AQP1', 'CA4', 'HEY1', 'HLA-DQA1', 'CD1C',
+                         'CLEC9A', 'LILRA4', 'IL3RA', 'CD14', 'CD68', 'C1QA', 'FCGR3A',
+                         'CD79A', 'MZB1', 'MS4A1', 'CD3D', 'CD8A', 'KLRB1', 'TNNI3',
+                         'MB', 'RGS5', 'MYH11', 'KCNJ8', 'ACTA2', 'DCN',
+                         'PDGFRA', 'PLP1', 'NRXN1'],
+             title='All Cells'
+             )
+```
+
+
+## Supplemental Figure 1B
+
+```{r supp_1b}
+p_1b <- ggplot(tissue_global_obs, aes(y = umap_name, fill = institution)) +
+  geom_bar(position = 'fill') +
+  scale_fill_manual(values = c('#0273b5', '#e18728')) +
+  scale_x_continuous(labels = scales::percent,
+                     expand = c(0,0),
+                     limits = c(0,1)) +
+  theme_classic()
+print(p_1b)
+```
+
+## Supplemental Figure 1C
+
+```{r supp_1c}
+melanoma <- c("SIC_171",
+              "SIC_182",
+              "SIC_237",
+              "SIC_319")
+
+renal <- c("SIC_197",
+           "SIC_199",
+           "SIC_217",
+           "SIC_232",
+           "SIC_317")
+
+other <- c("SIC_48",
+           "SIC_153",
+           "SIC_164",
+           "SIC_175",
+           "SIC_177",
+           "SIC_258",
+           "SIC_264",
+           "SIC_333")
+non_sanger <- unique(tissue_global_obs$donor)[!str_detect(unique(tissue_global_obs$donor), 'Sanger')]
+
+p_1c <- tissue_global_obs %>%
+  filter(donor %in% non_sanger) %>%
+  filter(condition == 'myocarditis') %>%
+  filter(on_steroids == 'False') %>%
+  mutate(tumor_type = case_when(
+    donor %in% melanoma ~ 'Melanoma',
+    donor %in% renal ~ 'Renal Cell',
+    donor %in% other ~ 'Other',
+    TRUE ~ "N/A"
+  )) %>%
+  ggplot(aes(y = donor, fill = umap_name)) +
+  geom_bar(position = 'fill') +
+  scale_fill_manual(values = c(
+    "#b3e900", # b and plasma
+    "#ff7f00", # cardiomyocytes
+    "#7f80cd", # cDC
+    "#f781bf", # doublets
+    "#ff0029", # endothelial
+    "#00d2d5", # fibroblast
+    "#377eb8", # mural
+    "#984ea3", # mnp
+    "#af8d00", # neuronal
+    "#c42e60", # pdf
+    '#66a61e' # t and nk
+
+  )) +
+  scale_x_continuous(labels = scales::percent,
+                     expand = c(0,0),
+                     limits = c(0,1)) +
+  scale_y_discrete(position = "right") +
+  facet_grid(tumor_type ~ ., scales = 'free_y', space = 'free', switch = 'y') +
+  theme_classic() +
+  labs(
+    x = '% of donor cells',
+    y = element_blank(),
+    fill = 'Lineage'
+  )
+print(p_1c)
+```
+
+
+## Supplemental Figure 1E
+
+```{r results = 'hold', message = F, supp_1e}
+# read in serum values per sample
+serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
+
+# get between condition statistics for log1p values
+serum_model <- serum_df %>%
+  select(!c(patient, timepoint, Sample)) %>%
+  pivot_longer(cols=!c(condition),
+               names_to='protein',
+               values_to='value') %>%
+  mutate(log1p_value = log1p(value)) %>%
+  group_by(condition, protein) %>%
+  summarize(log1p_values = list(log1p_value)) %>%
+  pivot_wider(names_from = condition,
+              values_from = log1p_values) %>%
+  group_by(protein) %>%
+  summarize(mean_case = mean(unlist(myocarditis)),
+            std_case = sd(unlist(myocarditis)),
+            n_case = length(unlist(myocarditis)),
+            mean_control = mean(unlist(control)),
+            std_control = sd(unlist(control)),
+            n_control = length(unlist(control)),
+            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
+            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
+            log2FC = log2(mean_case/mean_control))
+kable(serum_model)
+
+# proteins to annotate in figures
+serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
+                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
+
+micromet_donors <- c("SIC_136", "SIC_171", "SIC_232", "SIC_182")
+
+# get data for ext fig 1e
+ext_1e_df <- serum_df %>%
+  select(!c(Sample, timepoint)) %>%
+  pivot_longer(cols = !c(patient, condition),
+               names_to='protein') %>%
+  filter(protein %in% serum_annot) %>%
+  left_join(serum_model %>% select(protein, p_value)) %>%
+  mutate(
+    protein = case_when(
+      protein == '6CKine' ~ 'CCL21',
+      protein == 'IP-10' ~ 'CXCL10',
+      protein == 'MIG/CXCL9' ~ 'CXCL9',
+      TRUE ~ protein),
+    condition2 =
+      case_when(
+        patient %in% micromet_donors ~ 'micromet',
+        TRUE ~ condition)
+    )
+
+ext_1e_labels <- ext_1e_df %>%
+  select(protein, p_value) %>%
+  mutate(facet_name = str_c(protein, str_c("p=", signif(p_value, 2)), sep = '\n')) %>%
+  select(protein, facet_name) %>%
+  distinct() %>%
+  deframe()
+
+
+p_1e <- ggplot(ext_1e_df, aes(x = condition, y = value + 1, fill = condition)) +
+  geom_boxplot(alpha = 0.6,
+               outlier.shape = NA) +
+  geom_jitter(aes(fill = condition2,
+                  size = condition2 == 'micromet'),
+              shape=21) +
+  scale_y_log10()+
+  scale_color_manual(values = c('slategray', 'tomato4')) +
+  scale_fill_manual(values = c('slategray', 'yellow', 'tomato4')) +
+  scale_size_manual(values = c(1,3)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  guides(size = "none") +
+  facet_wrap(~protein,
+             labeller = labeller(protein = ext_1e_labels),
+             scales = 'free_y',
+             nrow=2) +
+  labs(fill = 'Condition',
+       color = 'Condition',
+       x = element_blank(),
+       y = "pg/mL + 1")
+print(p_1e)
+```
+
+## Supplemental Figure 1G
+```{python results = 'hold', supp_1g}
+cluster_order = ['pDCs', 'B and plasma', 'cDCs', 'CD4', 'MNP', 'CD8 and NK']
+gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 'CLEC9A', 'CD4', 'CD3D', 'IL7R', 'LYZ',
+              'CD14', 'AIF1', 'CD8A', 'NKG7', 'KLRF1']
+pyfun.make_gene_dotplot(adata.to_anndata(), cluster_order, gene_order, 'All cells', figsize=(5, 4), names='lineage')
+```
+
+## Supplemental Figure 1H
+```{r message = F, warning = F, results = 'hold', fig.width = 14, fig.height = 7, supp_1h}
+# run masc for pre- vs post-steroid by lineage (or read in file if it exists)
+if (!file.exists(glue('{wd}/output/masc_for_steroid_treatment_by_lineage.csv'))) {
+  lineage_masc_res <- run_masc(obs,
+                               c('steroid_treatment', 'post_steroid', 'pre_steroid'),
+                               'lineage')
+  write_csv(lineage_masc_res, glue('{wd}/output/masc_for_steroid_treatment_by_lineage.csv'))
+} else {
+  lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_steroid_treatment_by_lineage.csv'))
+}
+
+lineage_masc_res$lineage <- str_replace_all(lineage_masc_res$lineage, '_', ' ')
+
+masc_helper(obs,
+            c('steroid_treatment', 'post_steroid', 'pre_steroid'),
+            'lineage',
+            masc_res = lineage_masc_res,
+            colors = c('darkolivegreen4', 'darkolivegreen2'))
+```
+
+## Supplemental Figure 1I
+```{r message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7, supp_1i}
+#### first run de
+if (!file.exists(glue('{wd}/output/lineage_de_by_steroid_treatment_all_results.csv'))) {
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
+  meta <- meta %>%
+    filter(steroid_treatment != "NA") %>%
+    filter(!str_detect(lineage, "Doublet"))
+  steroid_contrast_vec <- c('steroid_treatment', 'pre_steroid', 'post_steroid')
+  steroid_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), steroid_contrast_vec,
+                                                deseq_formula = formula("~ steroid_treatment"))
+} else {
+  steroid_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_steroid_treatment_all_results.csv'))
+}
+
+#### now plot barplot
+colors <- c('darkolivegreen2', 'darkolivegreen4')
+cluster_order <- c('pDCs', 'B and plasma', 'cDCs', 'CD4', 'MNP', 'CD8 and NK')
+res <- steroid_lineage_results %>%
+  mutate(cluster = str_replace_all(cluster, '_', ' '))
+res <- res[res$padj < 0.1, ]
+ups <- downs <- numeric(length(cluster_order))
+
+for (i in seq_along(cluster_order)) {
+  clust <- cluster_order[i]
+  up_genes <- res[res$cluster == clust & res$log2FoldChange > 0, ]
+  down_genes <- res[res$cluster == clust & res$log2FoldChange < 0, ]
+  ups[i] <- nrow(up_genes)
+  downs[i] <- -nrow(down_genes)
+}
+
+df <- data.frame(cluster = cluster_order, up = ups, down = downs)
+df <- df %>% mutate(cluster = factor(cluster, levels = rev(cluster_order)))
+
+ggplot(df, aes(x = up, y = cluster)) +
+  geom_bar(stat = "identity", fill = colors[1]) +
+  geom_bar(stat = "identity", aes(x = down, y = cluster), fill = colors[2]) +
+  geom_vline(xintercept = 0, color = "black", linetype = "solid", size = 0.5) +
+  scale_x_continuous(breaks = scales::pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 16),
+        axis.text = element_text(color = 'black')) +
+  labs(x = element_blank(),
+       y = element_blank())
+```
+
+## Supplemental Figure 1J
+```{python results = 'hold', message = F, supp_1j}
+bcells = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad')
+bcells.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
+bcells.obs[['umap_number', 'umap_name']] = bcells.obs['cluster_name_w_num'].str.split('\. ', expand=True)
+bcells.obs['umap_number'] = bcells.obs['umap_number'].astype(int).astype('category')
+bcells.obs['umap_name'] = bcells.obs['umap_name'].astype('category')
+pyfun.plot_umap(bcells, 'Blood: B and Plasma Cells', pyfun.blood_b_pal, marker_multiplier=13)
+```
+
+## Supplemental Figure 1K
+```{python results = 'hold', supp_1k}
+cluster_order = [f'bcells_{i}' for i in [4, 5, 3, 2, 6, 1]]
+cluster_order = [name_dict[i] for i in cluster_order]
+gene_order = ['FOXP1', 'LINC01857', 'BACH2', 'CIB1', 'FGR', 'AIM2', 'COCH', 'XBP1', 'JCHAIN', 'TCL1A', 'CXCR4']
+pyfun.make_gene_dotplot(bcells.to_anndata(), cluster_order, gene_order, 'B and plasma', figsize=(5, 4),
+                        names='cluster_name_w_num')
+```
+
+## Supplemental Figure 1L
+```{r message = F, results = 'hold', warning = F, fig.width = 14, fig.height = 7, supp_1L}
+# run masc for case vs control by cluster (or read in file if it exists)
+if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))) {
+  cluster_masc_res <- run_masc(obs,
+                               c('deg_case_control', 'control', 'case'),
+                               'lineage_cluster',
+                               fixed_effects = c('sex', 'ici_type'))
+  write_csv(cluster_masc_res, glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+} else {
+  cluster_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+}
+
+# rename clusters
+cluster_name_dict <- setNames(cluster_annots$cluster_name_w_num,
+                              cluster_annots$lineage_cluster)
+cluster_masc_res$cluster_name_w_num <- cluster_masc_res$lineage_cluster %>% recode(!!!cluster_name_dict)
+
+# filter for only b and plasma clusters and plot
+bcells_clusters <- obs %>%
+  filter((lineage == 'B and plasma') & (lineage != 'Doublets and RBCs')) %>%
+  pull(cluster_name_w_num) %>%
+  unique()
+masc_helper(obs,
+            c('deg_case_control', 'control', 'case'),
+            'cluster_name_w_num',
+            fixed_effects = c('sex', 'ici_type'),
+            group_subset = bcells_clusters,
+            masc_res = cluster_masc_res,
+            colors = c('slategray', 'tomato4'))
+```

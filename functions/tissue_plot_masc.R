@@ -9,7 +9,7 @@ masc_filter <- function(df){
 }
 
 
-odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
+tissue_odds_ratio_and_box_plot <- function(abundance, masc_res, group, plot_title) {
   
   # arrange results by p-value
   masc_res <- masc_res %>% 
@@ -126,7 +126,7 @@ plot_masc_by_cell_type <- function(cluster_masc_res, filtered_df, lineage, filte
     pull(cluster_names)
   }
   
-  odds_ratio_and_box_plot(abundance %>% filter(cluster_names %in% clusters),
+  tissue_odds_ratio_and_box_plot(abundance %>% filter(cluster_names %in% clusters),
                          cluster_masc_res %>% filter(cluster_names %in% clusters),
                          group = 'cluster_names',
                          plot_title = lineage)
@@ -150,7 +150,7 @@ plot_masc_by_lineage <- function(lineage_masc_res, filtered_df) {
                 distinct(),
               by='donor')
   
-  odds_ratio_and_box_plot(abundance %>% filter(umap_name != 'pDC'), 
+  tissue_odds_ratio_and_box_plot(abundance %>% filter(umap_name != 'pDC'), 
                           lineage_masc_res %>% filter(umap_name != 'pDC'), 
                           group = 'umap_name', plot_title = 'Tissue Global')
 }

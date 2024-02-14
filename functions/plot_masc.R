@@ -93,7 +93,7 @@ plot_masc_by_cell_type <- function(cluster_masc_res, filtered_df, lineage, comp_
     mutate(log10_percent = log10(percent)) %>%
     filter(is.finite(log10_percent)) %>%
     left_join(filtered_df %>%
-                select(c(donor, !!sym(comp_var))) %>%
+                dplyr::select(c(donor, !!sym(comp_var))) %>%
                 distinct(),
               by='donor') %>%
     mutate(cluster_names = unlist(map(str_split(global_subcluster_name, '\\. '), 2)))
@@ -135,7 +135,7 @@ plot_masc_by_lineage <- function(lineage_masc_res, filtered_df) {
     mutate(log10_percent = log10(percent)) %>%
     filter(is.finite(log10_percent)) %>%
     left_join(filtered_df %>%
-                select(c(donor, condition)) %>%
+                dplyr::select(c(donor, condition)) %>%
                 distinct(),
               by='donor') %>%
     mutate(lineage_names = unlist(map(str_split(umap_name, '\\. '), 2)))

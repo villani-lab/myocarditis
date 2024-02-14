@@ -122,7 +122,7 @@ select_clusters <- c("h-NK: KLRF1 FCER1G",
                     "h-MNP: S100A8-low C1QA-low",
                     "h-MNP: FCGR3A LILRB2",
                     "h-cDC: CLEC9A CD1C",
-                    "Fibroblasts: DCN LUM")
+                    "Fibroblast: CXCL9, HLA-DRA")
 troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
 select_cluster_percs <- troponin_cluster_percs %>%
         filter(cluster_names %in% select_clusters)
@@ -140,14 +140,15 @@ troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-cDC: CLEC
 
 | cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
 | :------------------------- | ----------: | --------: | ---------: | --------: |
+| Fibroblast: CXCL9, HLA-DRA |   0.0079106 | 0.0024072 |  0.0082023 | 0.0532563 |
 | h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
-| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.9073854 |
-| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.7211231 |
-| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0730168 |
-| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0730168 |
-| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.9073854 |
-| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3874531 |
-| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2903079 |
+| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.8932075 |
+| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.6760529 |
+| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0547626 |
+| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0532563 |
+| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.8932075 |
+| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
+| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |
 
 ## Figure 5f
 
@@ -412,6 +413,6 @@ fig_5g_genes = ['IFITM1', 'CXCL10', 'HLA-DQB2', 'STAT1']
 python_functions.multi_hexfp_by_condition(tissue_myeloid, fig_5g_genes, cmap = python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|          | 0/4 [00:00<?, ?it/s] 25%|##5       | 1/4 [00:00<00:01,  2.42it/s] 50%|#####     | 2/4 [00:00<00:00,  2.55it/s] 75%|#######5  | 3/4 [00:01<00:00,  2.36it/s]100%|##########| 4/4 [00:01<00:00,  2.45it/s]100%|##########| 4/4 [00:01<00:00,  2.45it/s]
+    ##   0%|          | 0/4 [00:00<?, ?it/s] 25%|##5       | 1/4 [00:00<00:01,  2.42it/s] 50%|#####     | 2/4 [00:00<00:00,  2.55it/s] 75%|#######5  | 3/4 [00:01<00:00,  2.36it/s]100%|##########| 4/4 [00:01<00:00,  2.45it/s]100%|##########| 4/4 [00:01<00:00,  2.44it/s]
 
 <img src="figure_5_files/figure-gfm/fig_5g-1.png" width="1152" />

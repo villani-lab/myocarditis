@@ -1,4 +1,4 @@
-Figure 3
+Figure 6
 ================
 
 ## Set up
@@ -54,191 +54,137 @@ import python_functions
 Read in single-cell data
 
 ``` python
-tissue_t = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_t.zarr')
+tissue_fibroblast = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_fibroblast.zarr')
 ```
 
 ``` r
 tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
 ```
 
-## Figure 3A
+    ## Rows: 84576 Columns: 19
+    ## ── Column specification ──────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (13): barcodekey, Channel, fatal, on_steroids, condition, sex, donor, so...
+    ## dbl  (6): n_genes, n_counts, percent_mito, scale, leiden_labels, umap_numbers
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+## Figure 6a
 
 ``` python
-python_functions.plot_umap(tissue_t, 'Tissue: T and NK', python_functions.tissue_t_pal, marker_multiplier=6)
+python_functions.plot_umap(tissue_fibroblast, 'Tissue: Fibroblast', python_functions.tissue_fibroblast_pal, marker_multiplier=6)
 ```
 
-<img src="figure_3_files/figure-gfm/fig_3a-1.png" width="960" />
+<img src="figure_6_files/figure-gfm/fig_6a-1.png" width="960" />
 
-## Figure 3B
+## Figure 6b
 
 ``` python
-python_functions.make_gene_dotplot(tissue_t.to_anndata(),
-             cluster_order=['CD8 T 2: CCL5, NKG7',
-                            'CD4 T: IL7R, LTB',
-                            'CD8 T 1: CD27, LAG3',
-                            'CD8 T 4: STMN1, TOP2A',
-                            'NK: KLRF1, FCER1G',
-                            'CD8 T 3: KLRG1, CX3CR1'
-                            ],
-             gene_order=['CD8A', 'CCL5', 'NKG7',  # CD8_2 markers
-                         'CD4', 'IL7R', 'LTB',  # CD4 markers
-                         'CD27', 'LAG3', 'PDCD1',  # CD8_1 markers
-                         'STMN1', 'TOP2A',  # CD8_4 markers
-                         'KLRF1', 'FCER1G',  # NK markers
-                         'KLRG1', 'CX3CR1', 'GZMH'  # CD8_3 markers
-                         ],
-             title='T/NK')
+python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
+             cluster_order=[
+                 'Fibroblast: CXCL9, HLA-DRA',
+                 'Fibroblast: DCN, EGR1low',
+                 'Myofibroblast: ACTA2, ID4',
+                 'Fibroblast: GPX3, EGR1high',
+                 'Fibroblast: POSTN, F2R',
+                 'Fibroblast: PCOLCE2, IGFBP6',
+
+             ],
+             gene_order=[
+                 "CXCL9", "HLA-DRA", "CCL5",
+                 "DCN",
+                 "ACTA2", "ID4",
+                 "GPX3", "EGR1",
+                 "POSTN", "F2R",
+                 "PCOLCE2", "IGFBP6"
+             ],
+             title='Tissue: Fibroblast')
 ```
 
-<img src="figure_3_files/figure-gfm/fig_3b-3.png" width="1152" />
+<img src="figure_6_files/figure-gfm/fig_6b-3.png" width="1152" />
 
-## Figure 3C
+## Figure 6C
 
 ``` r
 # filter
 masc_df <- masc_filter(tissue_obs)
 
-# get global cluster numbers
-global_number_map <- masc_df %>%
-  group_by(lineage_subcluster_name, umap_name) %>%
-  summarize(n_cells_clust = n()) %>%
-  arrange(desc(n_cells_clust)) %>%
-  ungroup() %>%
-  mutate(global_subcluster_number = rank(n_cells_clust))
-
-# add global cluster numbers to obs
-masc_df <- masc_df %>%
-  left_join(global_number_map %>% dplyr::select(lineage_subcluster_name, global_subcluster_number))
-
-## run MASC for subclusters
-cluster_masc_res <- MASC(masc_df,
-                         cluster = masc_df$global_subcluster_number,
-                         contrast = "condition",
-                         random_effects = "donor",
-                         fixed_effects = "",
-                         verbose = TRUE, save_models = FALSE)
-
-## add cluster names to results
-cluster_masc_formatted <- cluster_masc_res %>%
-  as_tibble() %>%
-  mutate(cluster_number = unlist(map(str_split(cluster, 'cluster'), 2)),
-         cluster_number = as.numeric(cluster_number)) %>%
-  left_join(global_number_map, by = c('cluster_number' = "global_subcluster_number"))
-
-## FDR adjust p-values
-cluster_masc_formatted['p.adj'] <- p.adjust(cluster_masc_formatted$model.pvalue, method = 'fdr')
-write_csv(cluster_masc_formatted, '/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+# read in masc res (from figure 3 code)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
 
 # plot masc results
-plot_masc_by_cell_type(cluster_masc_formatted, masc_df, lineage='T and NK')
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast')
 ```
 
-![](figure_3_files/figure-gfm/fig_3c-5.png)<!-- -->
+![](figure_6_files/figure-gfm/fig_6c-5.png)<!-- -->
 
-## Figure 3D
-
-``` r
-tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
-troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
-
-# fit linear model by troponin for DE clusters
-select_clusters <- c("h-NK: KLRF1 FCER1G",
-                     "h-CD4T: IL7R LTB",
-                    "h-CD8T: CD27 LAG3",
-                    "h-CD8T: CCL5 NKG7",
-                    "h-CD8T: cycling",
-                    "h-MNP: S100A8-low C1QA-low",
-                    "h-MNP: FCGR3A LILRB2",
-                    "h-cDC: CLEC9A CD1C",
-                    "Fibroblast: CXCL9, HLA-DRA")
-troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
-select_cluster_percs <- troponin_cluster_percs %>%
-        filter(cluster_names %in% select_clusters)
-select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
-kable(select_cluster_model %>%
-              dplyr::select(!c(data, model)) %>%
-              unnest(cols = c(trop_coef, trop_se, trop_pval)))
-
-troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-CD8T: cycling"),
-                    select_cluster_percs %>% filter(cluster_names =="h-CD8T: cycling"),
-                   "h-CD8T: cycling", level='cluster', point_size = 2.2, type='simple')
-```
-
-![](figure_3_files/figure-gfm/fig_3d-1.png)<!-- -->
-
-| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
-| :------------------------- | ----------: | --------: | ---------: | --------: |
-| Fibroblast: CXCL9, HLA-DRA |   0.0079106 | 0.0024072 |  0.0082023 | 0.0532563 |
-| h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
-| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.8932075 |
-| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.6760529 |
-| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0547626 |
-| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0532563 |
-| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.8932075 |
-| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
-| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |
-
-## Figure 3E
+## Figure 6D
 
 ``` python
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
 
-# get pseudobulk values for DE analysis
-python_functions.get_pseudobulk_info(tissue_t, 'tissue_t')
-tissue_t.obs['t_cell'] = tissue_t.obs['umap_name'].isin(['CD8 T 1: CD27, LAG3',
-                                                         'CD4 T: IL7R, LTB',
-                                                         'CD8 T 2: CCL5, NKG7',
-                                                         'CD8 T 3: KLRG1, CX3CR1',
-                                                         'CD8 T 4: STMN1, TOP2A'])
-tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: 'other'})
-python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
+# get pseudobulk counts and metadata by donor
+python_functions.get_pseudobulk_info(tissue_fibroblast, 'tissue_fibroblast')
+tissue_fibroblast.obs['fibroblast_cell'] = tissue_fibroblast.obs['umap_name'].isin(['Fibroblast: CXCL9, HLA-DRA',
+                                                                                    'Fibroblast: DCN, EGR1low',
+                                                                                    'Fibroblast: GPX3, EGR1high',
+                                                                                    'Fibroblast: PCOLCE2, IGFBP6',
+                                                                                    'Fibroblast: POSTN, F2R'])
+tissue_fibroblast.obs['fibroblast_cell'] = tissue_fibroblast.obs['fibroblast_cell'].replace({True: 'all_fibroblast', False: 'other'})
+python_functions.get_pseudobulk_info(tissue_fibroblast, 'tissue_fibroblast_grouped', cluster_col='fibroblast_cell')
 ```
 
 ``` r
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis')
 
 # run DE analysis by condition
-tissue_t_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_pseudocounts.csv')
-tissue_t_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_metainfo.csv')
-tissue_t_deres <- run_de_by_comp_var(counts = tissue_t_cts,
-                               meta = tissue_t_meta,
-                               save_name = 'tissue_t',
+tissue_fibroblast_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_fibroblast_pseudocounts.csv')
+tissue_fibroblast_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_fibroblast_metainfo.csv')
+tissue_fibroblast_deres <- run_de_by_comp_var(counts = tissue_fibroblast_cts,
+                               meta = tissue_fibroblast_meta,
+                               save_name = 'tissue_fibroblast',
                                comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 
-tissue_t_grouped_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_grouped_pseudocounts.csv')
-tissue_t_grouped_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_t_grouped_metainfo.csv')
-tissue_t_grouped_deres <- run_de_by_comp_var(counts = tissue_t_grouped_cts,
-                               meta = tissue_t_grouped_meta,
-                               save_name = 'tissue_t_grouped',
+tissue_fibroblast_grouped_cts <- read_counts('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_fibroblast_grouped_pseudocounts.csv')
+tissue_fibroblast_grouped_meta <- read_meta('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk/tissue_fibroblast_grouped_metainfo.csv')
+tissue_fibroblast_grouped_deres <- run_de_by_comp_var(counts = tissue_fibroblast_grouped_cts,
+                               meta = tissue_fibroblast_grouped_meta,
+                               save_name = 'tissue_fibroblast_grouped',
                                comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
 ``` r
-tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
-
 # combine de results and meta data for heatmap
-t_full_deres <- bind_rows(tissue_t_deres %>%
+fibroblast_full_deres <- bind_rows(tissue_fibroblast_deres %>%
                                mutate(cluster = as.character(cluster)),
-                             tissue_t_grouped_deres)
-t_clusters <- tissue_obs %>%
-  filter(umap_name == 'T and NK cells') %>%
+                             tissue_fibroblast_grouped_deres)
+fibroblast_clusters <- tissue_obs %>%
+  filter(umap_name == 'Fibroblasts') %>%
   dplyr::select(lineage_subcluster_name, lineage_subcluster_number) %>%
   distinct() %>%
   dplyr::rename('cluster_name' = 'lineage_subcluster_name') %>%
   dplyr::rename('cluster_number' = 'lineage_subcluster_number') %>%
-  add_row(cluster_name = 'all_t', cluster_number = 'all_t') %>%
+  add_row(cluster_name = 'all_fibroblast', cluster_number = 'all_fibroblast') %>%
     add_row(cluster_name = 'other', cluster_number = 'other') %>%
-  add_row(cluster_name = 'Doublets/RBCs', cluster_number = '7')
-t_genes <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis/t_heatmap_genes.csv') # genes to include in heatmap
-t_heatmap_df <- get_heatmap_data(t_full_deres, t_genes, t_clusters)
+  add_row(cluster_name = 'Doublets/RBCs', cluster_number = '7') %>%
+  mutate(cluster_name =
+           case_when(
+           str_detect(cluster_name, ':') ~ str_c(cluster_number, cluster_name, sep = '. '),
+           TRUE ~ cluster_name)
+  )
+fibroblast_genes <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis/fibroblast_genes.csv') # genes to include in heatmap
+fibroblast_heatmap_df <- get_heatmap_data(fibroblast_full_deres, fibroblast_genes, fibroblast_clusters)
 
-heatmap_df <- t_heatmap_df %>%
+
+heatmap_df <- fibroblast_heatmap_df %>%
   mutate(cluster = cluster_name,
     cluster = case_when(
-    cluster == 'all_t' ~ 'All T',
+    cluster == 'all_fibroblast' ~ 'All Fibroblast',
     TRUE ~ cluster
   )) %>%
   dplyr::select(!cluster_name)
+
 
 # Format main body --------------------------------------------------------
 
@@ -271,6 +217,7 @@ heatmap_col_fun <- colorRamp2(c(floor(min(heatmap_mtx)), 0, ceiling(max(heatmap_
 heatmap_mtx_subcluster <- heatmap_mtx[, !str_detect(colnames(heatmap_mtx), 'All')]
 colnames(heatmap_mtx_subcluster) <- str_remove(colnames(heatmap_mtx_subcluster), regex(":.*"))
 heatmap_mtx_lineage <- heatmap_mtx[, str_detect(colnames(heatmap_mtx), 'All'), drop=FALSE]
+
 
 
 # Main body annotation (FDR) ----------------------------------------------
@@ -308,28 +255,26 @@ fdr_func_lineage <- function(j, i, x, y, width, height, fill){
 lgd_fdr = Legend(pch = 16, type = "points", labels = "FDR < 0.1")
 
 
+
 # Column annotation (cluster names) ---------------------------------------
 
 # define colors
-clust_col_fun <- c('#cf8c00', '#ff4040', '#0097ff', '#00d067', '#bdbdbd', '#8a2be2')
-names(clust_col_fun) <- seq(1,6)
-
-lineage_col_fun <- c('white')
-names(lineage_col_fun) <- 'All'
-
-
+clust_col_fun <- c('#A85529', '#F67FBD', '#8DD3C8', '#BEBBD9', '#FC7F72', '#80B1D2')
+names(clust_col_fun) <- seq(1, 6)
 clust_ha <- HeatmapAnnotation(clust_colors = names(clust_col_fun),
                               col = list(clust_colors = clust_col_fun),
                               show_legend = FALSE,
                               show_annotation_name = FALSE,
                               simple_anno_size = unit(3, "mm"))
+
+lineage_col_fun <- c('white')
+names(lineage_col_fun) <- 'All'
 lineage_ha <- HeatmapAnnotation(lineage = names(lineage_col_fun),
                                 col = list(lineage = lineage_col_fun),
                                 show_legend = FALSE,
                                 show_annotation_name = FALSE,
                                 simple_anno_size = unit(3, "mm"),
                                 border = T)
-
 
 # Row annotation (gene names) ---------------------------------------------
 
@@ -375,70 +320,67 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-![](figure_3_files/figure-gfm/fig_3e_de_heatmap-1.png)<!-- -->
+![](figure_6_files/figure-gfm/fig_5f_heatmap-1.png)<!-- -->
 
 ``` r
 # filter out doublets
-filtered_t_deres <- t_full_deres %>%
-        left_join(t_clusters,
+filtered_fibroblast_deres <- fibroblast_full_deres %>%
+        left_join(fibroblast_clusters,
                   by = c('cluster' = 'cluster_number')) %>%
         filter(!str_detect(str_to_lower(cluster_name), 'doublets')) %>%
-        dplyr::rename('cluster_names' = 'cluster_name') %>%
-  mutate(cluster_names =
-           case_when(
-           str_detect(cluster_names, ':') ~ str_c(cluster, cluster_names, sep = '. '),
-           TRUE ~ cluster_names)
-  )
+        dplyr::rename('cluster_names' = 'cluster_name')
 
 # read in gsea pathways
 pathways <- gmtPathways("/projects/home/ikernin/projects/myocarditis/updated_datasets/msigdb_symbols.gmt")
 
 # run gsea
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/gsea')
-run_gsea_by_cluster(filtered_t_deres, 'tissue_t_gsea')
-t_gsea_res <- gsea_combine_xlsx('/projects/home/ikernin/projects/myocarditis/updated_datasets/gsea/tissue_t_gsea_all_gsea.xlsx')
+run_gsea_by_cluster(filtered_fibroblast_deres, 'tissue_fibroblast')
+fibroblast_gsea_res <- gsea_combine_xlsx('/projects/home/ikernin/projects/myocarditis/updated_datasets/gsea/tissue_fibroblast_all_gsea.xlsx')
 
 # plot gsea
-t_pathways <- c(
-        "HALLMARK:INTERFERON_GAMMA_RESPONSE",
-        "KEGG:ALLOGRAFT_REJECTION",
-        "KEGG:CELL_ADHESION_MOLECULES_CAMS",
-        "KEGG:DNA_REPLICATION",
-        "KEGG:T_CELL_RECEPTOR_SIGNALING_PATHWAY",
-        "KEGG:VIRAL_MYOCARDITIS"
-                )
-t_cluster_order <- c("all",
-                     "3. h-CD4T",
-                     "2. h-CD8T",
-                     "4. h-CD8T",
-                     "5. h-CD8T",
-                     "6. h-CD8T",
-                     "1. h-NK")
-# pre-process data
-t_plot_df <- t_gsea_res %>%
+fibroblast_pathways <- c("HALLMARK:INTERFERON_GAMMA_RESPONSE",
+                         "KEGG:ALLOGRAFT_REJECTION",
+                         "KEGG:ANTIGEN_PROCESSING_AND_PRESENTATION",
+                         "KEGG:CELL_ADHESION_MOLECULES_CAMS",
+                         "KEGG:DILATED_CARDIOMYOPATHY",
+                         "KEGG:DNA_REPLICATION",
+                         "KEGG:HYPERTROPHIC_CARDIOMYOPATHY_HCM",
+                         "KEGG:VIRAL_MYOCARDITIS")
+
+fibroblast_order <- c('all',
+                      '1. Fibroblast',
+                      '2. Myofibroblast',
+                      '3. Fibroblast',
+                      '4. Fibroblast',
+                      '5. Fibroblast',
+                      '6. Fibroblast')
+
+fibroblast_plot_df <- fibroblast_gsea_res %>%
   mutate(pathway_name = str_c(geneset, pathway_name, sep=':')) %>%
-  filter(pathway_name %in% t_pathways,
-         cluster_name %in% t_cluster_order) %>%
+  filter(pathway_name %in% fibroblast_pathways,
+         cluster_name %in% fibroblast_order) %>%
   mutate(cluster_name = factor(cluster_name),
          pathway_name = factor(pathway_name)) %>%
   complete(cluster_name, pathway_name)
 
+
 # make heatmap
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/figures')
-plot_heatmap(t_plot_df,
-             cluster_order = t_cluster_order,
-             col_order = t_pathways,
-             't_gsea.pdf',
+plot_heatmap(fibroblast_plot_df,
+             cluster_order = fibroblast_order,
+             col_order = fibroblast_pathways,
+             'fibroblast_gsea.pdf',
              split = T)
 ```
 
 ``` r
-knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/t_gsea.pdf")
+knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/fibroblast_gsea.pdf")
 ```
 
-![](../../../../projects/myocarditis/updated_datasets/figures/t_gsea.pdf)<!-- -->
+<embed src="../../../../projects/myocarditis/updated_datasets/figures/fibroblast_gsea.pdf" width="800px" height="460px" type="application/pdf" />
 
-## Figure 3F
+## Figure 6E
 
 ``` r
 mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
@@ -447,7 +389,7 @@ mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tis
 lin_assign <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/global_lineage_number_to_name_map.csv")
 
 lin_assign$clust <- paste("c", lin_assign$umap_number, sep = "")
-# trop_values <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv")
+trop_values <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv")
 
 meta_data <- data.frame(row.names = colnames(mtx))
 
@@ -456,10 +398,9 @@ meta_data$donor <- sub("_c10|_c[1-9]", "", rownames(meta_data))
 
 meta_data %<>%
   rownames_to_column() %>%
-  dplyr::left_join(tissue_troponin_metadata, by = "donor") %>%
+  dplyr::left_join(trop_values, by = "donor") %>%
   dplyr::left_join(lin_assign, by = "clust") %>%
   column_to_rownames()
-
 
 if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin.csv")){
   all_res <- data.frame()
@@ -562,68 +503,16 @@ if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin
   gset_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv")
 }
 
+plot_gsets <- c("KEGG_CHEMOKINE_SIGNALING_PATHWAY", "KEGG_ALLOGRAFT_REJECTION",
+                "HALLMARK_INTERFERON_GAMMA_RESPONSE", "KEGG_VIRAL_MYOCARDITIS")
 
-# Side-by-side bars
-n_degs <- all_res %>%
-  dplyr::filter(padj < 0.1, cluster != "10. Doublets and RBC") %>%
-  mutate(direction = ifelse(stat > 0, "positive", "negative")) %>%
-  group_by(cluster, direction) %>%
-  summarise(n_degs = n()) %>%
-  mutate(n_degs = ifelse(direction == "negative", -n_degs, n_degs))
-
-order <- n_degs %>%
-  group_by(cluster) %>%
-  summarise(tot = sum(abs(n_degs))) %>%
-  arrange(desc(tot)) %>%
-  .$cluster
-n_degs$cluster <- factor(n_degs$cluster, levels = rev(order))
-
-
-ggplot(n_degs, aes(x = cluster, y = n_degs, group = direction, fill = direction)) +
-  geom_bar(stat = "identity") + coord_flip() +
-  scale_fill_manual(values = c("#0000FF", "#FF0000")) +
-  scale_y_continuous(labels = abs) +
-  ggtitle(glue("# of DEGs by troponin")) +
-  ylab("# of DE genes") + xlab("") +
-  theme_classic(base_size = 20)
-```
-
-![](figure_3_files/figure-gfm/fig_3f-1.png)<!-- -->
-
-## Figure 3G
-
-``` r
-plot_data <- all_res %>%
-  dplyr::filter(cluster == "3. T and NK cells")
-
-label_up <- c("MKI67", "TOP2A", "BIRC5", "LAG3", "HLA-DRA", "HLA-DRB1", "KIR2DL4")
-label_down <- c("CX3CR1", "S1PR5", "CCL4", "KLF3", "KLRG1")
-label_genes <- c(label_up, label_down)
-ggplot(plot_data, aes(x = log2FoldChange, y = -log10(pvalue))) +
-          geom_point(data = plot_data[plot_data$padj > 0.1,], color = "grey") +
-          geom_point(data = plot_data[plot_data$log2FoldChange > 0 & plot_data$padj < 0.1,], pch = 21, fill = "red") +
-          geom_point(data = plot_data[plot_data$log2FoldChange < 0 & plot_data$padj < 0.1,], pch = 21, fill = "blue") +
-          geom_label_repel(data = plot_data[plot_data$gene %in% label_genes,], aes(label = gene)) +
-          ggtitle("")+
-          theme_classic(base_size = 20)
-```
-
-![](figure_3_files/figure-gfm/fig_3g-1.png)<!-- -->
-
-## Figure 3H
-
-``` r
-tcell_data <- all_res %>%
-  dplyr::filter(cluster == "3. T and NK cells")
-plot_gsets <- c("KEGG_CELL_CYCLE",
-                "HALLMARK_TNFA_SIGNALING_VIA_NFKB",
-                "HALLMARK_G2M_CHECKPOINT",
-                "HALLMARK_MTORC1_SIGNALING")
+fib_data <- all_res %>%
+  dplyr::filter(cluster == "5. Fibroblasts")
 
 plot_list <- list()
 for (gset in plot_gsets){
   print(gset)
-  ranks <- tcell_data %>%
+  ranks <- fib_data %>%
     dplyr::select(gene, stat) %>%
     na.omit() %>%
     arrange(desc(stat))  %>%
@@ -673,14 +562,15 @@ for (gset in plot_gsets){
                      mapping=aes(x=x, y=-0.15,
                                  xend=x, yend=-0.25),
                      size=0.4) +
-    scale_y_continuous(limits = c(-0.5, 1), expand = c(0.05,0.05)) +
+    scale_y_continuous(expand = c(0.05,0.05)) +
     xlab("Rank") + ylab("Enrichment score") +
     geom_text(aes(label = "")) +
     annotate("text", label = glue("NES : {nes}"), x = length(ranks) - 1000, y  =0.9) +
     annotate("text", label = glue("p-value : {pval}"), x = length(ranks) - 1000, y = 0.8) +
     annotate("text", label = glue("# genes : {n_genes}"), x = length(ranks) - 1000, y = 0.7) +
     ggtitle(glue("{gset}")) +
-    theme_classic(base_size = 12)
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(size=8))
   plot_list <- c(plot_list, list(p))
 
 }
@@ -689,9 +579,52 @@ plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
 plots
 ```
 
-![](figure_3_files/figure-gfm/fig_3h-1.png)<!-- -->
+![](figure_6_files/figure-gfm/fig_6e-1.png)<!-- -->
 
-    ## [1] "KEGG_CELL_CYCLE"
-    ## [1] "HALLMARK_TNFA_SIGNALING_VIA_NFKB"
-    ## [1] "HALLMARK_G2M_CHECKPOINT"
-    ## [1] "HALLMARK_MTORC1_SIGNALING"
+    ## [1] "KEGG_CHEMOKINE_SIGNALING_PATHWAY"
+    ## [1] "KEGG_ALLOGRAFT_REJECTION"
+    ## [1] "HALLMARK_INTERFERON_GAMMA_RESPONSE"
+    ## [1] "KEGG_VIRAL_MYOCARDITIS"
+
+## Figure 6H
+
+``` r
+tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
+troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
+
+# fit linear model by troponin for DE clusters
+select_clusters <- c("h-NK: KLRF1 FCER1G",
+                     "h-CD4T: IL7R LTB",
+                    "h-CD8T: CD27 LAG3",
+                    "h-CD8T: CCL5 NKG7",
+                    "h-CD8T: cycling",
+                    "h-MNP: S100A8-low C1QA-low",
+                    "h-MNP: FCGR3A LILRB2",
+                    "h-cDC: CLEC9A CD1C",
+                    "Fibroblast: CXCL9, HLA-DRA")
+troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
+select_cluster_percs <- troponin_cluster_percs %>%
+        filter(cluster_names %in% select_clusters)
+select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
+kable(select_cluster_model %>%
+              dplyr::select(!c(data, model)) %>%
+              unnest(cols = c(trop_coef, trop_se, trop_pval)))
+
+troponin_plot_model(select_cluster_model %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                    select_cluster_percs %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                   "Fibroblast: CXCL9, HLA-DRA", level='cluster', point_size = 2.2, type='simple')
+```
+
+![](figure_6_files/figure-gfm/fig_6h-1.png)<!-- -->
+
+| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
+| :------------------------- | ----------: | --------: | ---------: | --------: |
+| Fibroblast: CXCL9, HLA-DRA |   0.0079106 | 0.0024072 |  0.0082023 | 0.0532563 |
+| h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
+| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.8932075 |
+| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.6760529 |
+| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0547626 |
+| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0532563 |
+| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.8932075 |
+| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
+| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |

@@ -116,7 +116,7 @@ select_clusters <- c("h-NK: KLRF1 FCER1G",
                     "h-MNP: S100A8-low C1QA-low",
                     "h-MNP: FCGR3A LILRB2",
                     "h-cDC: CLEC9A CD1C",
-                    "Fibroblasts: DCN LUM")
+                    "Fibroblast: CXCL9, HLA-DRA")
 troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
 select_cluster_percs <- troponin_cluster_percs %>%
         filter(cluster_names %in% select_clusters)

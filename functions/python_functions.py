@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as clr
 import matplotlib.patheffects as path_effects
+import matplotlib.patches as patches
+import seaborn as sns
 from tqdm import tqdm
 
 
