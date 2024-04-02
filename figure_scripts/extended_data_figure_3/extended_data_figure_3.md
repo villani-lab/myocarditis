@@ -56,62 +56,6 @@ adt_df = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_data
 
 ## Figure 2A
 
-``` r
-wd = '/projects/home/sramesh/github/myocarditis'
-
-#### first run de
-if (!file.exists(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))) {
-  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
-  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
-  meta <- meta %>%
-    filter(deg_case_control != "NA") %>%
-    filter(!str_detect(lineage, "Doublet"))
-  case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
-  case_control_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), case_control_contrast_vec,
-                                                     deseq_formula = formula("~ deg_case_control + sex + ici_type"))
-} else {
-    case_control_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))
-}
-
-#### now plot barplot
-colors <- c('tomato4', 'slategray')
-cluster_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
-res <- case_control_lineage_results %>%
-  mutate(cluster = str_replace_all(cluster, '_', ' '))
-res <- res[res$padj < 0.1, ]
-ups <- downs <- numeric(length(cluster_order))
-
-for (i in seq_along(cluster_order)) {
-  clust <- cluster_order[i]
-  up_genes <- res[res$cluster == clust & res$log2FoldChange > 0, ]
-  down_genes <- res[res$cluster == clust & res$log2FoldChange < 0, ]
-  ups[i] <- nrow(up_genes)
-  downs[i] <- -nrow(down_genes)
-}
-
-df <- data.frame(cluster = cluster_order, up = ups, down = downs)
-df <- df %>% mutate(cluster = factor(cluster, levels = rev(cluster_order)))
-
-ggplot(df, aes(x = up, y = cluster)) +
-  geom_bar(stat = "identity", fill = colors[1]) +
-  geom_bar(stat = "identity", aes(x = down, y = cluster), fill = colors[2]) +
-  geom_vline(xintercept = 0, color = "black", linetype = "solid", size = 0.5) +
-  scale_x_continuous(breaks = scales::pretty_breaks()) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        plot.title = element_text(hjust = 0.5),
-        text = element_text(size = 16),
-        axis.text = element_text(color = 'black')) +
-  labs(x = element_blank(),
-       y = element_blank())
-```
-
-![](extended_2_files/figure-gfm/fig_2A-1.png)<!-- -->
-
-## Figure 2B
-
 Note: please run “adt\_gating.py” for plotting code
 
 ``` python
@@ -265,9 +209,9 @@ print(f'Myocarditis adt cells {adt_df[adt_df.obs["condition"] == "myocarditis"].
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/adt_scatterplots.png")
 ```
 
-<img src="../../../../projects/myocarditis/updated_datasets/figures/adt_scatterplots.png" width="800px" height="460px" />
+<img src="../../../../../ikernin/projects/myocarditis/updated_datasets/figures/adt_scatterplots.png" width="800px" height="460px" />
 
-## Figure 2C
+## Figure 2B
 
 Note: please run “adt\_gating.py” for plotting code
 
@@ -275,9 +219,9 @@ Note: please run “adt\_gating.py” for plotting code
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/adt_hexbins.pdf")
 ```
 
-<embed src="../../../../projects/myocarditis/updated_datasets/figures/adt_hexbins.pdf" width="800px" height="460px" type="application/pdf" />
+<embed src="../../../../../ikernin/projects/myocarditis/updated_datasets/figures/adt_hexbins.pdf" width="800px" height="460px" type="application/pdf" />
 
-## Figure 2D
+## Figure 2C
 
 ``` r
 # numbers from previous python chunk
@@ -315,9 +259,9 @@ df %>%
   )
 ```
 
-![](extended_2_files/figure-gfm/fig_2d-1.png)<!-- -->
+![](extended_data_figure_3_files/figure-gfm/fig_2c-1.png)<!-- -->
 
-## Figure 2E
+## Figure 2D
 
 ``` r
 df <- df %>%
@@ -340,7 +284,7 @@ tissue_odds_ratio_and_box_plot(ungrouped_abundance %>%
                                'Ungrouped Gates')
 ```
 
-![](extended_2_files/figure-gfm/fig_2e-1.png)<!-- -->
+![](extended_data_figure_3_files/figure-gfm/fig_2d-1.png)<!-- -->
 
 ``` r
 # for grouped gates
@@ -357,4 +301,4 @@ tissue_odds_ratio_and_box_plot(grouped_abundance %>%
                                'Grouped Gates')
 ```
 
-![](extended_2_files/figure-gfm/fig_2e-2.png)<!-- -->
+![](extended_data_figure_3_files/figure-gfm/fig_2d-2.png)<!-- -->

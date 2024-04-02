@@ -58,63 +58,10 @@ adt_df = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_data
 
 
 ## Figure 2A
-```{r results = 'hold', message = F, warning = F, fig_2A}
-wd = '/projects/home/sramesh/github/myocarditis'
-
-#### first run de
-if (!file.exists(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))) {
-  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
-  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
-  meta <- meta %>%
-    filter(deg_case_control != "NA") %>%
-    filter(!str_detect(lineage, "Doublet"))
-  case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
-  case_control_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), case_control_contrast_vec,
-                                                     deseq_formula = formula("~ deg_case_control + sex + ici_type"))
-} else {
-    case_control_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))
-}
-
-#### now plot barplot
-colors <- c('tomato4', 'slategray')
-cluster_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
-res <- case_control_lineage_results %>%
-  mutate(cluster = str_replace_all(cluster, '_', ' '))
-res <- res[res$padj < 0.1, ]
-ups <- downs <- numeric(length(cluster_order))
-
-for (i in seq_along(cluster_order)) {
-  clust <- cluster_order[i]
-  up_genes <- res[res$cluster == clust & res$log2FoldChange > 0, ]
-  down_genes <- res[res$cluster == clust & res$log2FoldChange < 0, ]
-  ups[i] <- nrow(up_genes)
-  downs[i] <- -nrow(down_genes)
-}
-
-df <- data.frame(cluster = cluster_order, up = ups, down = downs)
-df <- df %>% mutate(cluster = factor(cluster, levels = rev(cluster_order)))
-
-ggplot(df, aes(x = up, y = cluster)) +
-  geom_bar(stat = "identity", fill = colors[1]) +
-  geom_bar(stat = "identity", aes(x = down, y = cluster), fill = colors[2]) +
-  geom_vline(xintercept = 0, color = "black", linetype = "solid", size = 0.5) +
-  scale_x_continuous(breaks = scales::pretty_breaks()) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        plot.title = element_text(hjust = 0.5),
-        text = element_text(size = 16),
-        axis.text = element_text(color = 'black')) +
-  labs(x = element_blank(),
-       y = element_blank())
-```
-
-## Figure 2B
 
 Note: please run "adt_gating.py" for plotting code
 
-```{python results = 'hold', fig_2b_filter}
+```{python results = 'hold', fig_2a_filter}
 def filter_df(df, x_gene, y_gene, x_line=None, y_line=None, x_gr=True, y_gr=True):
     # make dataframe with gene counts
     x = np.squeeze(np.asarray(df[:, x_gene].copy().get_matrix('X').todense()))
@@ -259,21 +206,21 @@ print(f'Myocarditis adt cells {adt_df[adt_df.obs["condition"] == "myocarditis"].
 
 
 
-```{r out.height = "460px", out.width='800px', fig_2b_plot}
+```{r out.height = "460px", out.width='800px', fig_2a_plot}
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/adt_scatterplots.png")
+```
+
+## Figure 2B
+
+Note: please run "adt_gating.py" for plotting code
+
+```{r out.height = "460px", out.width='800px', fig_2b_plot}
+knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/adt_hexbins.pdf")
 ```
 
 ## Figure 2C
 
-Note: please run "adt_gating.py" for plotting code
-
-```{r out.height = "460px", out.width='800px', fig_2c_plot}
-knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/adt_hexbins.pdf")
-```
-
-## Figure 2D
-
-```{r results = 'hold', message = F, fig_2d}
+```{r results = 'hold', message = F, fig_2c}
 # numbers from previous python chunk
 n_adt_cells <- 294573
 n_ctrl <- 111676
@@ -309,9 +256,9 @@ df %>%
   )
 ```
 
-## Figure 2E
+## Figure 2D
 
-```{r results = 'hold', message = F, warning = F, fig.width = 15, fig.height = 10, fig_2e}
+```{r results = 'hold', message = F, warning = F, fig.width = 15, fig.height = 10, fig_2d}
 df <- df %>%
   mutate(merged_gate = case_when(
     gate %in% c("cd8_gate", "nk_gate") ~ 'cd8_nk_gate',
