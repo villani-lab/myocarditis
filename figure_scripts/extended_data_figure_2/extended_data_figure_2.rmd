@@ -1,11 +1,13 @@
-Figure 2
-================
+---
+title: "Extended Data Figure 2"
+output: rmarkdown::github_document
+---
 
 ## Set up
 
-Load R libraries
 
-``` r
+Load R libraries
+```{r message=FALSE, load_libraries}
 library(reticulate)
 library(tidyverse)
 library(rmarkdown)
@@ -39,8 +41,7 @@ use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 ```
 
 Load Python packages
-
-``` python
+```{python message=FALSE, load_python_packages}
 import pandas as pd
 import pegasus as pg
 import os
@@ -54,25 +55,20 @@ warnings.filterwarnings('ignore')
 ```
 
 Read in single-cell data and cluster names
-
-``` python
+```{python results = 'hold', read_data_python}
 adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
 cluster_annots = pd.read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
 name_dict = dict(zip(cluster_annots['lineage_cluster_mod'], cluster_annots['cluster_name_w_num']))
 ```
 
-    ## 2024-02-05 12:02:56,935 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
-    ## 2024-02-05 12:02:56,936 - pegasusio.readwrite - INFO - Function 'read_input' finished in 5.53s.
-
-``` r
+```{r message = F, results = 'hold', read_data_r}
 ### Read in obs matrix and cluster annotations
 obs <- read_csv('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv')
 cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
 ```
 
 ## Figure 2A
-
-``` python
+```{python results = 'hold', fig_2a}
 cd8 = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad')
 cd8.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 cd8.obs[['umap_number', 'umap_name']] = cd8.obs['cluster_name_w_num'].str.split('\. ', expand=True)
@@ -81,14 +77,8 @@ cd8.obs['umap_name'] = cd8.obs['umap_name'].astype('category')
 pyfun.plot_umap(cd8, 'Blood: CD8 T and NK Cells', pyfun.blood_cd8_pal, wspace=1)
 ```
 
-    ## 2024-02-05 12:03:18,234 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd8.h5ad' is loaded.
-    ## 2024-02-05 12:03:18,234 - pegasusio.readwrite - INFO - Function 'read_input' finished in 14.67s.
-
-<img src="figure_2_files/figure-gfm/fig_2a-1.png" width="1056" />
-
 ## Figure 2B
-
-``` python
+```{python results = 'hold', fig_2b}
 cluster_order = [f'cd8_{i}' for i in [9, 6, 1, 7, 11, 2, 12, 10, 3, 8, 5, 4]]
 cluster_order = [name_dict[i] for i in cluster_order]
 gene_order = ['CX3CR1', 'TBX21', 'BRD4', 'S1PR5', 'SPON2', 'FGFBP2', 'AKR1C3', 'TCF7', 'IL7R', 'XCL1', 'SPTSSB',
@@ -97,11 +87,8 @@ pyfun.make_gene_dotplot(cd8.to_anndata(), cluster_order, gene_order, 'CD8 and NK
                         names='cluster_name_w_num')
 ```
 
-<img src="figure_2_files/figure-gfm/fig_2b-3.png" width="1152" />
-
 ## Figure 2C
-
-``` r
+```{r message = F, results = 'hold', fig.width = 14, fig.height = 7, fig_2c}
 # run masc for case vs control by cluster (or read in file if it exists)
 if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))) {
   cluster_masc_res <- run_masc(obs,
@@ -132,19 +119,8 @@ masc_helper(obs,
             colors = c('slategray', 'tomato4'))
 ```
 
-    ## Warning: Transformation introduced infinite values in continuous x-axis
-
-    ## Warning: The following aesthetics were dropped during statistical transformation: x
-    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-
-    ## Warning: `position_quasirandom()` requires non-overlapping x intervals
-
-![](figure_2_files/figure-gfm/fig_2c-5.png)<!-- -->
-
 ## Figure 2D
-
-``` python
+```{python results = 'hold', fig_2d}
 cd4 = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad')
 cd4.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 cd4.obs[['umap_number', 'umap_name']] = adata.obs['cluster_name_w_num'].str.split('\. ', expand=True)
@@ -153,14 +129,8 @@ cd4.obs['umap_name'] = cd4.obs['umap_name'].astype('category')
 pyfun.plot_umap(cd4, 'Blood: CD4 T Cells', pyfun.blood_cd4_pal)
 ```
 
-    ## 2024-02-05 12:03:34,769 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_cd4.h5ad' is loaded.
-    ## 2024-02-05 12:03:34,769 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.30s.
-
-<img src="figure_2_files/figure-gfm/fig_2d-1.png" width="960" />
-
 ## Figure 2E
-
-``` python
+```{python results = 'hold', fig_2e}
 cluster_order = [f'cd4_{i}' for i in [3, 6, 2, 1, 5, 4, 7]]
 cluster_order = [name_dict[i] for i in cluster_order]
 gene_order = ['GZMA', 'HLA-DRB1', 'LGALS1', 'CCR7', 'TNFRSF4', 'CD40LG', 'GZMK', 'KLRB1', 'FOXP3', 'IL2RA', 'CXCR3',
@@ -168,11 +138,8 @@ gene_order = ['GZMA', 'HLA-DRB1', 'LGALS1', 'CCR7', 'TNFRSF4', 'CD40LG', 'GZMK',
 pyfun.make_gene_dotplot(cd4.to_anndata(), cluster_order, gene_order, 'CD4', figsize=(9, 5), names='cluster_name_w_num')
 ```
 
-<img src="figure_2_files/figure-gfm/fig_2e-3.png" width="1152" />
-
 ## Figure 2F
-
-``` r
+```{r message = F, results = 'hold', fig.width = 14, fig.height = 5, fig_2f}
 cd4_clusters <- obs %>%
   filter((lineage == 'CD4') & (lineage != 'Doublets and RBCs')) %>%
   pull(cluster_name_w_num) %>%
@@ -186,19 +153,8 @@ masc_helper(obs,
             colors = c('slategray', 'tomato4'))
 ```
 
-    ## Warning: Transformation introduced infinite values in continuous x-axis
-
-    ## Warning: The following aesthetics were dropped during statistical transformation: x
-    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-
-    ## Warning: `position_quasirandom()` requires non-overlapping x intervals
-
-![](figure_2_files/figure-gfm/fig_2f-5.png)<!-- -->
-
 ## Figure 2G
-
-``` python
+```{python results = 'hold', fig_2g}
 mnp = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad')
 mnp.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
 mnp.obs[['umap_number', 'umap_name']] = adata.obs['cluster_name_w_num'].str.split('\. ', expand=True)
@@ -207,14 +163,8 @@ mnp.obs['umap_name'] = mnp.obs['umap_name'].astype('category')
 pyfun.plot_umap(mnp, 'Blood: MNP Cells', pyfun.blood_mnp_pal)
 ```
 
-    ## 2024-02-05 12:03:56,526 - pegasusio.readwrite - INFO - h5ad file '/projects/home/sramesh/myo_final/blood/final/myo_blood_myeloid.h5ad' is loaded.
-    ## 2024-02-05 12:03:56,526 - pegasusio.readwrite - INFO - Function 'read_input' finished in 15.37s.
-
-<img src="figure_2_files/figure-gfm/fig_2g-1.png" width="960" />
-
 ## Figure 2H
-
-``` python
+```{python results = 'hold', fig_2h}
 cluster_order = [f'mnp_{i}' for i in [11, 6, 8, 10, 7, 5, 9, 1, 2, 4, 3, 12]]
 cluster_order = [name_dict[i] for i in cluster_order]
 gene_order = ['CLEC9A', 'IDO1', 'CD1C', 'CLEC10A', 'RNASE2', 'F13A1', 'LILRA4', 'JCHAIN', 'IFI44L', 'IFI6', 'C1QB',
@@ -223,11 +173,8 @@ gene_order = ['CLEC9A', 'IDO1', 'CD1C', 'CLEC10A', 'RNASE2', 'F13A1', 'LILRA4', 
 pyfun.make_gene_dotplot(mnp.to_anndata(), cluster_order, gene_order, 'MNP', figsize=(12, 6), names='cluster_name_w_num')
 ```
 
-<img src="figure_2_files/figure-gfm/fig_2h-3.png" width="1152" />
-
 ## Figure 2I
-
-``` r
+```{r message = F, results = 'hold', fig.width = 14, fig.height = 5, fig_2i}
 mnp_clusters <- c("11. b-DC1: CLEC9A, IDO1", "6. b-DC2: CD1C, CLEC10A", "8. b-DC3: RNASE2, F13A1",
                   "10. b-pDC: LILRA4, JCHAIN", "7. b-MNP: IFI44L, IFI6", "5. b-MNP: C1QB, CTSL",
                   "9. b-MNP: CCL3, IL1B", "1. b-MNP: CD14, CSF3R", "2. b-MNP: S100A12, CTSD",
@@ -252,66 +199,113 @@ masc_helper(obs,
             row_order = T)
 ```
 
-    ## Warning: Transformation introduced infinite values in continuous x-axis
-
-    ## Warning: Removed 1 rows containing missing values (`geom_errorbarh()`).
-
-    ## Warning: Removed 1 rows containing missing values (`geom_point()`).
-
-    ## Warning: Removed 1 rows containing missing values (`geom_label()`).
-
-    ## Warning: The following aesthetics were dropped during statistical transformation: x
-    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-
-    ## Warning: `position_quasirandom()` requires non-overlapping x intervals
-
-![](figure_2_files/figure-gfm/fig_2i-5.png)<!-- -->
-
-## Figure 2J
-
-``` r
-# read in troponin data and format obs data for troponin analysis
-troponin_data <- read_csv('/projects/home/sramesh/myo_final/blood/other_stuff/blood_troponin.csv')
-filt_obs <- obs %>%
-  filter(steroid_treatment == 'pre_steroid') %>% # only one sample per donor bc only looking at pre-steroid samples
-  filter(!str_detect(lineage, "Doublet")) %>%
-  left_join(troponin_data, by = 'sample_id') %>%
-  filter(abs(days_sample_to_troponin) <= 3) %>%
-  dplyr::rename(nearest_troponin = troponin_nearest_sample,
-                cluster_names = lineage_cluster,
-                lineage_names = lineage,
-                donor = sample_id) %>%
-  select(donor, nearest_troponin, cluster_names, lineage_names)
-
-# select significantly abundant lineages
-lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
-sig_lineages <- lineage_masc_res %>%
-  filter((model.pvalue < 0.1)) %>%
-  pull(lineage)
-
-# calculate troponin trends
-troponin_percents <- troponin_get_percent_per_level(filt_obs, level = 'lineage')
-troponin_model <- troponin_fit_model(troponin_percents, level = 'lineage')
-troponin_model <- troponin_model %>%
-  mutate(trop_coef = unlist(trop_coef),
-         trop_se = unlist(trop_se),
-         trop_pval = unlist(trop_pval)) %>%
-  select(-c(data, model))
-troponin_percents <- troponin_percents %>% filter(lineage_names %in% sig_lineages)
-troponin_model <- troponin_model %>% filter(lineage_names %in% sig_lineages)
-troponin_model$padj <- p.adjust(troponin_model$trop_pval, method = 'fdr')
-
-write_csv(troponin_model, glue('{wd}/output/troponin_by_sig_lineage.csv'))
-troponin_plot_model(troponin_model, troponin_percents, 'Significant Lineages',
-                    level = 'lineage', point_size = 2.2, type = 'detailed')
+## Supplemental Figure 2J
+```{python results = 'hold', message = F, supp_2j}
+bcells = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad')
+bcells.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
+bcells.obs[['umap_number', 'umap_name']] = bcells.obs['cluster_name_w_num'].str.split('\. ', expand=True)
+bcells.obs['umap_number'] = bcells.obs['umap_number'].astype(int).astype('category')
+bcells.obs['umap_name'] = bcells.obs['umap_name'].astype('category')
+pyfun.plot_umap(bcells, 'Blood: B and Plasma Cells', pyfun.blood_b_pal, marker_multiplier=13)
 ```
 
-![](figure_2_files/figure-gfm/fig_2j-1.png)<!-- -->
+## Supplemental Figure 2K
+```{python results = 'hold', supp_2k}
+cluster_order = [f'bcells_{i}' for i in [4, 5, 3, 2, 6, 1]]
+cluster_order = [name_dict[i] for i in cluster_order]
+gene_order = ['FOXP1', 'LINC01857', 'BACH2', 'CIB1', 'FGR', 'AIM2', 'COCH', 'XBP1', 'JCHAIN', 'TCL1A', 'CXCR4']
+pyfun.make_gene_dotplot(bcells.to_anndata(), cluster_order, gene_order, 'B and plasma', figsize=(5, 4),
+                        names='cluster_name_w_num')
+```
 
-## Figure 2K
+## Supplemental Figure 2L
+```{r message = F, results = 'hold', warning = F, fig.width = 14, fig.height = 7, supp_2l}
+# run masc for case vs control by cluster (or read in file if it exists)
+if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))) {
+  cluster_masc_res <- run_masc(obs,
+                               c('deg_case_control', 'control', 'case'),
+                               'lineage_cluster',
+                               fixed_effects = c('sex', 'ici_type'))
+  write_csv(cluster_masc_res, glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+} else {
+  cluster_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+}
 
-``` python
+# rename clusters
+cluster_name_dict <- setNames(cluster_annots$cluster_name_w_num,
+                              cluster_annots$lineage_cluster)
+cluster_masc_res$cluster_name_w_num <- cluster_masc_res$lineage_cluster %>% recode(!!!cluster_name_dict)
+
+# filter for only b and plasma clusters and plot
+bcells_clusters <- obs %>%
+  filter((lineage == 'B and plasma') & (lineage != 'Doublets and RBCs')) %>%
+  pull(cluster_name_w_num) %>%
+  unique()
+masc_helper(obs,
+            c('deg_case_control', 'control', 'case'),
+            'cluster_name_w_num',
+            fixed_effects = c('sex', 'ici_type'),
+            group_subset = bcells_clusters,
+            masc_res = cluster_masc_res,
+            colors = c('slategray', 'tomato4'))
+```
+
+
+## Figure 2M
+```{r results = 'hold', message = F, warning = F, fig_2A}
+wd = '/projects/home/sramesh/github/myocarditis'
+
+#### first run de
+if (!file.exists(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))) {
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
+  meta <- meta %>%
+    filter(deg_case_control != "NA") %>%
+    filter(!str_detect(lineage, "Doublet"))
+  case_control_contrast_vec <- c('deg_case_control', 'case', 'control')
+  case_control_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), case_control_contrast_vec,
+                                                     deseq_formula = formula("~ deg_case_control + sex + ici_type"))
+} else {
+    case_control_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_deg_case_control_all_results.csv'))
+}
+
+#### now plot barplot
+colors <- c('tomato4', 'slategray')
+cluster_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
+res <- case_control_lineage_results %>%
+  mutate(cluster = str_replace_all(cluster, '_', ' '))
+res <- res[res$padj < 0.1, ]
+ups <- downs <- numeric(length(cluster_order))
+
+for (i in seq_along(cluster_order)) {
+  clust <- cluster_order[i]
+  up_genes <- res[res$cluster == clust & res$log2FoldChange > 0, ]
+  down_genes <- res[res$cluster == clust & res$log2FoldChange < 0, ]
+  ups[i] <- nrow(up_genes)
+  downs[i] <- -nrow(down_genes)
+}
+
+df <- data.frame(cluster = cluster_order, up = ups, down = downs)
+df <- df %>% mutate(cluster = factor(cluster, levels = rev(cluster_order)))
+
+ggplot(df, aes(x = up, y = cluster)) +
+  geom_bar(stat = "identity", fill = colors[1]) +
+  geom_bar(stat = "identity", aes(x = down, y = cluster), fill = colors[2]) +
+  geom_vline(xintercept = 0, color = "black", linetype = "solid", size = 0.5) +
+  scale_x_continuous(breaks = scales::pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 16),
+        axis.text = element_text(color = 'black')) +
+  labs(x = element_blank(),
+       y = element_blank())
+```
+
+## Supplemental figure 2N
+```{python results = 'hold', fig_2k_python}
 if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or not os.path.exists(
     f'{wd}/output/pb_meta_by_sample_id_and_cluster.csv'):
     counts, meta = pyfun.blood_pb_info('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr',
@@ -323,11 +317,12 @@ if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or 
     meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_cluster.csv')
 ```
 
-``` r
+
+```{r message = F, results = 'hold', fig.width = 15, fig.height = 8, fig_2k_r}
 #### first run de
 if (!file.exists(glue('{wd}/output/cluster_de_by_deg_case_control_all_results.csv'))) {
-  counts <- read_counts("{wd}/output/pb_counts_by_sample_id_and_cluster.csv")
-  meta <- read_meta("{wd}/output/pb_meta_by_sample_id_and_cluster.csv")
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_cluster.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_cluster.csv"))
   meta <- meta %>%
     filter(deg_case_control != "NA") %>%
     filter(!str_detect(lineage, "Doublet"))
@@ -604,5 +599,3 @@ draw(ht_de %v% ht_gsea,
      heatmap_legend_list = pd,
      merge_legends = FALSE)
 ```
-
-![](figure_2_files/figure-gfm/fig_2k_r-1.png)<!-- -->
