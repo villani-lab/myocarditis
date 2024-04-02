@@ -27,6 +27,7 @@ library(ggstance)
 library(knitr)
 library(grid)
 library(readxl)
+library(ggpubr)
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
 source('de.R')
@@ -253,6 +254,61 @@ ggplot(plot_degs_all, aes(x = log2FoldChange, y = no_mm_log2FoldChange)) +
 
 ## Supplemental Figure 1F
 
+```{r message = FALSE, results = 'hold', fig_1g}
+
+# read in serum values per sample
+serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
+
+# get between condition statistics for log1p values
+serum_model <- serum_df %>%
+  dplyr::select(!c(patient, timepoint, Sample)) %>%
+  pivot_longer(cols=!c(condition),
+               names_to='protein',
+               values_to='value') %>%
+  mutate(log1p_value = log1p(value)) %>%
+  group_by(condition, protein) %>%
+  summarize(log1p_values = list(log1p_value)) %>%
+  pivot_wider(names_from = condition,
+              values_from = log1p_values) %>%
+  group_by(protein) %>%
+  summarize(mean_case = mean(unlist(myocarditis)),
+            std_case = sd(unlist(myocarditis)),
+            n_case = length(unlist(myocarditis)),
+            mean_control = mean(unlist(control)),
+            std_control = sd(unlist(control)),
+            n_control = length(unlist(control)),
+            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
+            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
+            log2FC = log2(mean_case/mean_control))
+kable(serum_model)
+
+# proteins to annotate in figures
+serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
+                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
+
+# make volcano plot
+serum_plot_df <- serum_model %>%
+  mutate(
+    name = case_when(
+      protein %in% serum_annot ~ protein,
+      TRUE ~ ""
+    ),
+    t_stat = -t_stat
+  )
+
+ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
+  geom_point(data = serum_plot_df %>% filter(t_stat < 0), color =  'slategray', size = 2.5) +
+  geom_point(data = serum_plot_df %>% filter(t_stat > 0), color =  'tomato4', size = 2.5) +
+  geom_vline(xintercept = 0, lty=2) +
+  ggrepel::geom_label_repel(aes(label = name), size = 4) +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+```
+
+## Supplemental Figure 1G
+
 ```{r results = 'hold', message = F, supp_1f}
 # read in serum values per sample
 serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
@@ -340,61 +396,6 @@ p_1e <- ggplot(ext_1e_df, aes(x = condition, y = value + 1, fill = condition)) +
 print(p_1e)
 ```
 
-## Supplemental Figure 1G
-
-```{r message = FALSE, results = 'hold', fig_1g}
-
-# read in serum values per sample
-serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
-
-# get between condition statistics for log1p values
-serum_model <- serum_df %>%
-  dplyr::select(!c(patient, timepoint, Sample)) %>%
-  pivot_longer(cols=!c(condition),
-               names_to='protein',
-               values_to='value') %>%
-  mutate(log1p_value = log1p(value)) %>%
-  group_by(condition, protein) %>%
-  summarize(log1p_values = list(log1p_value)) %>%
-  pivot_wider(names_from = condition,
-              values_from = log1p_values) %>%
-  group_by(protein) %>%
-  summarize(mean_case = mean(unlist(myocarditis)),
-            std_case = sd(unlist(myocarditis)),
-            n_case = length(unlist(myocarditis)),
-            mean_control = mean(unlist(control)),
-            std_control = sd(unlist(control)),
-            n_control = length(unlist(control)),
-            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
-            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
-            log2FC = log2(mean_case/mean_control))
-kable(serum_model)
-
-# proteins to annotate in figures
-serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
-                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
-
-# make volcano plot
-serum_plot_df <- serum_model %>%
-  mutate(
-    name = case_when(
-      protein %in% serum_annot ~ protein,
-      TRUE ~ ""
-    ),
-    t_stat = -t_stat
-  )
-
-ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
-  geom_point(data = serum_plot_df %>% filter(t_stat < 0), color =  'slategray', size = 2.5) +
-  geom_point(data = serum_plot_df %>% filter(t_stat > 0), color =  'tomato4', size = 2.5) +
-  geom_vline(xintercept = 0, lty=2) +
-  ggrepel::geom_label_repel(aes(label = name), size = 4) +
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.border = element_blank(),
-        panel.background = element_blank())
-```
-
 ## Supplemental Figure 1H
 
 
@@ -425,16 +426,17 @@ ggplot(plot_df, aes(x = -t_stat_mets, y = -t_stat_nomets)) +
 
 ```
 
+## Supplemental figure 1I
 
-```{python results = 'hold', supp_1h}
+```{python results = 'hold', supp_1i}
 cluster_order = ['pDCs', 'B and plasma', 'cDCs', 'CD4', 'MNP', 'CD8 and NK']
 gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 'CLEC9A', 'CD4', 'CD3D', 'IL7R', 'LYZ',
               'CD14', 'AIF1', 'CD8A', 'NKG7', 'KLRF1']
 pyfun.make_gene_dotplot(adata.to_anndata(), cluster_order, gene_order, 'All cells', figsize=(5, 4), names='lineage')
 ```
 
-## Supplemental Figure 1I
-```{r message = F, warning = F, results = 'hold', fig.width = 14, fig.height = 7, supp_1I}
+## Supplemental Figure 1J
+```{r message = F, warning = F, results = 'hold', fig.width = 14, fig.height = 7, supp_1j}
 # run masc for pre- vs post-steroid by lineage (or read in file if it exists)
 if (!file.exists(glue('{wd}/output/masc_for_steroid_treatment_by_lineage.csv'))) {
   lineage_masc_res <- run_masc(obs,
@@ -454,8 +456,8 @@ masc_helper(obs,
             colors = c('darkolivegreen4', 'darkolivegreen2'))
 ```
 
-## Supplemental Figure 1J
-```{r message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7, supp_1j}
+## Supplemental Figure 1K
+```{r message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7, supp_1k}
 #### first run de
 if (!file.exists(glue('{wd}/output/lineage_de_by_steroid_treatment_all_results.csv'))) {
   counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
@@ -505,53 +507,324 @@ ggplot(df, aes(x = up, y = cluster)) +
        y = element_blank())
 ```
 
-## Supplemental Figure 1k
-```{python results = 'hold', message = F, supp_1k}
-bcells = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad')
-bcells.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
-bcells.obs[['umap_number', 'umap_name']] = bcells.obs['cluster_name_w_num'].str.split('\. ', expand=True)
-bcells.obs['umap_number'] = bcells.obs['umap_number'].astype(int).astype('category')
-bcells.obs['umap_name'] = bcells.obs['umap_name'].astype('category')
-pyfun.plot_umap(bcells, 'Blood: B and Plasma Cells', pyfun.blood_b_pal, marker_multiplier=13)
+## Supplemental figure 1L
+
+## Supplemental figure 1M
+```{r supp_1m, message = F, results = 'hold', warning = F, fig.width = 10, height = 12}
+
+plot_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/swimmer_plot/swimmer_plot_info.csv")
+
+# Need to figure out how long to make the line for everyone
+plot_info$end_line <- apply(plot_info, 1, function(d){
+  if (!is.na(d[["post_steroid_samp_day"]])){
+    return(as.numeric(d[["post_steroid_samp_day"]]) - as.numeric(d[["ici_start_day"]]))
+  } else {
+    return(as.numeric(d[["steroid_start_day"]]) - as.numeric(d[["ici_start_day"]]))
+  }
+})
+plot_info$days_to_steroid <-  plot_info$steroid_start_day - plot_info$ici_start_day
+plot_info$days_to_post_steroid <-plot_info$post_steroid_samp_day - plot_info$ici_start_day
+plot_df <- plot_info %>%
+  dplyr::select(ID, time_ici_to_pre_steroid_samp, time_pre_steroid_samp_to_steroid,
+                time_steroid_start_to_post_steroid_samp,days_to_steroid, days_to_post_steroid, end_line)
+# Lets get the rows ordered
+fatal_ids <- c("SIC_3", "SIC_17", "SIC_175", "SIC_232", "SIC_264", "SIC_266")
+plot_df$fatal <- ifelse(plot_df$ID %in% fatal_ids, "fatal", "non-fatal")
+plot_df$has_pre <- ifelse(is.na(plot_df$time_ici_to_pre_steroid_samp), "no", "yes")
+
+order <- plot_df %>%
+  arrange(desc(has_pre), fatal) %>%
+  .$ID
+plot_df$ID <- factor(plot_df$ID, levels = rev(order))
+
+brewer.pal(4, "Set1")
+
+plot_info$steroid_to_pre_steroid <- plot_info$pre_steroid_samp_day - plot_info$steroid_start_day
+# Time from steroid to post-steroid samp
+plot_info$steroid_to_post_steroid <- plot_info$post_steroid_samp_day - plot_info$steroid_start_day
+
+plot_df <- plot_info %>%
+  dplyr::select(ID, steroid_to_pre_steroid, steroid_to_post_steroid) %>%
+  mutate("steroid_start" = 0)
+plot_df$start_point <- ifelse(is.na(plot_df$steroid_to_pre_steroid), 0, (plot_df$steroid_to_pre_steroid))
+plot_df$end_point <- ifelse(is.na(plot_df$steroid_to_post_steroid), 0, (plot_df$steroid_to_post_steroid))
+
+# Lets get the rows ordered
+fatal_ids <- c("SIC_3", "SIC_17", "SIC_175", "SIC_232", "SIC_264", "SIC_266")
+plot_df$fatal <- ifelse(plot_df$ID %in% fatal_ids, "fatal", "non-fatal")
+plot_df$has_pre <- ifelse(is.na(plot_df$steroid_to_pre_steroid), "no", "yes")
+plot_df$has_post <- ifelse(is.na(plot_df$steroid_to_post_steroid), "no", "yes")
+order <- plot_df %>%
+  arrange(desc(has_post), fatal,steroid_to_post_steroid ) %>%
+  .$ID
+plot_df$ID <- factor(plot_df$ID, levels = rev(order))
+
+# Lets add a table next to it with peak troponin
+trop_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/post_steroid_trop_data.csv")
+trop_info$ID <- sapply(trop_info$sample, function(x) paste(strsplit(x, "_")[[1]][1:2], collapse = "_"))
+trop_info$sample <- NULL
+trop_info$trop_fc <-((trop_info$Peak.troponin- trop_info$post_steroid_troponin)/ trop_info$Peak.troponin) * 100
+
+# Get the missing ones as well
+trop_no_post <- read.csv("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/no_pre_steroid_peak_trop.csv")
+trop_no_post$post_steroid_troponin <- NA
+trop_no_post$trop_fc <- NA
+trop_no_post <- trop_no_post %>%
+  dplyr::select(colnames(trop_info))
+
+trop_info <- rbind(trop_info, trop_no_post)
+trop_info$ID <- factor(trop_info$ID, levels = levels(plot_df$ID))
+
+p1 <- ggplot(plot_df, aes(x = value, y = ID)) +
+  geom_stripes(aes(x = NULL), odd = "#ffffff00", even = "#33333333") +
+  geom_segment(aes(x=start_point, xend=end_point, y=ID, yend=ID)) +
+  geom_point(x = 0, size = 4, (aes(color = "Steroid treatment")), alpha = 0.9) +
+  geom_point(x = plot_df$steroid_to_pre_steroid, size = 4, pch = 17,aes(color = "Pre-steroid sample"), alpha = 0.9) +
+  geom_point(x = plot_df$steroid_to_post_steroid, size = 4, pch = 18, aes(color = "Post-steroid sample"), alpha = 0.9) +
+  scale_color_manual(name = "",
+                     values = c("Steroid treatment" = "#E41A1C", "Pre-steroid sample" = "#377EB8", "Post-steroid sample" = "#984EA3"),
+                     breaks = c("Steroid treatment", "Pre-steroid sample", "Post-steroid sample")) +
+  scale_shape_manual(name = "",
+                   values = c("Steroid treatment" = 16, "Pre-steroid sample" = 17, "Post-steroid sample" = 18),
+                   breaks = c("Steroid treatment", "Pre-steroid sample", "Post-steroid sample")) +
+  xlab("Days") +
+  theme_classic(base_size = 20)
+
+all(levels(trop_info$ID) == levels(plot_df$ID))
+
+p2 <- ggplot(trop_info, aes(x = 1, y = ID)) +
+  geom_tile(fill = NA, color = "black", size = 1) +
+  geom_text(aes(label = Peak.troponin)) +
+  ggtitle("Peak troponin") +
+  geom_stripes(odd = "#ffffff00", even = "#33333333") +
+  theme_void()
+p3 <- ggplot(trop_info, aes(x = 1, y = ID)) +
+  geom_tile(fill = NA, color = "black", size = 1) +
+  geom_text(aes(label = round(trop_fc, 2))) +
+  ggtitle("% Troponin reduction") +
+  geom_stripes(odd = "#ffffff00", even = "#33333333") +
+  theme_void()
+
+ggarrange(p1, p2, p3, widths = c(0.8, 0.15, 0.15), align = "h", nrow = 1, common.legend = TRUE)
+
 ```
 
-## Supplemental Figure 1L
-```{python results = 'hold', supp_1l}
-cluster_order = [f'bcells_{i}' for i in [4, 5, 3, 2, 6, 1]]
-cluster_order = [name_dict[i] for i in cluster_order]
-gene_order = ['FOXP1', 'LINC01857', 'BACH2', 'CIB1', 'FGR', 'AIM2', 'COCH', 'XBP1', 'JCHAIN', 'TCL1A', 'CXCR4']
-pyfun.make_gene_dotplot(bcells.to_anndata(), cluster_order, gene_order, 'B and plasma', figsize=(5, 4),
-                        names='cluster_name_w_num')
-```
+## Supplemental figure 1N
+```{r supp_1n, message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7}
 
-## Supplemental Figure 1M
-```{r message = F, results = 'hold', warning = F, fig.width = 14, fig.height = 7, supp_1m}
-# run masc for case vs control by cluster (or read in file if it exists)
-if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))) {
-  cluster_masc_res <- run_masc(obs,
-                               c('deg_case_control', 'control', 'case'),
-                               'lineage_cluster',
-                               fixed_effects = c('sex', 'ici_type'))
-  write_csv(cluster_masc_res, glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+
+mtx <- read.csv("/projects/home/sramesh/github/myocarditis/output/pb_counts_by_sample_id_and_lineage.csv",
+                row.names = 1)
+
+norm_counts <- apply(mtx, 2, function(c){
+  n_total <- sum(c)
+  per_100k <- (c * 1000000) / n_total
+  return(per_100k)
+})
+
+norm_counts <- log1p(norm_counts)
+
+meta <- read.csv("/projects/home/sramesh/github/myocarditis/output/pb_meta_by_sample_id_and_lineage.csv",
+                 row.names = 1)
+meta$donor <- sapply(meta$sample, function(x) paste(strsplit(x, "_")[[1]][1:2], collapse = "_"))
+
+trop_meta <- read.csv("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/post_steroid_trop_data.csv")
+trop_meta$trop_fc <-(trop_meta$Peak.troponin- trop_meta$post_steroid_troponin)/ trop_meta$Peak.troponin
+trop_meta$trop_logfc <- log1p(trop_meta$trop_fc)
+
+# Also need to add time from steroid start to post-steroid sample
+time_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/swimmer_plot/swimmer_plot_info.csv")
+time_info %<>%
+  dplyr::select(ID, time_steroid_start_to_post_steroid_samp) %>%
+  dplyr::rename(donor = ID)
+
+meta %<>%
+  rownames_to_column() %>%
+  dplyr::left_join(trop_meta, by = "sample") %>%
+  dplyr::left_join(time_info, by = "donor") %>%
+  column_to_rownames("rowname")
+meta$log_time_steroid_start_to_post_steroid_samp <- log1p(meta$time_steroid_start_to_post_steroid_samp)
+# Need to fix SIC_3
+rownames(meta)[grepl("SIC_3_", rownames(meta))] <- sub("-", ".", rownames(meta)[grepl("SIC_3_", rownames(meta))])
+ps_meta <- meta %>%
+  dplyr::filter(sample %in% trop_meta$sample)
+ps_mtx <- mtx[,rownames(ps_meta)]
+
+if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/all_deg_res.csv")){
+  # Iterate across lineages
+  gene_sets <-  gmtPathways( "/projects/home/nealpsmith/projects/medoff/data/msigdb_symbols.gmt")
+  n_gene_df <- data.frame()
+  deg_res <- data.frame()
+  gsea_res <- data.frame()
+
+  for(lin in unique(ps_meta$lineage)){
+
+    if (lin == "Doublets_and_RBCs"){
+      next()
+    }
+
+    meta_temp <- ps_meta[ps_meta$lineage == lin,]
+    meta_temp$post_steroid_fatal <- factor(meta_temp$post_steroid_fatal, levels = c("non_fatal", "fatal"))
+    count_temp <- ps_mtx[,rownames(meta_temp)]
+
+    # Make sure the genes are detected in enough samples
+    n_samp <- rowSums(count_temp != 0)
+    count_temp <- count_temp[n_samp > round(nrow(meta_temp) / 2),]
+
+    models <- c(as.formula("~log_time_steroid_start_to_post_steroid_samp+trop_logfc"),
+                as.formula("~trop_logfc+log_time_steroid_start_to_post_steroid_samp"),
+                as.formula("~post_steroid_fatal"))
+    for (m in models){
+      test_var <- tail(strsplit(as.character(m), "+", fixed = TRUE)[[2]], n = 1)
+      test_var <- gsub(" ", "", test_var)
+
+      dds <- DESeqDataSetFromMatrix(countData = count_temp,
+                                colData = meta_temp,
+                                design = m)
+      dds <- DESeq(dds)
+      res <- as.data.frame(results(dds))
+      res <- res[!is.na(res$padj),]
+      res$contrast <- test_var
+      res$lin <- lin
+      res$gene <- rownames(res)
+      deg_res <- rbind(deg_res, res)
+
+      n_up <- nrow(res[res$padj < 0.1 & res$log2FoldChange > 0,])
+      n_down <- nrow(res[res$padj < 0.1 & res$log2FoldChange < 0,])
+      df <- data.frame(lin = lin, contrast = test_var, n_up = n_up, n_down = n_down)
+      n_gene_df <- rbind(n_gene_df, df)
+
+      ## GSEA ##
+      order_genes <- res %>%
+        dplyr::select(gene, stat) %>%
+        na.omit() %>%
+        distinct() %>%
+        group_by(gene) %>%
+        summarize(stat=mean(stat))
+      ranks <- deframe(order_genes)
+
+      for (geneset in c("BIOCARTA", "HALLMARK", "KEGG")){
+        gsets <- gene_sets[grep(geneset, names(gene_sets))]
+        fgseaRes <- fgsea(pathways=gsets, stats=ranks, nperm=10000)
+        fgseaResTidy <- fgseaRes %>%
+          as_tibble() %>%
+          arrange(desc(NES))
+        fgseaResTidy$contrast <- test_var
+        fgseaResTidy$lin <- lin
+        fgseaResTidy$library <- geneset
+        gsea_res <- rbind(gsea_res, fgseaResTidy)
+
+        }
+      }
+    }
+    gsea_res$leadingEdge <- as.character(gsea_res$leadingEdge)
+
+    # Write the results
+    write.csv(deg_res, "/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/all_deg_res.csv")
+    write.csv(gsea_res, "/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/all_gsea_res.csv")
+
 } else {
-  cluster_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+  deg_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/all_deg_res.csv",
+                      row.names = 1)
+  gsea_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/post_steroid_trop/data/all_gsea_res.csv",
+                       row.names = 1)
 }
 
-# rename clusters
-cluster_name_dict <- setNames(cluster_annots$cluster_name_w_num,
-                              cluster_annots$lineage_cluster)
-cluster_masc_res$cluster_name_w_num <- cluster_masc_res$lineage_cluster %>% recode(!!!cluster_name_dict)
+var <- "log_time_steroid_start_to_post_steroid_samp"
+plot_df <-deg_res %>%
+  dplyr::filter(contrast == var, padj < 0.1) %>%
+  mutate(variable = ifelse(log2FoldChange > 0, "n_up", "n_down")) %>%
+  group_by(lin, variable) %>%
+  summarise(value = n()) %>%
+  mutate(value = ifelse(variable == "n_down", -value, value))
 
-# filter for only b and plasma clusters and plot
-bcells_clusters <- obs %>%
-  filter((lineage == 'B and plasma') & (lineage != 'Doublets and RBCs')) %>%
-  pull(cluster_name_w_num) %>%
-  unique()
-masc_helper(obs,
-            c('deg_case_control', 'control', 'case'),
-            'cluster_name_w_num',
-            fixed_effects = c('sex', 'ici_type'),
-            group_subset = bcells_clusters,
-            masc_res = cluster_masc_res,
-            colors = c('slategray', 'tomato4'))
+ggplot(plot_df, aes(x = lin, y = value, group = variable, fill = variable)) +
+  geom_bar(stat = "identity") + coord_flip() +
+  scale_fill_manual(values = c("#FF0000", "#0000FF")) +
+  scale_y_continuous(labels = abs, limits = c(-1500, 1750)) +
+  ylab("# of DE genes") + xlab("") +
+  ggtitle(glue("model by {var}")) +
+  theme_classic(base_size = 15)
+
+```
+
+```{r supp_1o, message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7}
+pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
+              'KEGG_CELL_ADHESION_MOLECULES_CAMS', 'KEGG_DNA_REPLICATION',
+              'HALLMARK_INTERFERON_GAMMA_RESPONSE',
+              'KEGG_VIRAL_MYOCARDITIS')
+pathway_abbrevs <- c('KEGG: Allo', 'KEGG: AP', 'KEGG: CAMS', 'KEGG: DNA', 'HALLMARK: IFNG', 'KEGG: Viral Myo')
+abbrev_dict <- setNames(pathway_abbrevs, pathways)
+lineage_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
+c <- "log_time_steroid_start_to_post_steroid_samp"
+c_data <- gsea_res %>%
+dplyr::filter(contrast == c)
+
+heatmap_df <- c_data %>%
+complete(pathway, lin) %>%
+replace_na(list(log2FoldChange = 0, padj = 1)) %>%
+dplyr::select(pathway, lin, NES, padj) %>%
+filter(pathway %in% pathways) %>%
+mutate(cluster = str_replace_all(lin, '_', ' ')) %>%
+mutate(pathway = abbrev_dict[pathway])
+
+nes_mtx <- heatmap_df %>%
+dplyr::select(c(pathway, cluster, NES)) %>%
+pivot_wider(names_from = cluster, values_from = NES) %>%
+column_to_rownames('pathway') %>%
+dplyr::select(all_of(lineage_order)) %>%
+as.matrix()
+nes_mtx <- nes_mtx[pathway_abbrevs,] %>% t()
+
+# define cell color range
+heatmap_col_fun <- colorRamp2(c(floor(min(nes_mtx, na.rm = T)), 0, ceiling(max(nes_mtx, na.rm = T))),
+                            brewer.pal(5, 'PiYG')[c(5,3,1)])
+
+fdr_mtx <- heatmap_df %>%
+dplyr::select(c(pathway, cluster, padj)) %>%
+pivot_wider(names_from = cluster, values_from = padj) %>%
+column_to_rownames('pathway') %>%
+dplyr::select(all_of(lineage_order)) %>%
+as.matrix()
+fdr_mtx <- fdr_mtx[pathway_abbrevs,] %>% t()
+
+# make function for plotting fdr value (this function returns a function)
+fdr_func <- function(mtx) {
+function(j, i, x, y, width, height, fill) {
+  if (!is.na(mtx[i, j]) & (mtx[i,j] < 0.1)) {
+    grid.circle(x = x, y = y, r = unit(1.5, 'mm'),
+                gp = gpar(fill = 'black', col = NA))
+  }
+}
+}
+
+# make sure columns are the same
+stopifnot(colnames(fdr_mtx) == colnames(nes_mtx))
+stopifnot(rownames(fdr_mtx) == rownames(nes_mtx))
+
+gsea_lgd <- Legend(col_fun = heatmap_col_fun, title = 'NES', direction = 'horizontal')
+fdr_lgd <- Legend(pch = 16, type = "points", labels = "FDR < 0.1")
+na_lgd <- Legend(labels = 'N/A', legend_gp = gpar(fill = 'grey'))
+pd <- packLegend(gsea_lgd, fdr_lgd, na_lgd, direction = 'horizontal')
+
+ht_gsea <- Heatmap(nes_mtx,
+                 col = heatmap_col_fun,
+                 cell_fun = fdr_func(fdr_mtx),
+                 column_order = colnames(nes_mtx),
+                 top_annotation = NULL, column_title = c,
+                 name = 'NES', show_heatmap_legend = FALSE,
+                 cluster_columns = FALSE, column_names_side = "top",
+                 show_column_names = T, column_names_rot = 45,
+                 cluster_rows = FALSE, row_names_side = "left",
+                 row_title_rot = 0, row_title_gp=gpar(fontface='bold'),
+                 row_gap = unit(2, "mm"), border = TRUE,
+                 width = ncol(nes_mtx)*unit(6, "mm"),
+                 height = nrow(nes_mtx)*unit(6, "mm"))
+
+draw(ht_gsea,
+   heatmap_legend_list = pd,
+   heatmap_legend_side = 'bottom',
+   merge_legends = FALSE)
+
+
 ```
