@@ -560,66 +560,9 @@ plot_heatmap(tissue_gsea_plot_df,
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/lineage_gsea_fig1.pdf")
 ```
 
-
 ## Figure 1H
 
-```{r message = FALSE, results = 'hold', fig_1h}
-
-# read in serum values per sample
-serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
-
-# get between condition statistics for log1p values
-serum_model <- serum_df %>%
-  dplyr::select(!c(patient, timepoint, Sample)) %>%
-  pivot_longer(cols=!c(condition),
-               names_to='protein',
-               values_to='value') %>%
-  mutate(log1p_value = log1p(value)) %>%
-  group_by(condition, protein) %>%
-  summarize(log1p_values = list(log1p_value)) %>%
-  pivot_wider(names_from = condition,
-              values_from = log1p_values) %>%
-  group_by(protein) %>%
-  summarize(mean_case = mean(unlist(myocarditis)),
-            std_case = sd(unlist(myocarditis)),
-            n_case = length(unlist(myocarditis)),
-            mean_control = mean(unlist(control)),
-            std_control = sd(unlist(control)),
-            n_control = length(unlist(control)),
-            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
-            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
-            log2FC = log2(mean_case/mean_control))
-kable(serum_model)
-
-# proteins to annotate in figures
-serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
-                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
-
-# make volcano plot
-serum_plot_df <- serum_model %>%
-  mutate(
-    name = case_when(
-      protein %in% serum_annot ~ protein,
-      TRUE ~ ""
-    ),
-    t_stat = -t_stat
-  )
-
-ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
-  geom_point(data = serum_plot_df %>% filter(t_stat < 0), color =  'slategray', size = 2.5) +
-  geom_point(data = serum_plot_df %>% filter(t_stat > 0), color =  'tomato4', size = 2.5) +
-  geom_vline(xintercept = 0, lty=2) +
-  ggrepel::geom_label_repel(aes(label = name), size = 4) +
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.border = element_blank(),
-        panel.background = element_blank())
-```
-
-
-## Figure 1I
-
-```{python results = 'hold', message = F, fig_1i}
+```{python results = 'hold', message = F, fig_1h}
 adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
 adata.obs['umap_name'] = adata.obs['lineage'].astype('category')
 lineage_order = adata.obs['lineage'].value_counts().index.to_list()
@@ -629,7 +572,7 @@ adata.obs['umap_number'] = adata.obs['umap_name'].map(lineage_dict).astype('cate
 python_functions.plot_umap(adata, '', python_functions.blood_global_pal)
 ```
 
-## Figure 1J
+## Figure 1i
 ```{r message = F, warning = F, results = 'hold', fig.width = 14, fig.height = 7, fig_1j}
 wd <- '/projects/home/sramesh/github/myocarditis'
 
@@ -637,7 +580,7 @@ wd <- '/projects/home/sramesh/github/myocarditis'
 obs <- read_csv(glue('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv'))
 cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
 
-## Figure 1J
+## Figure 1i
 # run masc for case vs control by lineage (or read in file if it exists)
 if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))) {
   lineage_masc_res <- run_masc(obs,
@@ -661,9 +604,9 @@ masc_helper(obs,
 
 ```
 
-## Figure 1K
+## Figure 1J
 
-```{python results = 'hold', fig_1k_python}
+```{python results = 'hold', fig_1j_python}
 wd = '/projects/home/ikernin/projects/myocarditis/updated_datasets/blood'
 
 counts, meta = python_functions.blood_pb_info('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr',
@@ -675,7 +618,7 @@ counts.to_csv(f'{wd}/output/pb_counts_by_sample_id_and_lineage.csv')
 meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_lineage.csv')
 ```
 
-```{r message = F, results = 'hold', fig.width = 7, fig.height = 7, fig_1k_r}
+```{r message = F, results = 'hold', fig.width = 7, fig.height = 7, fig_1j_r}
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/blood')
 
 #### first run de
@@ -781,4 +724,52 @@ draw(ht_gsea,
      heatmap_legend_list = pd,
      heatmap_legend_side = 'bottom',
      merge_legends = FALSE)
+```
+
+
+## Figure 1K
+
+```{r fig_1k,message = F, results = 'hold', fig.width = 7, fig.height = 7}
+
+wd <- '/projects/home/nealpsmith/publication_githubs/myocarditis'
+setwd(glue('{wd}/functions'))
+source('blood_troponin.R')
+# setwd(glue('{wd}/functions'))
+
+# read in troponin data and format obs data for troponin analysis
+troponin_data <- read_csv('/projects/home/sramesh/myo_final/blood/other_stuff/blood_troponin.csv')
+filt_obs <- obs %>%
+  filter(steroid_treatment == 'pre_steroid') %>% # only one sample per donor bc only looking at pre-steroid samples
+  filter(!str_detect(lineage, "Doublet")) %>%
+  left_join(troponin_data, by = 'sample_id') %>%
+  filter(abs(days_sample_to_troponin) <= 3) %>%
+  dplyr::rename(nearest_troponin = troponin_nearest_sample,
+                cluster_names = lineage_cluster,
+                lineage_names = lineage,
+                donor = sample_id) %>%
+  dplyr::select(donor, nearest_troponin, cluster_names, lineage_names)
+
+# select significantly abundant lineages
+wd <- '/projects/home/sramesh/github/myocarditis'
+lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
+sig_lineages <- lineage_masc_res %>%
+  filter((model.pvalue < 0.1)) %>%
+  pull(lineage)
+
+# calculate troponin trends
+troponin_percents <- troponin_get_percent_per_level(filt_obs, level = 'lineage')
+troponin_model <- troponin_fit_model(troponin_percents, level = 'lineage')
+troponin_model <- troponin_model %>%
+  mutate(trop_coef = unlist(trop_coef),
+         trop_se = unlist(trop_se),
+         trop_pval = unlist(trop_pval)) %>%
+  dplyr::select(-c(data, model))
+troponin_percents <- troponin_percents %>% filter(lineage_names %in% sig_lineages)
+troponin_model <- troponin_model %>% filter(lineage_names %in% sig_lineages)
+troponin_model$padj <- p.adjust(troponin_model$trop_pval, method = 'fdr')
+
+# write_csv(troponin_model, glue('{wd}/output/troponin_by_sig_lineage.csv'))
+troponin_plot_model(troponin_model, troponin_percents, 'Significant Lineages',
+                    level = 'lineage', point_size = 2.2, type = 'detailed')
+
 ```

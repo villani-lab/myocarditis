@@ -580,139 +580,9 @@ plot_heatmap(tissue_gsea_plot_df,
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/lineage_gsea_fig1.pdf")
 ```
 
-<embed src="../../../../projects/myocarditis/updated_datasets/figures/lineage_gsea_fig1.pdf" width="800px" height="460px" type="application/pdf" />
+<embed src="../../../../../ikernin/projects/myocarditis/updated_datasets/figures/lineage_gsea_fig1.pdf" width="800px" height="460px" type="application/pdf" />
 
 ## Figure 1H
-
-``` r
-# read in serum values per sample
-serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
-
-# get between condition statistics for log1p values
-serum_model <- serum_df %>%
-  dplyr::select(!c(patient, timepoint, Sample)) %>%
-  pivot_longer(cols=!c(condition),
-               names_to='protein',
-               values_to='value') %>%
-  mutate(log1p_value = log1p(value)) %>%
-  group_by(condition, protein) %>%
-  summarize(log1p_values = list(log1p_value)) %>%
-  pivot_wider(names_from = condition,
-              values_from = log1p_values) %>%
-  group_by(protein) %>%
-  summarize(mean_case = mean(unlist(myocarditis)),
-            std_case = sd(unlist(myocarditis)),
-            n_case = length(unlist(myocarditis)),
-            mean_control = mean(unlist(control)),
-            std_control = sd(unlist(control)),
-            n_control = length(unlist(control)),
-            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
-            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
-            log2FC = log2(mean_case/mean_control))
-kable(serum_model)
-
-# proteins to annotate in figures
-serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
-                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
-
-# make volcano plot
-serum_plot_df <- serum_model %>%
-  mutate(
-    name = case_when(
-      protein %in% serum_annot ~ protein,
-      TRUE ~ ""
-    ),
-    t_stat = -t_stat
-  )
-
-ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
-  geom_point(data = serum_plot_df %>% filter(t_stat < 0), color =  'slategray', size = 2.5) +
-  geom_point(data = serum_plot_df %>% filter(t_stat > 0), color =  'tomato4', size = 2.5) +
-  geom_vline(xintercept = 0, lty=2) +
-  ggrepel::geom_label_repel(aes(label = name), size = 4) +
-  theme_bw() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.border = element_blank(),
-        panel.background = element_blank())
-```
-
-![](figure_1_files/figure-gfm/fig_1h-1.png)<!-- -->
-
-| protein      | mean\_case | std\_case | n\_case | mean\_control | std\_control | n\_control |  p\_value |     t\_stat |      log2FC |
-| :----------- | ---------: | --------: | ------: | ------------: | -----------: | ---------: | --------: | ----------: | ----------: |
-| 6CKine       |  6.4363743 | 0.7101943 |      16 |     4.5567455 |    2.5437937 |         10 | 0.0459437 | \-2.2817143 |   0.4982444 |
-| BCA-1        |  4.8896005 | 1.0394112 |      16 |     3.8822775 |    0.5560748 |         10 | 0.0037935 | \-3.2104880 |   0.3328134 |
-| CTACK        |  7.3854061 | 0.3856017 |      16 |     7.0697631 |    0.6390623 |         10 | 0.1818264 | \-1.4097232 |   0.0630154 |
-| EGF          |  5.2334156 | 0.7222864 |      16 |     4.7273420 |    1.7544192 |         10 | 0.4043610 | \-0.8673928 |   0.1467236 |
-| ENA-78       |  6.4743338 | 0.6180568 |      16 |     6.7690392 |    0.8540781 |         10 | 0.3586866 |   0.9471231 | \-0.0642193 |
-| Eotaxin      |  3.9514577 | 0.6351661 |      16 |     4.0296076 |    0.9319650 |         10 | 0.8187338 |   0.2334441 | \-0.0282544 |
-| Eotaxin-2    |  6.3029821 | 0.8643721 |      16 |     6.0331097 |    0.2604114 |         10 | 0.2576432 | \-1.1670045 |   0.0631328 |
-| Eotaxin-3    |  1.2128693 | 1.4846713 |      16 |     0.6737767 |    1.3778945 |         10 | 0.3573158 | \-0.9418352 |   0.8480817 |
-| FGF-2        |  5.0137612 | 1.2062506 |      16 |     3.8426111 |    1.4997129 |         10 | 0.0533933 | \-2.0838641 |   0.3838063 |
-| FLT-3L       |  3.8099334 | 0.7345215 |      16 |     3.3411918 |    1.1989049 |         10 | 0.2855658 | \-1.1127215 |   0.1894030 |
-| Fractalkine  |  5.3353875 | 0.7747217 |      16 |     4.3582980 |    1.5767914 |         10 | 0.0932337 | \-1.8266092 |   0.2918282 |
-| G-CSF        |  2.4111508 | 2.2985718 |      16 |     1.9313054 |    1.9185079 |         10 | 0.5716786 | \-0.5742302 |   0.3201456 |
-| GM-CSF       |  4.1298428 | 1.4318275 |      16 |     3.5633644 |    1.3597476 |         10 | 0.3233776 | \-1.0124982 |   0.2128469 |
-| GROα         |  3.4976916 | 0.7170439 |      16 |     3.0594765 |    1.2331317 |         10 | 0.3260535 | \-1.0210509 |   0.1931183 |
-| I-309        |  1.7733368 | 0.5745722 |      16 |     1.2702573 |    0.4969847 |         10 | 0.0276843 | \-2.3628207 |   0.4813458 |
-| IFN-α2       |  4.3034714 | 1.9341091 |      16 |     3.0050394 |    2.2079845 |         10 | 0.1443742 | \-1.5288179 |   0.5181170 |
-| IFNγ         |  1.9435044 | 1.4059266 |      16 |     0.9612081 |    0.6652875 |         10 | 0.0250747 | \-2.3979847 |   1.0157397 |
-| IL-10        |  2.7738412 | 1.7354165 |      16 |     1.2456889 |    1.3806524 |         10 | 0.0209809 | \-2.4827516 |   1.1549414 |
-| IL-12p40     |  6.1262569 | 1.3028557 |      16 |     4.4349363 |    1.2923763 |         10 | 0.0042644 | \-3.2363434 |   0.4660925 |
-| IL-12p70     |  2.3888904 | 2.1255133 |      16 |     1.2592322 |    0.9518119 |         10 | 0.0776223 | \-1.8497685 |   0.9237963 |
-| IL-13        |  4.4144231 | 1.0829592 |      16 |     3.6266109 |    1.5080893 |         10 | 0.1716196 | \-1.4365869 |   0.2836030 |
-| IL-15        |  3.7151701 | 1.0837076 |      16 |     2.2245260 |    1.1138127 |         10 | 0.0033590 | \-3.3545572 |   0.7399303 |
-| IL-16        |  1.2938391 | 2.4059516 |      16 |     1.3318474 |    2.8292304 |         10 | 0.9722888 |   0.0352558 | \-0.0417706 |
-| IL-17A       |  2.8404342 | 1.7656720 |      16 |     1.5745222 |    1.5799273 |         10 | 0.0714845 | \-1.8988200 |   0.8511974 |
-| IL-17E/IL-25 |  5.7418729 | 2.6941808 |      16 |     3.9094564 |    2.8434321 |         10 | 0.1198353 | \-1.6310400 |   0.5545534 |
-| IL-17F       |  2.9082138 | 0.9201737 |      16 |     2.3049660 |    1.6178459 |         10 | 0.3022050 | \-1.0754080 |   0.3353879 |
-| IL-18        |  4.5529270 | 0.8469335 |      16 |     3.1609961 |    1.7582195 |         10 | 0.0379982 | \-2.3395791 |   0.5264150 |
-| IL-1RA       |  3.9844177 | 1.3788921 |      16 |     2.9077550 |    1.0645687 |         10 | 0.0355673 | \-2.2345065 |   0.4544632 |
-| IL-1α        |  3.7092153 | 1.7665737 |      16 |     2.7010582 |    1.5049316 |         10 | 0.1350191 | \-1.5527928 |   0.4575893 |
-| IL-1β        |  3.7776029 | 1.6315738 |      16 |     2.5616238 |    1.4620230 |         10 | 0.0619753 | \-1.9722459 |   0.5604124 |
-| IL-2         |  1.8627309 | 1.6871037 |      16 |     0.6756830 |    0.7037706 |         10 | 0.0209716 | \-2.4891432 |   1.4630008 |
-| IL-20        |  2.5522352 | 3.1023734 |      16 |     1.2752235 |    2.7138124 |         10 | 0.2819649 | \-1.1039848 |   1.0010112 |
-| IL-21        |  1.4868531 | 1.6123368 |      16 |     1.0480728 |    1.8236082 |         10 | 0.5409368 | \-0.6236353 |   0.5045232 |
-| IL-22        |  3.0965614 | 2.0476407 |      16 |     2.7713745 |    2.0495117 |         10 | 0.6981034 | \-0.3937390 |   0.1600654 |
-| IL-23        |  2.2091780 | 3.4142322 |      16 |     2.4069013 |    4.1287228 |         10 | 0.9006628 |   0.1267562 | \-0.1236673 |
-| IL-27        |  8.1959283 | 0.4365125 |      16 |     7.1586560 |    0.8112040 |         10 | 0.0028027 | \-3.7208548 |   0.1952186 |
-| IL-28A       |  1.9237581 | 2.8072062 |      16 |     1.3484567 |    2.8816697 |         10 | 0.6227331 | \-0.5001813 |   0.5126182 |
-| IL-3         |  0.3936793 | 0.2708367 |      16 |     0.3364586 |    0.2951412 |         10 | 0.6257284 | \-0.4962530 |   0.2265919 |
-| IL-33        |  1.5510885 | 1.9664495 |      16 |     2.0807321 |    2.6816080 |         10 | 0.5968677 |   0.5403444 | \-0.4238102 |
-| IL-4         |  1.2619752 | 1.1323697 |      16 |     0.9644388 |    0.8338522 |         10 | 0.4496054 | \-0.7690763 |   0.3879219 |
-| IL-5         |  2.6155659 | 0.9475224 |      16 |     1.9732390 |    1.1590662 |         10 | 0.1600244 | \-1.4718343 |   0.4065574 |
-| IL-6         |  2.4841638 | 0.9811992 |      16 |     2.0299885 |    1.7216854 |         10 | 0.4607923 | \-0.7605674 |   0.2912888 |
-| IL-7         |  2.4569886 | 1.0001989 |      16 |     1.8172582 |    0.7737255 |         10 | 0.0806058 | \-1.8286225 |   0.4351277 |
-| IL-8         |  3.1816575 | 1.3405947 |      16 |     2.8762683 |    1.3367150 |         10 | 0.5778419 | \-0.5661131 |   0.1455803 |
-| IL-9         |  2.3737289 | 1.3995452 |      16 |     0.8601500 |    1.3993118 |         10 | 0.0146041 | \-2.6830949 |   1.4644951 |
-| IP-10        |  7.3232318 | 1.7088805 |      16 |     5.2281214 |    1.9587047 |         10 | 0.0125870 | \-2.7844134 |   0.4861878 |
-| LIF          |  1.7842529 | 1.5358532 |      16 |     1.1075488 |    1.7872170 |         10 | 0.3358263 | \-0.9904071 |   0.6879499 |
-| M-CSF        |  5.4138877 | 0.8799103 |      16 |     4.4735527 |    1.8044625 |         10 | 0.1506946 | \-1.5376150 |   0.2752439 |
-| MCP-1        |  5.6576888 | 0.8842821 |      16 |     5.4289545 |    1.5628755 |         10 | 0.6797663 | \-0.4224752 |   0.0595385 |
-| MCP-2        |  3.9274040 | 0.3776841 |      16 |     3.9516614 |    0.1769999 |         10 | 0.8270705 |   0.2209949 | \-0.0088833 |
-| MCP-3        |  3.2201558 | 1.0213659 |      16 |     2.5523514 |    1.0656746 |         10 | 0.1310709 | \-1.5794558 |   0.3353036 |
-| MCP-4        |  4.0842874 | 1.7666237 |      16 |     4.2803509 |    1.5920842 |         10 | 0.7726134 |   0.2927517 | \-0.0676447 |
-| MDC          |  6.5570121 | 0.3519171 |      16 |     5.9321419 |    2.1367101 |         10 | 0.3822666 | \-0.9170513 |   0.1444855 |
-| MIG/CXCL9    |  9.1631650 | 0.6288525 |      16 |     8.2298567 |    1.1837104 |         10 | 0.0399116 | \-2.2988098 |   0.1549787 |
-| MIP-1α       |  4.3172488 | 1.1287316 |      16 |     3.2865776 |    1.2553439 |         10 | 0.0487888 | \-2.1161581 |   0.3935262 |
-| MIP-1β       |  4.3389583 | 0.5230917 |      16 |     3.5320302 |    1.3570783 |         10 | 0.1003234 | \-1.7986546 |   0.2968510 |
-| MIP-1δ       |  8.6986187 | 0.6016228 |      16 |     8.0169640 |    1.1240404 |         10 | 0.1022145 | \-1.7661075 |   0.1177303 |
-| PDGF-AA      |  7.2625498 | 0.4149287 |      16 |     6.8714718 |    2.4434248 |         10 | 0.6275551 | \-0.5016323 |   0.0798570 |
-| PDGF-AB/BB   |  9.8534586 | 0.2195944 |      16 |     9.5292300 |    1.2586629 |         10 | 0.4397492 | \-0.8069556 |   0.0482706 |
-| RANTES       |  7.4055882 | 0.4235097 |      16 |     6.8356067 |    2.4265108 |         10 | 0.4798918 | \-0.7358396 |   0.1155449 |
-| SCF          |  3.2519765 | 2.0302255 |      16 |     1.6751457 |    2.4194080 |         10 | 0.1043613 | \-1.7174330 |   0.9570302 |
-| SDF-1α+β     |  8.8320183 | 0.5500243 |      16 |     8.6591937 |    0.5690661 |         10 | 0.4549002 | \-0.7631023 |   0.0285105 |
-| TARC         |  4.5425314 | 0.5415717 |      16 |     4.6026783 |    0.9859257 |         10 | 0.8623928 |   0.1769515 | \-0.0189771 |
-| TGFα         |  2.4649651 | 0.8532875 |      16 |     2.2624766 |    1.3603165 |         10 | 0.6798823 | \-0.4217117 |   0.1236643 |
-| TNFα         |  5.0640180 | 0.7379993 |      16 |     4.2743596 |    0.9044013 |         10 | 0.0335644 | \-2.3201738 |   0.2445742 |
-| TNFβ         |  2.8253295 | 0.9145280 |      16 |     2.4683577 |    0.9559061 |         10 | 0.3583456 | \-0.9418542 |   0.1948676 |
-| TPO          |  5.6742710 | 1.0042720 |      16 |     5.4147425 |    2.8027303 |         10 | 0.7836404 | \-0.2817361 |   0.0675423 |
-| TRAIL        |  3.7510727 | 0.4668613 |      16 |     3.7174592 |    0.5276374 |         10 | 0.8707802 | \-0.1650769 |   0.0129863 |
-| TSLP         |  0.7325628 | 1.1914176 |      16 |     1.4436622 |    2.9711651 |         10 | 0.4859080 |   0.7214547 | \-0.9787090 |
-| VEGF-A       |  5.2810634 | 0.6310147 |      16 |     5.1891024 |    1.8756073 |         10 | 0.8837901 | \-0.1498372 |   0.0253435 |
-| sCD40L       |  8.4292255 | 0.4433345 |      16 |     8.1623234 |    1.8579870 |         10 | 0.6651690 | \-0.4463922 |   0.0464202 |
-
-## Figure 1I
 
 ``` python
 adata = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr')
@@ -724,12 +594,12 @@ adata.obs['umap_number'] = adata.obs['umap_name'].map(lineage_dict).astype('cate
 python_functions.plot_umap(adata, '', python_functions.blood_global_pal)
 ```
 
-    ## 2024-02-13 20:27:56,128 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
-    ## 2024-02-13 20:27:56,128 - pegasusio.readwrite - INFO - Function 'read_input' finished in 5.09s.
+    ## 2024-04-02 12:24:33,072 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
+    ## 2024-04-02 12:24:33,072 - pegasusio.readwrite - INFO - Function 'read_input' finished in 4.55s.
 
-<img src="figure_1_files/figure-gfm/fig_1i-1.png" width="960" />
+<img src="figure_1_files/figure-gfm/fig_1h-1.png" width="960" />
 
-## Figure 1J
+## Figure 1i
 
 ``` r
 wd <- '/projects/home/sramesh/github/myocarditis'
@@ -738,7 +608,7 @@ wd <- '/projects/home/sramesh/github/myocarditis'
 obs <- read_csv(glue('/projects/home/sramesh/myo_final/blood/final/myo_blood_global_obs.csv'))
 cluster_annots <- readxl::read_excel('/projects/home/sramesh/myo_final/blood/other_stuff/cluster_annotations.xlsx')
 
-## Figure 1J
+## Figure 1i
 # run masc for case vs control by lineage (or read in file if it exists)
 if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))) {
   lineage_masc_res <- run_masc(obs,
@@ -763,7 +633,7 @@ masc_helper(obs,
 
 ![](figure_1_files/figure-gfm/fig_1j-3.png)<!-- -->
 
-## Figure 1K
+## Figure 1J
 
 ``` python
 wd = '/projects/home/ikernin/projects/myocarditis/updated_datasets/blood'
@@ -777,8 +647,8 @@ counts.to_csv(f'{wd}/output/pb_counts_by_sample_id_and_lineage.csv')
 meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_lineage.csv')
 ```
 
-    ## 2024-02-13 20:28:14,138 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
-    ## 2024-02-13 20:28:14,138 - pegasusio.readwrite - INFO - Function 'read_input' finished in 5.31s.
+    ## 2024-04-02 12:24:52,087 - pegasusio.readwrite - INFO - zarr file '/projects/home/sramesh/myo_final/blood/final/myo_blood_global.zarr' is loaded.
+    ## 2024-04-02 12:24:52,088 - pegasusio.readwrite - INFO - Function 'read_input' finished in 7.47s.
 
 ``` r
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/blood')
@@ -888,4 +758,51 @@ draw(ht_gsea,
      merge_legends = FALSE)
 ```
 
-![](figure_1_files/figure-gfm/fig_1k_r-1.png)<!-- -->
+![](figure_1_files/figure-gfm/fig_1j_r-1.png)<!-- -->
+
+## Figure 1K
+
+``` r
+wd <- '/projects/home/nealpsmith/publication_githubs/myocarditis'
+setwd(glue('{wd}/functions'))
+source('blood_troponin.R')
+# setwd(glue('{wd}/functions'))
+
+# read in troponin data and format obs data for troponin analysis
+troponin_data <- read_csv('/projects/home/sramesh/myo_final/blood/other_stuff/blood_troponin.csv')
+filt_obs <- obs %>%
+  filter(steroid_treatment == 'pre_steroid') %>% # only one sample per donor bc only looking at pre-steroid samples
+  filter(!str_detect(lineage, "Doublet")) %>%
+  left_join(troponin_data, by = 'sample_id') %>%
+  filter(abs(days_sample_to_troponin) <= 3) %>%
+  dplyr::rename(nearest_troponin = troponin_nearest_sample,
+                cluster_names = lineage_cluster,
+                lineage_names = lineage,
+                donor = sample_id) %>%
+  dplyr::select(donor, nearest_troponin, cluster_names, lineage_names)
+
+# select significantly abundant lineages
+wd <- '/projects/home/sramesh/github/myocarditis'
+lineage_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_lineage.csv'))
+sig_lineages <- lineage_masc_res %>%
+  filter((model.pvalue < 0.1)) %>%
+  pull(lineage)
+
+# calculate troponin trends
+troponin_percents <- troponin_get_percent_per_level(filt_obs, level = 'lineage')
+troponin_model <- troponin_fit_model(troponin_percents, level = 'lineage')
+troponin_model <- troponin_model %>%
+  mutate(trop_coef = unlist(trop_coef),
+         trop_se = unlist(trop_se),
+         trop_pval = unlist(trop_pval)) %>%
+  dplyr::select(-c(data, model))
+troponin_percents <- troponin_percents %>% filter(lineage_names %in% sig_lineages)
+troponin_model <- troponin_model %>% filter(lineage_names %in% sig_lineages)
+troponin_model$padj <- p.adjust(troponin_model$trop_pval, method = 'fdr')
+
+# write_csv(troponin_model, glue('{wd}/output/troponin_by_sig_lineage.csv'))
+troponin_plot_model(troponin_model, troponin_percents, 'Significant Lineages',
+                    level = 'lineage', point_size = 2.2, type = 'detailed')
+```
+
+![](figure_1_files/figure-gfm/fig_1k-1.png)<!-- -->

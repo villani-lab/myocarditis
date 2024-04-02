@@ -342,7 +342,63 @@ print(p_1e)
 
 ## Supplemental Figure 1G
 
-```{r supp_1g, message = FALSE, warning = FALSE}
+```{r message = FALSE, results = 'hold', fig_1g}
+
+# read in serum values per sample
+serum_df <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tidy_serum.csv')
+
+# get between condition statistics for log1p values
+serum_model <- serum_df %>%
+  dplyr::select(!c(patient, timepoint, Sample)) %>%
+  pivot_longer(cols=!c(condition),
+               names_to='protein',
+               values_to='value') %>%
+  mutate(log1p_value = log1p(value)) %>%
+  group_by(condition, protein) %>%
+  summarize(log1p_values = list(log1p_value)) %>%
+  pivot_wider(names_from = condition,
+              values_from = log1p_values) %>%
+  group_by(protein) %>%
+  summarize(mean_case = mean(unlist(myocarditis)),
+            std_case = sd(unlist(myocarditis)),
+            n_case = length(unlist(myocarditis)),
+            mean_control = mean(unlist(control)),
+            std_control = sd(unlist(control)),
+            n_control = length(unlist(control)),
+            p_value = t.test(unlist(control), unlist(myocarditis))$p.value,
+            t_stat = t.test(unlist(control), unlist(myocarditis))$statistic,
+            log2FC = log2(mean_case/mean_control))
+kable(serum_model)
+
+# proteins to annotate in figures
+serum_annot <-  c('MIG/CXCL9', 'IP-10', 'TNFα','IFNγ', 'IL-2',
+                  'IL-12p40', 'IL-15', 'IL-18', 'IL-27', '6CKine')
+
+# make volcano plot
+serum_plot_df <- serum_model %>%
+  mutate(
+    name = case_when(
+      protein %in% serum_annot ~ protein,
+      TRUE ~ ""
+    ),
+    t_stat = -t_stat
+  )
+
+ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
+  geom_point(data = serum_plot_df %>% filter(t_stat < 0), color =  'slategray', size = 2.5) +
+  geom_point(data = serum_plot_df %>% filter(t_stat > 0), color =  'tomato4', size = 2.5) +
+  geom_vline(xintercept = 0, lty=2) +
+  ggrepel::geom_label_repel(aes(label = name), size = 4) +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+```
+
+## Supplemental Figure 1H
+
+
+```{r supp_1h, message = FALSE, warning = FALSE}
 
 serum_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/updated_supplemental_tables/all_serum_stats.csv")
 
@@ -369,7 +425,7 @@ ggplot(plot_df, aes(x = -t_stat_mets, y = -t_stat_nomets)) +
 
 ```
 
-## Supplemental Figure 1h
+
 ```{python results = 'hold', supp_1h}
 cluster_order = ['pDCs', 'B and plasma', 'cDCs', 'CD4', 'MNP', 'CD8 and NK']
 gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 'CLEC9A', 'CD4', 'CD3D', 'IL7R', 'LYZ',

@@ -1,7 +1,7 @@
 troponin_get_percent_per_level <- function(df, level = 'cluster'){
   # get donor troponin info
   troponin_donor <- df %>%
-    select(c(donor, nearest_troponin)) %>%
+    dplyr::select(c(donor, nearest_troponin)) %>%
     distinct()
 
   # get total number of donor cells
@@ -62,7 +62,7 @@ troponin_plot_model <- function(model_res, model_data, title,
 
   # format columns for printing
   model_annot <- model_res %>%
-    select(c(!!sym(glue("{level}_names")), trop_coef, trop_se, trop_pval, padj)) %>%
+    dplyr::select(c(!!sym(glue("{level}_names")), trop_coef, trop_se, trop_pval, padj)) %>%
     mutate(
       trop_coef = round(as.numeric(trop_coef), 2),
       trop_se = round(as.numeric(trop_se), 2),

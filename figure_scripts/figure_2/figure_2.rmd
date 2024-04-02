@@ -237,6 +237,58 @@ troponin_plot_model(troponin_model, troponin_percents, 'Significant Lineages',
                     level = 'lineage', point_size = 2.2, type = 'detailed')
 ```
 
+## Supplemental Figure 1l
+```{python results = 'hold', message = F, supp_1k}
+bcells = pg.read_input('/projects/home/sramesh/myo_final/blood/final/myo_blood_bcells.h5ad')
+bcells.obs['cluster_name_w_num'] = adata.obs['cluster_name_w_num']
+bcells.obs[['umap_number', 'umap_name']] = bcells.obs['cluster_name_w_num'].str.split('\. ', expand=True)
+bcells.obs['umap_number'] = bcells.obs['umap_number'].astype(int).astype('category')
+bcells.obs['umap_name'] = bcells.obs['umap_name'].astype('category')
+pyfun.plot_umap(bcells, 'Blood: B and Plasma Cells', pyfun.blood_b_pal, marker_multiplier=13)
+```
+
+## Supplemental Figure 1L
+```{python results = 'hold', supp_1l}
+cluster_order = [f'bcells_{i}' for i in [4, 5, 3, 2, 6, 1]]
+cluster_order = [name_dict[i] for i in cluster_order]
+gene_order = ['FOXP1', 'LINC01857', 'BACH2', 'CIB1', 'FGR', 'AIM2', 'COCH', 'XBP1', 'JCHAIN', 'TCL1A', 'CXCR4']
+pyfun.make_gene_dotplot(bcells.to_anndata(), cluster_order, gene_order, 'B and plasma', figsize=(5, 4),
+                        names='cluster_name_w_num')
+```
+
+## Supplemental Figure 1M
+```{r message = F, results = 'hold', warning = F, fig.width = 14, fig.height = 7, supp_1m}
+# run masc for case vs control by cluster (or read in file if it exists)
+if (!file.exists(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))) {
+  cluster_masc_res <- run_masc(obs,
+                               c('deg_case_control', 'control', 'case'),
+                               'lineage_cluster',
+                               fixed_effects = c('sex', 'ici_type'))
+  write_csv(cluster_masc_res, glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+} else {
+  cluster_masc_res <- read_csv(glue('{wd}/output/masc_for_deg_case_control_by_cluster.csv'))
+}
+
+# rename clusters
+cluster_name_dict <- setNames(cluster_annots$cluster_name_w_num,
+                              cluster_annots$lineage_cluster)
+cluster_masc_res$cluster_name_w_num <- cluster_masc_res$lineage_cluster %>% recode(!!!cluster_name_dict)
+
+# filter for only b and plasma clusters and plot
+bcells_clusters <- obs %>%
+  filter((lineage == 'B and plasma') & (lineage != 'Doublets and RBCs')) %>%
+  pull(cluster_name_w_num) %>%
+  unique()
+masc_helper(obs,
+            c('deg_case_control', 'control', 'case'),
+            'cluster_name_w_num',
+            fixed_effects = c('sex', 'ici_type'),
+            group_subset = bcells_clusters,
+            masc_res = cluster_masc_res,
+            colors = c('slategray', 'tomato4'))
+```
+
+
 ## Figure 2K
 ```{python results = 'hold', fig_2k_python}
 if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or not os.path.exists(
@@ -249,6 +301,7 @@ if not os.path.exists(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv') or 
     counts.to_csv(f'{wd}/output/pb_counts_by_sample_id_and_cluster.csv')
     meta.to_csv(f'{wd}/output/pb_meta_by_sample_id_and_cluster.csv')
 ```
+
 
 ```{r message = F, results = 'hold', fig.width = 15, fig.height = 8, fig_2k_r}
 #### first run de
