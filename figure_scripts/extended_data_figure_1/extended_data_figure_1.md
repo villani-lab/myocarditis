@@ -104,7 +104,7 @@ python_functions.make_gene_dotplot(tissue_global.to_anndata(),
              )
 ```
 
-<img src="supplemental_figure_1_files/figure-gfm/supp_1a-1.png" width="1152" />
+<img src="extended_data_figure_1_files/figure-gfm/supp_1a-1.png" width="1152" />
 
 ## Supplemental Figure 1B
 
@@ -119,7 +119,7 @@ p_1b <- ggplot(tissue_global_obs, aes(y = umap_name, fill = institution)) +
 print(p_1b)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1b-3.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1b-3.png)<!-- -->
 
 ## Supplemental Figure 1C
 
@@ -185,7 +185,7 @@ p_1c <- tissue_global_obs %>%
 print(p_1c)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1c-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1c-1.png)<!-- -->
 
 ## Supplemental Figure 1D
 
@@ -221,7 +221,7 @@ ggplot(plot_df, aes(x = OR_mets, y = OR_nomets)) +
   theme_classic(base_size = 20)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1d-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1d-1.png)<!-- -->
 
 ## Supplemental Figure 1E
 
@@ -266,7 +266,7 @@ ggplot(plot_degs_all, aes(x = log2FoldChange, y = no_mm_log2FoldChange)) +
 
     ## Warning: Removed 154 rows containing missing values (`geom_point()`).
 
-![](supplemental_figure_1_files/figure-gfm/supp_1e-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1e-1.png)<!-- -->
 
 ## Supplemental Figure 1F
 
@@ -322,7 +322,7 @@ ggplot(serum_plot_df, aes(y = -log10(p_value), x = log2FC)) +
         panel.background = element_blank())
 ```
 
-![](supplemental_figure_1_files/figure-gfm/fig_1g-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/fig_1g-1.png)<!-- -->
 
 | protein      | mean\_case | std\_case | n\_case | mean\_control | std\_control | n\_control |  p\_value |     t\_stat |      log2FC |
 | :----------- | ---------: | --------: | ------: | ------------: | -----------: | ---------: | --------: | ----------: | ----------: |
@@ -487,7 +487,7 @@ p_1e <- ggplot(ext_1e_df, aes(x = condition, y = value + 1, fill = condition)) +
 print(p_1e)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1f-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1f-1.png)<!-- -->
 
 | protein      | mean\_case | std\_case | n\_case | mean\_control | std\_control | n\_control |  p\_value |     t\_stat |      log2FC |
 | :----------- | ---------: | --------: | ------: | ------------: | -----------: | ---------: | --------: | ----------: | ----------: |
@@ -590,7 +590,7 @@ ggplot(plot_df, aes(x = -t_stat_mets, y = -t_stat_nomets)) +
   theme_classic(base_size = 20)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1h-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1h-1.png)<!-- -->
 
 ## Supplemental figure 1I
 
@@ -601,7 +601,7 @@ gene_order = ['LILRA4', 'IL3RA', 'CD79A', 'MS4A1', 'JCHAIN', 'CD1C', 'CLEC10A', 
 pyfun.make_gene_dotplot(adata.to_anndata(), cluster_order, gene_order, 'All cells', figsize=(5, 4), names='lineage')
 ```
 
-<img src="supplemental_figure_1_files/figure-gfm/supp_1i-1.png" width="1152" />
+<img src="extended_data_figure_1_files/figure-gfm/supp_1i-1.png" width="1152" />
 
 ## Supplemental Figure 1J
 
@@ -625,7 +625,7 @@ masc_helper(obs,
             colors = c('darkolivegreen4', 'darkolivegreen2'))
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1j-3.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1j-3.png)<!-- -->
 
 ## Supplemental Figure 1K
 
@@ -679,7 +679,7 @@ ggplot(df, aes(x = up, y = cluster)) +
        y = element_blank())
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1k-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1k-1.png)<!-- -->
 
 ## Supplemental figure 1L
 
@@ -782,7 +782,7 @@ p3 <- ggplot(trop_info, aes(x = 1, y = ID)) +
 ggarrange(p1, p2, p3, widths = c(0.8, 0.15, 0.15), align = "h", nrow = 1, common.legend = TRUE)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1m-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1m-1.png)<!-- -->
 
     ## [1] "#E41A1C" "#377EB8" "#4DAF4A" "#984EA3"
     ## [1] TRUE
@@ -924,7 +924,7 @@ ggplot(plot_df, aes(x = lin, y = value, group = variable, fill = variable)) +
   theme_classic(base_size = 15)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1n-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1n-1.png)<!-- -->
 
 ``` r
 pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
@@ -1005,4 +1005,4 @@ draw(ht_gsea,
    merge_legends = FALSE)
 ```
 
-![](supplemental_figure_1_files/figure-gfm/supp_1o-1.png)<!-- -->
+![](extended_data_figure_1_files/figure-gfm/supp_1o-1.png)<!-- -->
