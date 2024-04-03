@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 6"
+title: "Supplemental Figure 7"
 output: rmarkdown::github_document
 ---
 
@@ -7,61 +7,109 @@ output: rmarkdown::github_document
 ## Setup
 
 Load R libraries
-```{r message=FALSE, load_r_libraries}
+```{r message=FALSE}
+# load packages
 library(tidyverse)
+library(rmarkdown)
+library(rlang)
+library(parameters)
+library(RColorBrewer)
 library(ComplexHeatmap)
 library(circlize)
-library(RColorBrewer)
-library(ggplot2)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
 library(ggrepel)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(DESeq2)
+library(knitr)
+library(fgsea)
+library(ggpubr)
+
+
+library(reticulate)
+use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
+
+setwd('/projects/home/nealpsmith/publication_githubs/myocarditis/functions')
+source('stacked_bar.R')
+source('blood_abundance.R')
+source('masc.R')
+source('tissue_plot_masc.R')
 
 ```
 
-## Supplemental figure 6B
 
-```{r fig_s6b, fig.width = 15, fig.height = 10}
+Load Python packages
+```{python load_python_packages}
+import pegasus as pg
+import scanpy as sc
+import warnings
+warnings.filterwarnings('ignore')
 
-colors <- brewer.pal(n = 10, "Set1")
-cd137_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/cd137_vals.csv", row.names = 1)
-# Make the lowest value 0
-# cd137_data[is.na(cd137_data)] <- 0
-cd137_data[cd137_data < 0] <- 0
-tcr_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/tcr_annotations.csv")
-
-donor_colors <- colors[1:length(unique(tcr_info$donor))]
-names(donor_colors) <- unique(tcr_info$donor)
-
-cd8_tcrs <- tcr_info[tcr_info$subset == "CD8",]
-
-heatmap_df_cd8 <- cd137_data[,cd8_tcrs$tcr]
-
-# Need a continuous color scale
-heatmap_col_fun = colorRamp2(c(min(heatmap_df_cd8), max(heatmap_df_cd8)), c("#D3D3D3", '#02024a'))
-
-# Lets do the column split
-donor_split <- factor(cd8_tcrs$donor)
-annotation_cd8 <- HeatmapAnnotation(donor = cd8_tcrs$donor, col = list(donor = donor_colors), which = "column",
-                                    show_annotation_name = FALSE)
-
-cd8_hmap <- Heatmap(heatmap_df_cd8, col = heatmap_col_fun, cluster_columns = FALSE, cluster_rows = FALSE,
-                    column_split = donor_split, column_title = "CD8 TCRs", name = "% CD137+",
-                    top_annotation = annotation_cd8, rect_gp = gpar(col = "black"), row_names_side = "left", na_col = "white")
+import sys
+sys.path.append("/projects/home/nealpsmith/publication_githubs/myocarditis/functions")
+import python_functions
+```
 
 
-cd4_tcrs <- tcr_info[tcr_info$subset == "CD4",]
+Read in single-cell data
+```{python results = 'hide', read_data}
+tissue_mnp = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid.zarr')
+```
 
-heatmap_df_cd4 <- cd137_data[,cd4_tcrs$tcr]
 
-# Lets do the column split
-donor_split <- factor(cd4_tcrs$donor)
-annotation_cd4 <- HeatmapAnnotation(donor = cd4_tcrs$donor, col = list(donor = donor_colors), which = "column")
+## Supplemental Figure 7A
 
-cd4_hmap <- Heatmap(heatmap_df_cd4, col = heatmap_col_fun, cluster_columns = FALSE, cluster_rows = FALSE,
-                    column_split = donor_split, column_title = "CD4 TCRs", show_heatmap_legend = FALSE,
-                    top_annotation = annotation_cd4, rect_gp = gpar(col = "black"), row_names_side = "left", na_col = "white")
+```{python supp_7A}
 
-hmap_list <- cd8_hmap + cd4_hmap
+supp_7a_genes = ["LILRB1", "LILRB2", "FLT3", "CD1C", "CLEC9A", "GPNMB", "FABP5", "FCN1", "CX3CR1"]
+python_functions.multi_hex_featureplot(tissue_mnp,
+                      supp_7a_genes,
+                      ncol=4,
+                      cmap=python_functions.blues_cmap,
+                      gridsize=200)
 
-draw(hmap_list, ht_gap = unit(1, "cm"))
+```
 
+## Supplemental Figure 7B
+
+```{python supp_7b}
+tissue_mnp.obs['Condition'] = [x.capitalize() for x in tissue_mnp.obs['condition']]
+tissue_mnp = tissue_mnp.to_anndata()
+sc.tl.embedding_density(tissue_mnp, groupby='Condition')
+sc.pl.embedding_density(tissue_mnp, basis='umap', key=f'umap_density_Condition')
+```
+
+
+## Supplemental Figure 7C
+
+```{python supp_7c_get_data}
+tissue_mnp = pg.read_input('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_myeloid.zarr')
+
+stacked_bar_df = python_functions.get_stacked_bar_df(tissue_mnp, 'mnp')
+stacked_bar_order = tissue_mnp.obs['umap_name'].cat.categories.values
+```
+
+```{r supp_7c_plot}
+stacked_bar_order = py$stacked_bar_order[!str_detect(py$stacked_bar_order, 'Doublets')]
+plot_clust_perc_by_donor(py$stacked_bar_df, 'mnp', cluster_order = stacked_bar_order)
+```
+
+## Supplemental figure 7D
+
+```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_7d}
+# read in tissue data
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+
+# filter
+masc_df <- masc_filter(tissue_obs)
+
+# read in masc res (from figure 3 code)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+
+# plot masc results
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='MNP')
 ```
