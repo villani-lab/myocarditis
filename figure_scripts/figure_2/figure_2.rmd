@@ -1,5 +1,5 @@
 ---
-title: "Figure 3"
+title: "Figure 2"
 output: rmarkdown::github_document
 ---
 
@@ -63,16 +63,16 @@ tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_data
 ```
 
 
-## Figure 3A
+## Figure 2A
 
-```{python fig_3a}
+```{python fig_2a}
 python_functions.plot_umap(tissue_t, 'Tissue: T and NK', python_functions.tissue_t_pal, marker_multiplier=6)
 ```
 
 
-## Figure 3B
+## Figure 2B
 
-```{python fig_3b}
+```{python fig_2b}
 python_functions.make_gene_dotplot(tissue_t.to_anndata(),
              cluster_order=['CD8 T 2: CCL5, NKG7',
                             'CD4 T: IL7R, LTB',
@@ -92,9 +92,9 @@ python_functions.make_gene_dotplot(tissue_t.to_anndata(),
 ```
 
 
-## Figure 3C
+## Figure 2C
 
-```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_3c}
+```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_2c}
 
 # filter
 masc_df <- masc_filter(tissue_obs)
@@ -134,39 +134,9 @@ write_csv(cluster_masc_formatted, '/projects/home/ikernin/projects/myocarditis/u
 plot_masc_by_cell_type(cluster_masc_formatted, masc_df, lineage='T and NK')
 ```
 
-## Figure 3D
+## Figure 2D
 
-```{r message = F, results = 'hold', warning = F, fig_3d}
-tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
-troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
-
-# fit linear model by troponin for DE clusters
-select_clusters <- c("h-NK: KLRF1 FCER1G",
-                     "h-CD4T: IL7R LTB",
-                    "h-CD8T: CD27 LAG3",
-                    "h-CD8T: CCL5 NKG7",
-                    "h-CD8T: cycling",
-                    "h-MNP: S100A8-low C1QA-low",
-                    "h-MNP: FCGR3A LILRB2",
-                    "h-cDC: CLEC9A CD1C",
-                    "Fibroblast: CXCL9, HLA-DRA")
-troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
-select_cluster_percs <- troponin_cluster_percs %>%
-        filter(cluster_names %in% select_clusters)
-select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
-kable(select_cluster_model %>%
-              dplyr::select(!c(data, model)) %>%
-              unnest(cols = c(trop_coef, trop_se, trop_pval)))
-
-troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-CD8T: cycling"),
-                    select_cluster_percs %>% filter(cluster_names =="h-CD8T: cycling"),
-                   "h-CD8T: cycling", level='cluster', point_size = 2.2, type='simple')
-```
-
-
-## Figure 3E
-
-```{python fig_3e_get_pseudobulk}
+```{python fig_2d_get_pseudobulk}
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
 
 # get pseudobulk values for DE analysis
@@ -180,7 +150,8 @@ tissue_t.obs['t_cell'] = tissue_t.obs['t_cell'].replace({True: 'all_t', False: '
 python_functions.get_pseudobulk_info(tissue_t, 'tissue_t_grouped', cluster_col='t_cell')
 ```
 
-```{r message = F, warning = F, results = F, fig_3e_run_de_analysis}
+
+```{r message = F, warning = F, results = F, fig_2d_run_de_analysis}
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis')
 
 # run DE analysis by condition
@@ -423,9 +394,11 @@ plot_heatmap(t_plot_df,
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/t_gsea.pdf")
 ```
 
-## Figure 3F
 
-```{r message = F, fig_3f}
+```{r message = F, fig_2e_modeling}
+
+tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
+
 mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
                 row.names = 1)
 
@@ -548,37 +521,12 @@ if (!file.exists("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin
   gset_res <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue_troponin_gene_modeling/data/tissue_lin_model_by_troponin_gsea_results.csv")
 }
 
-
-# Side-by-side bars
-n_degs <- all_res %>%
-  dplyr::filter(padj < 0.1, cluster != "10. Doublets and RBC") %>%
-  mutate(direction = ifelse(stat > 0, "positive", "negative")) %>%
-  group_by(cluster, direction) %>%
-  summarise(n_degs = n()) %>%
-  mutate(n_degs = ifelse(direction == "negative", -n_degs, n_degs))
-
-order <- n_degs %>%
-  group_by(cluster) %>%
-  summarise(tot = sum(abs(n_degs))) %>%
-  arrange(desc(tot)) %>%
-  .$cluster
-n_degs$cluster <- factor(n_degs$cluster, levels = rev(order))
-
-
-ggplot(n_degs, aes(x = cluster, y = n_degs, group = direction, fill = direction)) +
-  geom_bar(stat = "identity") + coord_flip() +
-  scale_fill_manual(values = c("#0000FF", "#FF0000")) +
-  scale_y_continuous(labels = abs) +
-  ggtitle(glue("# of DEGs by troponin")) +
-  ylab("# of DE genes") + xlab("") +
-  theme_classic(base_size = 20)
-
 ```
 
 
-## Figure 3G
+## Figure 2E
 
-```{r fig_3g}
+```{r fig_2e}
 plot_data <- all_res %>%
   dplyr::filter(cluster == "3. T and NK cells")
 
@@ -595,9 +543,9 @@ ggplot(plot_data, aes(x = log2FoldChange, y = -log10(pvalue))) +
 ```
 
 
-## Figure 3H
+## Figure 2F
 
-```{r fig_3h, fig.width = 10, fig.height = 10, message = F, warning = F, results = 'hold'}
+```{r fig_2f, fig.width = 10, fig.height = 10, message = F, warning = F, results = 'hold'}
 
 tcell_data <- all_res %>%
   dplyr::filter(cluster == "3. T and NK cells")
@@ -608,7 +556,6 @@ plot_gsets <- c("KEGG_CELL_CYCLE",
 
 plot_list <- list()
 for (gset in plot_gsets){
-  print(gset)
   ranks <- tcell_data %>%
     dplyr::select(gene, stat) %>%
     na.omit() %>%
