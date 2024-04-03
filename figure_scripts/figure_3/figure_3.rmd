@@ -1,5 +1,5 @@
 ---
-title: "Figure 4"
+title: "Figure 3"
 output: rmarkdown::github_document
 ---
 
@@ -78,54 +78,9 @@ bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A
 
 ```
 
-## Figure 4B
-```{r fig_4B, warning = FALSE, message = FALSE}
-control_ids <- c("SIC_176", "SIC_14", "T01241")
-healing_ids <- c("SIC_3", "SIC_175", "SIC_266")
-borderline_ids <- c("SIC_136")
-active <- c("SIC_264", "SIC_17")
-# micromets <- c("SIC_232", "SIC_136")
+## Figure 3B
 
-meta_df <- data.frame("category" = c("control", "control", "control",
-                                     "healing", "healing", "healing",
-                                     "borderline", "active", "active"),
-                      "id" = c("SIC_176", "SIC_14", "T01241",
-                               "SIC_3", "SIC_175", "SIC_266", "SIC_136", "SIC_264", "SIC_17"))
-
-heart_tcrs <- lapply(names(bulk_tissue_samples), function(s){
-  heart_samp <- bulk_tissue_samples[[s]][["myo"]]
-  subj_tcrs <- bulk_tcr_df %>%
-    dplyr::filter(sample == heart_samp) %>%
-    dplyr::select(amino_acid, sample, id, count_templates_reads)
-  return(subj_tcrs)
-}) %>% do.call(rbind, .)
-
-
-
-colnames(heart_tcrs)[colnames(heart_tcrs) == "amino_acid"] <- "clone_id"
-# Only look at subjects with at least 200 TCRs
-div_df <- heart_tcrs[,c("clone_id", "id", "count_templates_reads")]
-# div_df <- div_df[div_df$id != "SIC_232",]
-
-div <- alphaDiversity(div_df, group = "id", nboot = 100, min_n = 100, copy = "count_templates_reads")
-
-# Add healing meta
-div %<>%
-  dplyr::left_join(meta_df, by = "id")
-
-ggplot(div, aes_string(x = "q", y = "d", group = "id", color = "category")) +
-  geom_line(size = 1) +
-  # facet_wrap(~subj) +
-  # scale_color_manual(values = c("blue", "red")) +
-  ggtitle("Hill diversity index") + baseTheme() +
-  xlab("q") + ylab("d") +
-  theme_classic(base_size = 20) +
-  theme(legend.title = element_blank())
-
-```
-
-## Figure 4C
-```{r fig_4c, warning=FALSE, message=FALSE}
+```{r fig_3b, warning=FALSE, message=FALSE}
 fisher_res <- data.frame()
 all_seq_info <- data.frame()
 
@@ -294,8 +249,8 @@ ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc, fill = sig_cat)) +
 
 ```
 
-##Figure 4D
-```{r fig_4D, message=FALSE, warning=FALSE}
+## Figure 3C
+```{r fig_3C, message=FALSE, warning=FALSE}
 fisher_res$subj <- factor(fisher_res$subj, levels = c("SIC_3", "SIC_17", "SIC_136", "SIC_175"))
 fisher_res <- fisher_res[order(fisher_res$subj, decreasing = TRUE),]
 ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc, fill = subj)) +
@@ -309,8 +264,8 @@ ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc, fill = subj)) +
   theme(legend.title = element_blank())
 ```
 
-## Figure 4E
-```{r fig_4e, fig.width = 6, fig.height = 6}
+## Figure 3D
+```{r fig_3d, fig.width = 6, fig.height = 6}
 
 subjs_oi <- c("SIC_175", "SIC_264", "SIC_48", "SIC_177")
 myo_exp_tcrs <- lapply(subjs_oi, function(s){
@@ -362,9 +317,9 @@ figure <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2, common.legend = TR
 figure
 ```
 
-## Figure 4F
+## Figure 3e
 
-```{r fig_4f, fig.height = 10, fig.width = 14}
+```{r fig_3e, fig.height = 10, fig.width = 14}
 
 
 # Blood TCR info
@@ -518,9 +473,9 @@ ggplot(prop_df, aes(y = t_cell_cluster, x = perc_exp_myo, fill = fatal)) +
 
 ```
 
-## Figure 4G
+## Figure 3f
 
-```{python results = 'hold', fig_4g}
+```{python results = 'hold', fig_3f}
 # for adt data
 fig_4g_adt_genes = ['cite_CD45RA', 'cite_CD45RO']
 python_functions.multi_hex_featureplot(blood_cd8_nk,
@@ -539,9 +494,9 @@ python_functions.multi_hex_featureplot(blood_cd8_nk,
 ```
 
 
-## Figure 4i
+## Figure 3h
 
-```{r fig_4i, fig.height = 10, fig.width = 8}
+```{r fig_3h, fig.height = 10, fig.width = 8}
 colors <- brewer.pal(n = 10, "Set1")
 cd137_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/cd137_vals.csv", row.names = 1)
 # Make the lowest value 0
