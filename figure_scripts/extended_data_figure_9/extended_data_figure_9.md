@@ -55,6 +55,19 @@ import python_functions
 import scanpy as sc
 ```
 
+``` r
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+```
+
+    ## Rows: 84576 Columns: 19
+    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (13): barcodekey, Channel, fatal, on_steroids, condition, sex, donor, so...
+    ## dbl  (6): n_genes, n_counts, percent_mito, scale, leiden_labels, umap_numbers
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
 ## Supplemental figure 9A
 
 ``` python
@@ -62,26 +75,44 @@ import scanpy as sc
 tissue_fibroblast = pg.read_input('/projects/myocarditis/data/heart/final_clusters/tissue_fibroblast.zarr')
 ```
 
-    ## 2024-01-10 14:51:56,442 - pegasusio.readwrite - INFO - zarr file '/projects/myocarditis/data/heart/final_clusters/tissue_fibroblast.zarr' is loaded.
-    ## 2024-01-10 14:51:56,442 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.21s.
+    ## 2024-04-03 16:56:16,661 - pegasusio.readwrite - INFO - zarr file '/projects/myocarditis/data/heart/final_clusters/tissue_fibroblast.zarr' is loaded.
+    ## 2024-04-03 16:56:16,661 - pegasusio.readwrite - INFO - Function 'read_input' finished in 0.20s.
 
 ``` python
 supp_fig9a_genes = ['CXCL9', 'CXCL10', 'CXCL11', 'CXCL16', 'CCL5', 'CCL19', 'ACTA2', 'HLA-DRA', 'GBP4']
 python_functions.multi_hex_featureplot(tissue_fibroblast, supp_fig9a_genes, ncol=3, cmap=python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|                                                                                                                                                                                                                 | 0/9 [00:00<?, ?it/s] 11%|######################3                                                                                                                                                                                  | 1/9 [00:00<00:02,  3.52it/s] 22%|############################################6                                                                                                                                                            | 2/9 [00:00<00:01,  4.03it/s] 33%|###################################################################                                                                                                                                      | 3/9 [00:00<00:01,  4.02it/s] 44%|#########################################################################################3                                                                                                               | 4/9 [00:00<00:01,  4.47it/s] 56%|###############################################################################################################6                                                                                         | 5/9 [00:01<00:00,  4.31it/s] 67%|######################################################################################################################################                                                                   | 6/9 [00:01<00:00,  4.72it/s] 78%|############################################################################################################################################################3                                            | 7/9 [00:01<00:00,  4.43it/s] 89%|##################################################################################################################################################################################6                      | 8/9 [00:01<00:00,  4.27it/s]100%|#########################################################################################################################################################################################################| 9/9 [00:01<00:00,  4.69it/s]
+    ##   0%|                                                                                                                                                                                                                                 | 0/9 [00:00<?, ?it/s] 11%|########################1                                                                                                                                                                                                | 1/9 [00:00<00:02,  3.52it/s] 22%|################################################2                                                                                                                                                                        | 2/9 [00:00<00:01,  4.03it/s] 33%|########################################################################3                                                                                                                                                | 3/9 [00:00<00:01,  4.00it/s] 44%|################################################################################################4                                                                                                                        | 4/9 [00:00<00:01,  4.45it/s] 56%|########################################################################################################################5                                                                                                | 5/9 [00:01<00:00,  4.26it/s] 67%|################################################################################################################################################6                                                                        | 6/9 [00:01<00:00,  4.66it/s] 78%|########################################################################################################################################################################7                                                | 7/9 [00:01<00:00,  4.41it/s] 89%|################################################################################################################################################################################################8                        | 8/9 [00:01<00:00,  4.80it/s]100%|#########################################################################################################################################################################################################################| 9/9 [00:01<00:00,  4.50it/s]
 
-<img src="supp_9_files/figure-gfm/fig_s9a-1.png" width="1728" />
+<img src="extended_data_figure_9_files/figure-gfm/fig_s9a-1.png" width="1728" />
 
 ## Supplemental figure 9B
+
+``` r
+tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
+
+# filter
+masc_df <- masc_filter(tissue_global_obs)
+
+# read in masc res (from figure 3 code)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+colnames(cluster_masc_res)[colnames(cluster_masc_res) == "lineage_subcluster_name"] <- "cluster_names"
+
+# plot masc results
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast',comp_var = "condition")
+```
+
+![](extended_data_figure_9_files/figure-gfm/fig_9b-3.png)<!-- -->
+
+## Supplemental figure 9C
 
 ``` r
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv')
 ```
 
     ## Rows: 13 Columns: 3
-    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     ## Delimiter: ","
     ## chr (1): donor
     ## dbl (2): nearest_troponin, days_from_collection
@@ -222,4 +253,4 @@ ggplot(plot_data, aes(x = log2FoldChange, y = -log10(pvalue))) +
           theme_classic(base_size = 20)
 ```
 
-![](supp_9_files/figure-gfm/fig_s9b-3.png)<!-- -->
+![](extended_data_figure_9_files/figure-gfm/fig_s9c-1.png)<!-- -->

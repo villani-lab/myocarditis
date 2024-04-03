@@ -58,6 +58,10 @@ import scanpy as sc
 
 ```
 
+```{r messaage = F, results = F, read_r_data}
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+```
+
 ## Supplemental figure 9A
 
 ```{python fig_s9a}
@@ -71,15 +75,19 @@ python_functions.multi_hex_featureplot(tissue_fibroblast, supp_fig9a_genes, ncol
 
 ## Supplemental figure 9B
 
-```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_6c}
+```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_9b}
+
+tissue_global_obs = read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_obs.csv')
+
 # filter
-masc_df <- masc_filter(tissue_obs)
+masc_df <- masc_filter(tissue_global_obs)
 
 # read in masc res (from figure 3 code)
 cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+colnames(cluster_masc_res)[colnames(cluster_masc_res) == "lineage_subcluster_name"] <- "cluster_names"
 
 # plot masc results
-plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast')
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast',comp_var = "condition")
 ```
 
 ## Supplemental figure 9C
