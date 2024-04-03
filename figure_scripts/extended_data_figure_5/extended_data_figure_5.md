@@ -1,4 +1,4 @@
-Supplemental Figure 4
+Supplemental Figure 5
 ================
 
 ## Setup
@@ -12,6 +12,7 @@ library(ggpubr)
 library(ggplot2)
 library(magrittr)
 library(ggrepel)
+library(alakazam)
 ```
 
 Read in the TCR data
@@ -40,7 +41,7 @@ bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A
 )
 ```
 
-## Supplemental figure 4A
+## Supplemental figure 5A
 
 ``` r
 plot_df <- read.csv("/projects/home/nealpsmith/projects/myocarditis/data/adaptive/perc_tcrb_of_nucleated_cells.csv")
@@ -60,9 +61,9 @@ ggplot(plot_df, aes(x = category, y = perc, fill = category)) +
   theme(legend.position = "none")
 ```
 
-![](supp_4_files/figure-gfm/fig_S4A-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_S5A-1.png)<!-- -->
 
-## Supplemental figure 4B
+## Supplemental figure 5B
 
 ``` r
 blood_overlap_subjs <- intersect(c(names(bulk_tissue_samples), unique(tissue_sc_info$donor)), unique(blood_sc_info$donor))
@@ -187,9 +188,9 @@ exp_bars <- ggplot(n_exp_tcrs, aes(x = n, y = subj)) +
 ggarrange(plotlist = list(exp_bars, bars, tiles), nrow = 1, ncol = 3, widths = c(1,1, 0.3), align = "h")
 ```
 
-![](supp_4_files/figure-gfm/fig_s4b-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_s4b-1.png)<!-- -->
 
-## Supplemental figure 4C
+## Supplemental figure 5C
 
 ``` r
 dset_df <- data.frame()
@@ -256,9 +257,140 @@ ggplot(plot_df, aes(y = donor, x = perc, fill = perc)) +
   theme(legend.position = "none")
 ```
 
-![](supp_4_files/figure-gfm/fig_S4C-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_S5C-1.png)<!-- -->
 
-## Supplemental figure 4D
+## Supplemental figure 5D
+
+``` r
+control_ids <- c("SIC_176", "SIC_14", "T01241")
+healing_ids <- c("SIC_3", "SIC_175", "SIC_266")
+borderline_ids <- c("SIC_136")
+active <- c("SIC_264", "SIC_17")
+
+meta_df <- data.frame("category" = c("control", "control", "control",
+                                     "healing", "healing", "healing",
+                                     "borderline", "active", "active"),
+                      "id" = c("SIC_176", "SIC_14", "T01241",
+                               "SIC_3", "SIC_175", "SIC_266", "SIC_136", "SIC_264", "SIC_17"))
+
+heart_tcrs <- lapply(names(bulk_tissue_samples), function(s){
+  heart_samp <- bulk_tissue_samples[[s]][["myo"]]
+  subj_tcrs <- bulk_tcr_df %>%
+    dplyr::filter(sample == heart_samp) %>%
+    dplyr::select(amino_acid, sample, id, count_templates_reads)
+  return(subj_tcrs)
+}) %>% do.call(rbind, .)
+
+
+
+colnames(heart_tcrs)[colnames(heart_tcrs) == "amino_acid"] <- "clone_id"
+# Only look at subjects with at least 200 TCRs
+div_df <- heart_tcrs[,c("clone_id", "id", "count_templates_reads")]
+# div_df <- div_df[div_df$id != "SIC_232",]
+
+div <- alphaDiversity(div_df, group = "id", nboot = 100, min_n = 100, copy = "count_templates_reads")
+```
+
+    ## [1] "MADE IT!"
+    ## # A tibble: 369 × 9
+    ## # Groups:   id [9]
+    ##    id          q     d  d_sd d_lower d_upper     e e_lower e_upper
+    ##    <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
+    ##  1 SIC_136   0    518.  12.6    493.    542. 1       0.952   1.05 
+    ##  2 SIC_136   0.1  506.  13.1    480.    531. 0.977   0.928   1.03 
+    ##  3 SIC_136   0.2  493.  13.6    467.    520. 0.953   0.902   1.00 
+    ##  4 SIC_136   0.3  480.  14.2    452.    508. 0.927   0.874   0.981
+    ##  5 SIC_136   0.4  466.  14.7    437.    495. 0.900   0.844   0.956
+    ##  6 SIC_136   0.5  451.  15.4    421.    481. 0.871   0.813   0.930
+    ##  7 SIC_136   0.6  435.  16.0    404.    467. 0.841   0.781   0.902
+    ##  8 SIC_136   0.7  419.  16.6    386.    452. 0.809   0.746   0.872
+    ##  9 SIC_136   0.8  402.  17.3    368.    436. 0.776   0.711   0.842
+    ## 10 SIC_136   0.9  384.  17.9    349.    419. 0.742   0.674   0.810
+    ## # ℹ 359 more rows
+
+``` r
+# Add healing meta
+div %<>%
+  dplyr::left_join(meta_df, by = "id")
+
+ggplot(div, aes_string(x = "q", y = "d", group = "id", color = "category")) +
+  geom_line(size = 1) +
+  # facet_wrap(~subj) +
+  # scale_color_manual(values = c("blue", "red")) +
+  ggtitle("Hill diversity index") + baseTheme() +
+  xlab("q") + ylab("d") +
+  theme_classic(base_size = 20) +
+  theme(legend.title = element_blank())
+```
+
+![](extended_data_figure_5_files/figure-gfm/fig_5d-1.png)<!-- -->
+
+## Supplemental figure 5E
+
+``` r
+micromets <- c("SIC_232", "SIC_136")
+
+meta_df <- data.frame("category" = c("control", "control", "control",
+                                     "healing", "healing", "healing",
+                                     "cardiac_mets", "cardiac_mets", "active", "active"),
+                      "id" = c("SIC_176", "SIC_14", "T01241",
+                               "SIC_3", "SIC_175", "SIC_266", "SIC_136", "SIC_232", "SIC_264", "SIC_17"))
+
+
+heart_tcrs <- lapply(names(bulk_tissue_samples), function(s){
+  heart_samp <- bulk_tissue_samples[[s]][["myo"]]
+  subj_tcrs <- bulk_tcr_df %>%
+    dplyr::filter(sample == heart_samp) %>%
+    dplyr::select(amino_acid, sample, id, count_templates_reads)
+  return(subj_tcrs)
+}) %>% do.call(rbind, .)
+
+
+
+colnames(heart_tcrs)[colnames(heart_tcrs) == "amino_acid"] <- "clone_id"
+# Only look at subjects with at least 200 TCRs
+div_df <- heart_tcrs[,c("clone_id", "id", "count_templates_reads")]
+# div_df <- div_df[div_df$id != "SIC_232",]
+
+div <- alphaDiversity(div_df, group = "id", nboot = 100, min_n = 100, copy = "count_templates_reads")
+```
+
+    ## [1] "MADE IT!"
+    ## # A tibble: 369 × 9
+    ## # Groups:   id [9]
+    ##    id          q     d  d_sd d_lower d_upper     e e_lower e_upper
+    ##    <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
+    ##  1 SIC_136   0    519.  13.6    492.    546. 1       0.949   1.05 
+    ##  2 SIC_136   0.1  507.  14.0    480.    535. 0.977   0.924   1.03 
+    ##  3 SIC_136   0.2  495.  14.5    466.    523. 0.953   0.898   1.01 
+    ##  4 SIC_136   0.3  481.  15.0    452.    511. 0.927   0.871   0.984
+    ##  5 SIC_136   0.4  467.  15.5    437.    497. 0.900   0.842   0.959
+    ##  6 SIC_136   0.5  452.  16.0    421.    483. 0.871   0.811   0.932
+    ##  7 SIC_136   0.6  436.  16.5    404.    469. 0.841   0.779   0.903
+    ##  8 SIC_136   0.7  420.  17.0    387.    453. 0.809   0.745   0.873
+    ##  9 SIC_136   0.8  403.  17.5    368.    437. 0.776   0.710   0.842
+    ## 10 SIC_136   0.9  385.  18.0    349.    420. 0.741   0.673   0.809
+    ## # ℹ 359 more rows
+
+``` r
+div$control <- ifelse(div$id %in% control_ids, "control", "myocarditis")
+
+div %<>%
+  dplyr::left_join(meta_df, by = "id")
+
+ggplot(div, aes_string(x = "q", y = "d", group = "id", color = "category")) +
+  geom_line(size = 1) +
+  # facet_wrap(~subj) +
+  # scale_color_manual(values = c("blue", "red")) +
+  ggtitle("Hill diversity index") + baseTheme() +
+  xlab("q") + ylab("d") +
+  theme_classic(base_size = 20) +
+  theme(legend.title = element_blank())
+```
+
+![](extended_data_figure_5_files/figure-gfm/fig_s5e-1.png)<!-- -->
+
+## Supplemental figure 5f
 
 ``` r
 fisher_res <- data.frame()
@@ -497,9 +629,9 @@ figure <- ggarrange(plotlist = plot_list, ncol = 3, nrow = 4, common.legend = TR
 figure
 ```
 
-![](supp_4_files/figure-gfm/fig_S4D-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_S5f-1.png)<!-- -->
 
-## Supplemental figure 4E
+## Supplemental figure 5g
 
 ``` r
 plot_list = list()
@@ -541,9 +673,9 @@ for (subj in unique(fisher_res$subj)){
 ggarrange(plotlist = plot_list, common.legend = TRUE, legend.grob = leg, legend = "right")
 ```
 
-![](supp_4_files/figure-gfm/fig_S4E-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_S5g-1.png)<!-- -->
 
-## Supplemental figure 4G
+## Supplemental figure 5I
 
 ``` r
 adaptive_to_imgt <- read.csv("/projects/home/nealpsmith/data/useful/adaptive_to_imgt_v_genes.csv")
@@ -687,7 +819,9 @@ ggplot(fisher_res, aes(x = myo_ctl_fc, y = tum_ctl_fc)) +
   theme_classic(base_size = 20)
 ```
 
-![](supp_4_files/figure-gfm/fig_s4g-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_s5i-1.png)<!-- -->
+
+## Supplemental figure 5J
 
 ``` r
 motif_perc_df$myo_to_ctrl <- motif_perc_df$myo_perc / motif_perc_df$control_perc
@@ -713,4 +847,4 @@ ggplot(plot_df, aes(x = myo_to_ctrl, y = tum_to_ctrl, fill = subj)) +
   theme_classic(base_size = 20)
 ```
 
-![](supp_4_files/figure-gfm/fig_s4h-1.png)<!-- -->
+![](extended_data_figure_5_files/figure-gfm/fig_s5j-1.png)<!-- -->
