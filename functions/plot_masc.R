@@ -107,7 +107,7 @@ plot_masc_by_cell_type <- function(cluster_masc_res, filtered_df, lineage, comp_
   # subset to clusters in lineage
   if (lineage == 'Nonimmune'){
     clusters <- cluster_masc_res %>%
-    filter(!umap_name %in% c('3. T and NK cells', '4. Myeloid cells', '9. B and plasma cells', '7. Dendritic cells')) %>%
+    filter(!umap_name %in% c('T and NK cells', 'Myeloid cells', 'B and plasma cells', 'Dendritic cells')) %>%
     pull(cluster_names)
   } else {
     clusters <- cluster_masc_res %>%
