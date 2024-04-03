@@ -1,4 +1,4 @@
-Figure 5
+Figure 4
 ================
 
 ## Set up
@@ -57,15 +57,19 @@ Read in single-cell data
 tissue_myeloid = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_myeloid.zarr')
 ```
 
-## Figure 5A
+``` r
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+```
+
+## Figure 4A
 
 ``` python
 python_functions.plot_umap(tissue_myeloid, 'Tissue: MNP', python_functions.tissue_mnp_pal, marker_multiplier=6)
 ```
 
-<img src="figure_5_files/figure-gfm/fig_5a-1.png" width="960" />
+<img src="figure_4_files/figure-gfm/fig_5a-1.png" width="960" />
 
-## Figure 5B
+## Figure 4B
 
 ``` python
 python_functions.make_gene_dotplot(tissue_myeloid.to_anndata(),
@@ -87,27 +91,9 @@ python_functions.make_gene_dotplot(tissue_myeloid.to_anndata(),
              title='Tissue MNP')
 ```
 
-<img src="figure_5_files/figure-gfm/fig_5b-3.png" width="1152" />
+<img src="figure_4_files/figure-gfm/fig_4b-3.png" width="1152" />
 
-## Figure 5c
-
-``` r
-# read in tissue data
-tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
-
-# filter
-masc_df <- masc_filter(tissue_obs)
-
-# read in masc res (from figure 3 code)
-cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
-
-# plot masc results
-plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='MNP')
-```
-
-![](figure_5_files/figure-gfm/fig_5c-5.png)<!-- -->
-
-## Figure 5d
+## Figure 4C
 
 ``` r
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
@@ -136,7 +122,7 @@ troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-cDC: CLEC
                    "h-cDC: CLEC9A CD1C", level='cluster', point_size = 2.2, type='simple')
 ```
 
-![](figure_5_files/figure-gfm/fig_5d-1.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_5d-5.png)<!-- -->
 
 | cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
 | :------------------------- | ----------: | --------: | ---------: | --------: |
@@ -150,7 +136,7 @@ troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-cDC: CLEC
 | h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
 | h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |
 
-## Figure 5f
+## Figure 4j
 
 ``` python
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
@@ -350,7 +336,7 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-![](figure_5_files/figure-gfm/fig_5f_heatmap-1.png)<!-- -->
+![](figure_4_files/figure-gfm/fig_4j_heatmap-1.png)<!-- -->
 
 ``` r
 # filter out doublets
@@ -404,15 +390,15 @@ plot_heatmap(mnp_plot_df,
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/mnp_gsea.pdf")
 ```
 
-![](../../../../projects/myocarditis/updated_datasets/figures/mnp_gsea.pdf)<!-- -->
+![](../../../../../ikernin/projects/myocarditis/updated_datasets/figures/mnp_gsea.pdf)<!-- -->
 
-## Figure 5G
+## Figure 4k
 
 ``` python
-fig_5g_genes = ['IFITM1', 'CXCL10', 'HLA-DQB2', 'STAT1']
+fig_5g_genes = ['CXCL10']
 python_functions.multi_hexfp_by_condition(tissue_myeloid, fig_5g_genes, cmap = python_functions.blues_cmap, gridsize=200)
 ```
 
-    ##   0%|          | 0/4 [00:00<?, ?it/s] 25%|##5       | 1/4 [00:00<00:01,  2.42it/s] 50%|#####     | 2/4 [00:00<00:00,  2.55it/s] 75%|#######5  | 3/4 [00:01<00:00,  2.36it/s]100%|##########| 4/4 [00:01<00:00,  2.45it/s]100%|##########| 4/4 [00:01<00:00,  2.44it/s]
+    ##   0%|                                                                                                                                                                                                                                 | 0/1 [00:00<?, ?it/s]100%|#########################################################################################################################################################################################################################| 1/1 [00:00<00:00,  2.50it/s]
 
-<img src="figure_5_files/figure-gfm/fig_5g-1.png" width="1152" />
+<img src="figure_4_files/figure-gfm/fig_4k-1.png" width="1152" />

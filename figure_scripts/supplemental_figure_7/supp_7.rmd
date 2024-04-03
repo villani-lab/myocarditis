@@ -82,3 +82,16 @@ plot_clust_perc_by_donor(py$stacked_bar_df, 'mnp', cluster_order = stacked_bar_o
 ```
 
 
+```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_5c}
+# read in tissue data
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+
+# filter
+masc_df <- masc_filter(tissue_obs)
+
+# read in masc res (from figure 3 code)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+
+# plot masc results
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='MNP')
+```

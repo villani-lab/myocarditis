@@ -1,5 +1,5 @@
 ---
-title: "Figure 5"
+title: "Figure 4"
 output: rmarkdown::github_document
 ---
 
@@ -58,14 +58,18 @@ Read in single-cell data
 tissue_myeloid = pg.read_input('/projects/home/ikernin/projects/myocarditis/updated_datasets/tissue_myeloid.zarr')
 ```
 
-## Figure 5A
+```{r message = F, r_read_data}
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+```
+
+## Figure 4A
 
 ```{python fig_5a}
 python_functions.plot_umap(tissue_myeloid, 'Tissue: MNP', python_functions.tissue_mnp_pal, marker_multiplier=6)
 ```
 
-## Figure 5B
-```{python fig_5b}
+## Figure 4B
+```{python fig_4b}
 python_functions.make_gene_dotplot(tissue_myeloid.to_anndata(),
              cluster_order=['pDC: LILRA4, IRF8',
                             'MNP 3: FCGR3A, LILRB2',
@@ -85,23 +89,8 @@ python_functions.make_gene_dotplot(tissue_myeloid.to_anndata(),
              title='Tissue MNP')
 ```
 
-## Figure 5c
+## Figure 4C
 
-```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_5c}
-# read in tissue data
-tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
-
-# filter
-masc_df <- masc_filter(tissue_obs)
-
-# read in masc res (from figure 3 code)
-cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
-
-# plot masc results
-plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='MNP')
-```
-
-## Figure 5d
 
 ```{r warning = F, message = F, results = 'hold', fig_5d}
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
@@ -130,9 +119,9 @@ troponin_plot_model(select_cluster_model %>% filter(cluster_names =="h-cDC: CLEC
                    "h-cDC: CLEC9A CD1C", level='cluster', point_size = 2.2, type='simple')
 ```
 
-## Figure 5f
+## Figure 4j
 
-```{python fig_5f_get_pseudobulk}
+```{python fig_4j_get_pseudobulk}
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
 python_functions.get_pseudobulk_info(tissue_myeloid, 'tissue_mnp')
 
@@ -146,7 +135,7 @@ tissue_myeloid.obs['mnp_cell'] = tissue_myeloid.obs['mnp_cell'].replace({True: '
 python_functions.get_pseudobulk_info(tissue_myeloid, 'tissue_mnp_grouped', cluster_col='mnp_cell')
 ```
 
-```{r message = F, results = F, fig_5f_run_de_analysis}
+```{r message = F, results = F, fig_4j_run_de_analysis}
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis')
 
 # run DE analysis by condition
@@ -165,7 +154,7 @@ tissue_mnp_grouped_deres <- run_de_by_comp_var(counts = tissue_mnp_grouped_cts,
                                comp_var_contrast_vec = c('condition', "myocarditis", "control"))
 ```
 
-```{r message = F, results = 'hold', fig.width = 10, fig.height = 16, fig_5f_heatmap}
+```{r message = F, results = 'hold', fig.width = 10, fig.height = 16, fig_4j_heatmap}
 # combine de results and meta data for heatmap
 mnp_full_deres <- bind_rows(tissue_mnp_deres %>%
                                mutate(cluster = as.character(cluster)),
@@ -331,7 +320,7 @@ draw(ht_lineage + ht_subcluster,
 
 ```
 
-```{r message = F, results = F, warning = F, fig_5f_run_gsea}
+```{r message = F, results = F, warning = F, fig_4j_run_gsea}
 # filter out doublets
 filtered_mnp_deres <- mnp_full_deres %>%
         left_join(mnp_clusters,
@@ -379,13 +368,13 @@ plot_heatmap(mnp_plot_df,
              split = T)
 ```
 
-```{r fig.width = 5, fig.height = 5, fig_5f_plot_gsea}
+```{r fig.width = 5, fig.height = 5, fig_4j_plot_gsea}
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/mnp_gsea.pdf")
 ```
 
-## Figure 5G
+## Figure 4k
 
-```{python fig_5g}
-fig_5g_genes = ['IFITM1', 'CXCL10', 'HLA-DQB2', 'STAT1']
+```{python fig_4k}
+fig_5g_genes = ['CXCL10']
 python_functions.multi_hexfp_by_condition(tissue_myeloid, fig_5g_genes, cmap = python_functions.blues_cmap, gridsize=200)
 ```
