@@ -9,17 +9,33 @@ output: rmarkdown::github_document
 Load R libraries
 ```{r message=FALSE, load_r_libraries}
 library(tidyverse)
-library(magrittr)
-library(glue)
+library(rmarkdown)
+library(rlang)
+library(parameters)
 library(RColorBrewer)
+library(ComplexHeatmap)
+library(circlize)
+library(Matrix)
+library(glue)
+library(ggforestplot)
+library(ggbeeswarm)
+library(ggrepel)
+library(patchwork)
+library(lme4)
+library(ggstance)
+library(DESeq2)
+library(knitr)
+library(fgsea)
 library(ggpubr)
-library(ggplot2)
-library(grid)
-library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
 
 setwd('/projects/home/ikernin/github_code/myocarditis/functions')
-source('stacked_bar.R')
+source('masc.R')
+source('de.R')
+source('tissue_plot_masc.R')
+source('tissue_gsea.R')
+source('tissue_troponin_abundance.R')
+
 ```
 
 Load Python packages
@@ -48,6 +64,9 @@ Read in TCR data
 ```{r tcr_data, message = FALSE, warning = FALSE}
 tissue_cell_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/tissue/data/tcr/blood_tissue_comps/tissue_cell_info.csv",
                              row.names = 1)
+
+tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
+
 ```
 
 ## Supplemental Figure 4A
@@ -102,7 +121,6 @@ plot_clust_perc_by_donor(py$stacked_bar_df, 't', cluster_order = stacked_bar_ord
 
 ## Supplemental Figure 4E
 
-
 ```{r message = F, results = 'hold', warning = F, fig_4e}
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
 troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
@@ -143,7 +161,7 @@ python_functions.multi_hexfp_by_condition(tissue_t,
 
 ## Supplemental Figure 4G
 
-```{r message = F, fig_3f}
+```{r message = F, fig_4g}
 mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
                 row.names = 1)
 
@@ -295,7 +313,7 @@ ggplot(n_degs, aes(x = cluster, y = n_degs, group = direction, fill = direction)
 
 ## Supplemental Figure 4H
 
-```{r supp_3f, message = FALSE, warning = FALSE, fig.height = 20, fig.width = 20}
+```{r supp_4h, message = FALSE, warning = FALSE, fig.height = 20, fig.width = 20}
 tissue_cell_info$samp_ster <- paste(tissue_cell_info$donor, tissue_cell_info$on_steroids, sep = "_")
 # Re-calculate expaded clones by sample
 tcr_props <- tissue_cell_info %>%
@@ -341,7 +359,7 @@ for (seq in plot_order){
   plot_df <- tissue_cell_info
   plot_df$clone_oi <- ifelse(plot_df$TRB_cdr3 == seq, TRUE, FALSE)
   plot <- ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
-    geom_point(data = select(plot_df, -clone_oi), color = "grey", size = 1) +
+    geom_point(data = dplyr::select(plot_df, -clone_oi), color = "grey", size = 1) +
     geom_point(data = plot_df[plot_df$clone_oi == TRUE,], pch = 21, size = 3, aes(fill = factor(on_steroids))) +
     scale_fill_manual(values = c("False" = "red", "True" = "blue")) +
     ggtitle(as.expression(bquote(TCR*beta ~ .(num)))) +
@@ -362,13 +380,13 @@ figure
 
 ## Supplemental figure 4I
 
-```{r supp_3g, message = FALSE, warning = FALSE}
+```{r supp_4i, message = FALSE, warning = FALSE}
 
 all_exp_clones <- unique(c(expanded_clones_post, expanded_clones_pre))
 plot_df <- tissue_cell_info
 plot_df$clone_oi <- ifelse(plot_df$TRB_cdr3 %in% all_exp_clones, TRUE, FALSE)
 ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
-  geom_point(data = select(plot_df, -clone_oi), color = "grey", size = 1) +
+  geom_point(data = dplyr::select(plot_df, -clone_oi), color = "grey", size = 1) +
   geom_point(data = plot_df[plot_df$clone_oi == TRUE,], pch = 21, size = 3, aes(fill = factor(on_steroids))) +
   scale_fill_manual(values = c("False" = "red", "True" = "blue")) +
   theme_classic(base_size = 20) +
@@ -378,7 +396,7 @@ ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
 
 ## Supplemental Figure 4J
 
-```{python fig_3h}
+```{python fig_4j}
 python_functions.hex_featureplot(tissue_t, 'STMN1', cmap=python_functions.blues_cmap)
 ```
 
