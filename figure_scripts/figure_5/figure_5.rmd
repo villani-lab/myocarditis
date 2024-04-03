@@ -1,5 +1,5 @@
 ---
-title: "Figure 6"
+title: "Figure 5"
 output: rmarkdown::github_document
 ---
 
@@ -62,14 +62,14 @@ tissue_fibroblast = pg.read_input('/projects/home/ikernin/projects/myocarditis/u
 tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_full_obs.csv')
 ```
 
-## Figure 6a
-```{python fig_6a}
+## Figure 5A
+```{python fig_5a}
 python_functions.plot_umap(tissue_fibroblast, 'Tissue: Fibroblast', python_functions.tissue_fibroblast_pal, marker_multiplier=6)
 ```
 
-## Figure 6b
+## Figure 5B
 
-```{python fig_6b}
+```{python fig_5b}
 python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
              cluster_order=[
                  'Fibroblast: CXCL9, HLA-DRA',
@@ -91,22 +91,38 @@ python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
              title='Tissue: Fibroblast')
 ```
 
-## Figure 6C
+## Figure 5C
 
-```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_6c}
-# filter
-masc_df <- masc_filter(tissue_obs)
+```{r warning = F, message = F, results = 'hold', fig_5c}
+tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
+troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
 
-# read in masc res (from figure 3 code)
-cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+# fit linear model by troponin for DE clusters
+select_clusters <- c("h-NK: KLRF1 FCER1G",
+                     "h-CD4T: IL7R LTB",
+                    "h-CD8T: CD27 LAG3",
+                    "h-CD8T: CCL5 NKG7",
+                    "h-CD8T: cycling",
+                    "h-MNP: S100A8-low C1QA-low",
+                    "h-MNP: FCGR3A LILRB2",
+                    "h-cDC: CLEC9A CD1C",
+                    "Fibroblast: CXCL9, HLA-DRA")
+troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
+select_cluster_percs <- troponin_cluster_percs %>%
+        filter(cluster_names %in% select_clusters)
+select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
+kable(select_cluster_model %>%
+              dplyr::select(!c(data, model)) %>%
+              unnest(cols = c(trop_coef, trop_se, trop_pval)))
 
-# plot masc results
-plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast')
+troponin_plot_model(select_cluster_model %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                    select_cluster_percs %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                   "Fibroblast: CXCL9, HLA-DRA", level='cluster', point_size = 2.2, type='simple')
 ```
 
-## Figure 6D
+## Figure 5D
 
-```{python fig_6d_get_pseudobulk}
+```{python fig_5d_get_pseudobulk}
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
 
 # get pseudobulk counts and metadata by donor
@@ -121,7 +137,7 @@ python_functions.get_pseudobulk_info(tissue_fibroblast, 'tissue_fibroblast_group
 ```
 
 
-```{r message = F, results = F, fig_6d_run_de_analysis}
+```{r message = F, results = F, fig_5d_run_de_analysis}
 setwd('/projects/home/ikernin/projects/myocarditis/updated_datasets/de_analysis')
 
 # run DE analysis by condition
@@ -143,7 +159,7 @@ tissue_fibroblast_grouped_deres <- run_de_by_comp_var(counts = tissue_fibroblast
 
 
 
-```{r message = F, results = 'hold', fig.width = 10, fig.height = 16, fig_5f_heatmap}
+```{r message = F, results = 'hold', fig.width = 10, fig.height = 16, fig_5d_heatmap}
 # combine de results and meta data for heatmap
 fibroblast_full_deres <- bind_rows(tissue_fibroblast_deres %>%
                                mutate(cluster = as.character(cluster)),
@@ -309,7 +325,7 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-```{r message = F, results = F, warning = F, eval = F, fig_5f_run_gsea}
+```{r message = F, results = F, warning = F, eval = F, fig_5d_run_gsea}
 # filter out doublets
 filtered_fibroblast_deres <- fibroblast_full_deres %>%
         left_join(fibroblast_clusters,
@@ -366,7 +382,7 @@ knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_dat
 ```
 
 
-## Figure 6E
+## Figure 5E
 
 ```{r fig_6e, fig.width = 10, fig.height = 10, message = F, results = 'hold', warning = F}
 
@@ -567,31 +583,3 @@ plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
 plots
 ```
 
-## Figure 6H
-
-```{r warning = F, message = F, results = 'hold', fig_6h}
-tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
-troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
-
-# fit linear model by troponin for DE clusters
-select_clusters <- c("h-NK: KLRF1 FCER1G",
-                     "h-CD4T: IL7R LTB",
-                    "h-CD8T: CD27 LAG3",
-                    "h-CD8T: CCL5 NKG7",
-                    "h-CD8T: cycling",
-                    "h-MNP: S100A8-low C1QA-low",
-                    "h-MNP: FCGR3A LILRB2",
-                    "h-cDC: CLEC9A CD1C",
-                    "Fibroblast: CXCL9, HLA-DRA")
-troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
-select_cluster_percs <- troponin_cluster_percs %>%
-        filter(cluster_names %in% select_clusters)
-select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
-kable(select_cluster_model %>%
-              dplyr::select(!c(data, model)) %>%
-              unnest(cols = c(trop_coef, trop_se, trop_pval)))
-
-troponin_plot_model(select_cluster_model %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
-                    select_cluster_percs %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
-                   "Fibroblast: CXCL9, HLA-DRA", level='cluster', point_size = 2.2, type='simple')
-```

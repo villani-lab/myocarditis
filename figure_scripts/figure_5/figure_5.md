@@ -1,4 +1,4 @@
-Figure 6
+Figure 5
 ================
 
 ## Set up
@@ -62,7 +62,7 @@ tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_data
 ```
 
     ## Rows: 84576 Columns: 19
-    ## ── Column specification ──────────────────────────────────────────────────
+    ## ── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     ## Delimiter: ","
     ## chr (13): barcodekey, Channel, fatal, on_steroids, condition, sex, donor, so...
     ## dbl  (6): n_genes, n_counts, percent_mito, scale, leiden_labels, umap_numbers
@@ -70,15 +70,15 @@ tissue_obs <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_data
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-## Figure 6a
+## Figure 5A
 
 ``` python
 python_functions.plot_umap(tissue_fibroblast, 'Tissue: Fibroblast', python_functions.tissue_fibroblast_pal, marker_multiplier=6)
 ```
 
-<img src="figure_6_files/figure-gfm/fig_6a-1.png" width="960" />
+<img src="figure_5_files/figure-gfm/fig_5a-1.png" width="960" />
 
-## Figure 6b
+## Figure 5B
 
 ``` python
 python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
@@ -102,24 +102,52 @@ python_functions.make_gene_dotplot(tissue_fibroblast.to_anndata(),
              title='Tissue: Fibroblast')
 ```
 
-<img src="figure_6_files/figure-gfm/fig_6b-3.png" width="1152" />
+<img src="figure_5_files/figure-gfm/fig_5b-3.png" width="1152" />
 
-## Figure 6C
+## Figure 5C
 
 ``` r
-# filter
-masc_df <- masc_filter(tissue_obs)
+tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
+troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
 
-# read in masc res (from figure 3 code)
-cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+# fit linear model by troponin for DE clusters
+select_clusters <- c("h-NK: KLRF1 FCER1G",
+                     "h-CD4T: IL7R LTB",
+                    "h-CD8T: CD27 LAG3",
+                    "h-CD8T: CCL5 NKG7",
+                    "h-CD8T: cycling",
+                    "h-MNP: S100A8-low C1QA-low",
+                    "h-MNP: FCGR3A LILRB2",
+                    "h-cDC: CLEC9A CD1C",
+                    "Fibroblast: CXCL9, HLA-DRA")
+troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
+select_cluster_percs <- troponin_cluster_percs %>%
+        filter(cluster_names %in% select_clusters)
+select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
+kable(select_cluster_model %>%
+              dplyr::select(!c(data, model)) %>%
+              unnest(cols = c(trop_coef, trop_se, trop_pval)))
 
-# plot masc results
-plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast')
+troponin_plot_model(select_cluster_model %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                    select_cluster_percs %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
+                   "Fibroblast: CXCL9, HLA-DRA", level='cluster', point_size = 2.2, type='simple')
 ```
 
-![](figure_6_files/figure-gfm/fig_6c-5.png)<!-- -->
+![](figure_5_files/figure-gfm/fig_5c-5.png)<!-- -->
 
-## Figure 6D
+| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
+| :------------------------- | ----------: | --------: | ---------: | --------: |
+| Fibroblast: CXCL9, HLA-DRA |   0.0079106 | 0.0024072 |  0.0082023 | 0.0532563 |
+| h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
+| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.8932075 |
+| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.6760529 |
+| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0547626 |
+| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0532563 |
+| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.8932075 |
+| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
+| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |
+
+## Figure 5D
 
 ``` python
 os.chdir('/projects/home/ikernin/projects/myocarditis/updated_datasets/pseudobulk')
@@ -320,7 +348,7 @@ draw(ht_lineage + ht_subcluster,
      merge_legends = TRUE)
 ```
 
-![](figure_6_files/figure-gfm/fig_5f_heatmap-1.png)<!-- -->
+![](figure_5_files/figure-gfm/fig_5d_heatmap-1.png)<!-- -->
 
 ``` r
 # filter out doublets
@@ -378,9 +406,9 @@ plot_heatmap(fibroblast_plot_df,
 knitr::include_graphics("/projects/home/ikernin/projects/myocarditis/updated_datasets/figures/fibroblast_gsea.pdf")
 ```
 
-<embed src="../../../../projects/myocarditis/updated_datasets/figures/fibroblast_gsea.pdf" width="800px" height="460px" type="application/pdf" />
+<embed src="../../../../../ikernin/projects/myocarditis/updated_datasets/figures/fibroblast_gsea.pdf" width="800px" height="460px" type="application/pdf" />
 
-## Figure 6E
+## Figure 5E
 
 ``` r
 mtx <- read.csv("/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_global_lineage_pseudocounts.csv",
@@ -579,52 +607,9 @@ plots <- ggarrange(plotlist = plot_list, ncol = 2, nrow = 2)
 plots
 ```
 
-![](figure_6_files/figure-gfm/fig_6e-1.png)<!-- -->
+![](figure_5_files/figure-gfm/fig_6e-1.png)<!-- -->
 
     ## [1] "KEGG_CHEMOKINE_SIGNALING_PATHWAY"
     ## [1] "KEGG_ALLOGRAFT_REJECTION"
     ## [1] "HALLMARK_INTERFERON_GAMMA_RESPONSE"
     ## [1] "KEGG_VIRAL_MYOCARDITIS"
-
-## Figure 6H
-
-``` r
-tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/metadata/tissue_troponin_metadata.csv')
-troponin_filtered_df <- troponin_filter_tissue(tissue_obs, tissue_troponin_metadata)
-
-# fit linear model by troponin for DE clusters
-select_clusters <- c("h-NK: KLRF1 FCER1G",
-                     "h-CD4T: IL7R LTB",
-                    "h-CD8T: CD27 LAG3",
-                    "h-CD8T: CCL5 NKG7",
-                    "h-CD8T: cycling",
-                    "h-MNP: S100A8-low C1QA-low",
-                    "h-MNP: FCGR3A LILRB2",
-                    "h-cDC: CLEC9A CD1C",
-                    "Fibroblast: CXCL9, HLA-DRA")
-troponin_cluster_percs <- troponin_get_percents_per_level(troponin_filtered_df, level='cluster')
-select_cluster_percs <- troponin_cluster_percs %>%
-        filter(cluster_names %in% select_clusters)
-select_cluster_model <- troponin_fit_model(select_cluster_percs, level='cluster')
-kable(select_cluster_model %>%
-              dplyr::select(!c(data, model)) %>%
-              unnest(cols = c(trop_coef, trop_se, trop_pval)))
-
-troponin_plot_model(select_cluster_model %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
-                    select_cluster_percs %>% filter(cluster_names =="Fibroblast: CXCL9, HLA-DRA"),
-                   "Fibroblast: CXCL9, HLA-DRA", level='cluster', point_size = 2.2, type='simple')
-```
-
-![](figure_6_files/figure-gfm/fig_6h-1.png)<!-- -->
-
-| cluster\_names             |  trop\_coef |  trop\_se | trop\_pval |      padj |
-| :------------------------- | ----------: | --------: | ---------: | --------: |
-| Fibroblast: CXCL9, HLA-DRA |   0.0079106 | 0.0024072 |  0.0082023 | 0.0532563 |
-| h-CD4T: IL7R LTB           |   0.0001508 | 0.0061707 |  0.9809880 | 0.9809880 |
-| h-CD8T: CCL5 NKG7          |   0.0041760 | 0.0104397 |  0.6975596 | 0.8932075 |
-| h-CD8T: CD27 LAG3          |   0.0049871 | 0.0063537 |  0.4507020 | 0.6760529 |
-| h-CD8T: cycling            |   0.0059728 | 0.0021203 |  0.0182542 | 0.0547626 |
-| h-cDC: CLEC9A CD1C         |   0.0019781 | 0.0006443 |  0.0118347 | 0.0532563 |
-| h-MNP: FCGR3A LILRB2       |   0.0022458 | 0.0083721 |  0.7939622 | 0.8932075 |
-| h-MNP: S100A8-low C1QA-low |   0.0115797 | 0.0083111 |  0.1937265 | 0.3487078 |
-| h-NK: KLRF1 FCER1G         | \-0.0054702 | 0.0031077 |  0.1088655 | 0.2449473 |

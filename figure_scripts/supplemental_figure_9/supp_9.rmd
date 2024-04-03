@@ -71,7 +71,20 @@ python_functions.multi_hex_featureplot(tissue_fibroblast, supp_fig9a_genes, ncol
 
 ## Supplemental figure 9B
 
-```{r fig_s9b}
+```{r message = F, warning = F, results = 'hold',  fig.width = 15, fig.height = 10, fig_6c}
+# filter
+masc_df <- masc_filter(tissue_obs)
+
+# read in masc res (from figure 3 code)
+cluster_masc_res <- read_csv('/projects/home/ikernin/projects/myocarditis/updated_datasets/masc/cluster_masc_res.csv')
+
+# plot masc results
+plot_masc_by_cell_type(cluster_masc_res, masc_df, lineage='Fibroblast')
+```
+
+## Supplemental figure 9C
+
+```{r fig_s9c}
 
 tissue_troponin_metadata <- read_csv('/projects/home/ikernin/projects/myocarditis/github_datasets/tissue_troponin_metadata.csv')
 
