@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Figure 5"
+title: "Supplemental Figure 6"
 output: rmarkdown::github_document
 ---
 
@@ -20,6 +20,9 @@ library(magrittr)
 library(alakazam)
 library(ggrepel)
 library(ggpubr)
+library(RColorBrewer)
+library(circlize)
+library(ComplexHeatmap)
 
 library(reticulate)
 use_python("/projects/home/nealpsmith/.conda/envs/updated_pegasus/bin/python")
@@ -100,7 +103,7 @@ bulk_tissue_samples = list("SIC_3" = list("tumor" = "A17-341_A2", "control" = "A
 ```
 
 
-## Supplemental figure 5A
+## Supplemental figure 6A
 
 ```{r fig_S5A, message = FALSE, warning = FALSE}
 
@@ -161,7 +164,7 @@ ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
 ```
 
 
-## Supplemental Figure 5B
+## Supplemental Figure 6B
 
 ```{r fig_S5B, message = FALSE, warning = FALSE}
 
@@ -216,7 +219,7 @@ ggplot(df, aes(x = myo_clone.OR, y = -log10(model.pvalue))) +
 ```
 
 
-## Supplemental Figure 5C
+## Supplemental Figure 6C
 
 ```{r fig_S5c, fig.height = 20, fig.width = 20}
 
@@ -245,9 +248,38 @@ figure
 
 ```
 
-## Supplemental Figure 5D
+## Supplemental Figure 6D
 
-```{r supp_5D, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
+```{r fig_s5f, fig.width = 20, fig.height = 20}
+
+subj_order <- c("SIC_232", "SIC_17", "SIC_175", "SIC_264", "SIC_136", "SIC_258", "SIC_48", "SIC_197",
+                "SIC_177", "SIC_164", "SIC_217", "SIC_153", "SIC_171")
+
+plot_list <- list()
+for (s in subj_order){
+  myo_clones <- myo_exp_tcrs[[s]]
+
+  plot_df <- blood_sc_info_cd4
+  plot_df$myo_clone <- ifelse(plot_df$donor == s & plot_df$TRB_cdr3 %in% myo_clones, TRUE, FALSE)
+
+  plot <- ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
+    geom_scattermore(data = plot_df[plot_df$myo_clone == FALSE,], color = "grey", size = 1) +
+    geom_point(data = plot_df[plot_df$myo_clone == TRUE,], color = "red", size = 2) +
+    xlab("") + ylab("") +
+    theme_classic(base_size = 20) +
+    ggtitle(s) +
+    theme(axis.ticks = element_blank(), axis.text = element_blank())
+  plot_list <- c(plot_list, list(plot))
+
+}
+figure <- ggarrange(plotlist = plot_list, ncol = 4, nrow = 4, common.legend = TRUE, legend = "right")
+figure
+
+```
+
+## Supplemental Figure 6E
+
+```{r supp_6e, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
 
 # This dataframe is the same as "tissue_sc_info",
 # but includes all cells (not just those tissue cells with a recovered TCR)
@@ -286,7 +318,7 @@ all_plots
 
 ```
 
-## Supplemental Figure 5E
+## Supplemental Figure 6F
 
 ```{python supp_5e}
 
@@ -300,32 +332,52 @@ python_functions.multi_hex_featureplot(tissue_t,
 ```
 
 
-## Supplemental Figure 5F
+## Supplemental Figure 6H
 
-```{r fig_s5f, fig.width = 20, fig.height = 20}
+```{r fig_s6h, fig.width = 15, fig.height = 10}
 
-subj_order <- c("SIC_232", "SIC_17", "SIC_175", "SIC_264", "SIC_136", "SIC_258", "SIC_48", "SIC_197",
-                "SIC_177", "SIC_164", "SIC_217", "SIC_153", "SIC_171")
+colors <- brewer.pal(n = 10, "Set1")
+cd137_data <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/cd137_vals.csv", row.names = 1)
+# Make the lowest value 0
+# cd137_data[is.na(cd137_data)] <- 0
+cd137_data[cd137_data < 0] <- 0
+tcr_info <- read.csv("/projects/home/nealpsmith/projects/myocarditis/antigen_discovery/data/tcr_annotations.csv")
 
-plot_list <- list()
-for (s in subj_order){
-  myo_clones <- myo_exp_tcrs[[s]]
+donor_colors <- colors[1:length(unique(tcr_info$donor))]
+names(donor_colors) <- unique(tcr_info$donor)
 
-  plot_df <- blood_sc_info_cd4
-  plot_df$myo_clone <- ifelse(plot_df$donor == s & plot_df$TRB_cdr3 %in% myo_clones, TRUE, FALSE)
+cd8_tcrs <- tcr_info[tcr_info$subset == "CD8",]
 
-  plot <- ggplot(plot_df, aes(x = umap_1, y = umap_2)) +
-    geom_scattermore(data = plot_df[plot_df$myo_clone == FALSE,], color = "grey", size = 1) +
-    geom_point(data = plot_df[plot_df$myo_clone == TRUE,], color = "red", size = 2) +
-    xlab("") + ylab("") +
-    theme_classic(base_size = 20) +
-    ggtitle(s) +
-    theme(axis.ticks = element_blank(), axis.text = element_blank())
-  plot_list <- c(plot_list, list(plot))
+heatmap_df_cd8 <- cd137_data[,cd8_tcrs$tcr]
 
-}
-figure <- ggarrange(plotlist = plot_list, ncol = 4, nrow = 4, common.legend = TRUE, legend = "right")
-figure
+# Need a continuous color scale
+heatmap_col_fun = colorRamp2(c(min(heatmap_df_cd8), max(heatmap_df_cd8)), c("#D3D3D3", '#02024a'))
+
+# Lets do the column split
+donor_split <- factor(cd8_tcrs$donor)
+annotation_cd8 <- HeatmapAnnotation(donor = cd8_tcrs$donor, col = list(donor = donor_colors), which = "column",
+                                    show_annotation_name = FALSE)
+
+cd8_hmap <- Heatmap(heatmap_df_cd8, col = heatmap_col_fun, cluster_columns = FALSE, cluster_rows = FALSE,
+                    column_split = donor_split, column_title = "CD8 TCRs", name = "% CD137+",
+                    top_annotation = annotation_cd8, rect_gp = gpar(col = "black"), row_names_side = "left", na_col = "white")
+
+
+cd4_tcrs <- tcr_info[tcr_info$subset == "CD4",]
+
+heatmap_df_cd4 <- cd137_data[,cd4_tcrs$tcr]
+
+# Lets do the column split
+donor_split <- factor(cd4_tcrs$donor)
+annotation_cd4 <- HeatmapAnnotation(donor = cd4_tcrs$donor, col = list(donor = donor_colors), which = "column")
+
+cd4_hmap <- Heatmap(heatmap_df_cd4, col = heatmap_col_fun, cluster_columns = FALSE, cluster_rows = FALSE,
+                    column_split = donor_split, column_title = "CD4 TCRs", show_heatmap_legend = FALSE,
+                    top_annotation = annotation_cd4, rect_gp = gpar(col = "black"), row_names_side = "left", na_col = "white")
+
+hmap_list <- cd8_hmap + cd4_hmap
+
+draw(hmap_list, ht_gap = unit(1, "cm"))
 
 ```
 
