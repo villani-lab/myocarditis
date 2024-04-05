@@ -509,6 +509,113 @@ ggplot(df, aes(x = up, y = cluster)) +
 
 ## Supplemental figure 1L
 
+```{r supp_1l, message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7}
+#### first run de
+if (!file.exists(glue('{wd}/output/lineage_de_by_steroid_treatment_all_results.csv'))) {
+  counts <- read_counts(glue("{wd}/output/pb_counts_by_sample_id_and_lineage.csv"))
+  meta <- read_meta(glue("{wd}/output/pb_meta_by_sample_id_and_lineage.csv"))
+  meta <- meta %>%
+    filter(steroid_treatment != "NA") %>%
+    filter(!str_detect(lineage, "Doublet"))
+  steroid_contrast_vec <- c('steroid_treatment', 'pre_steroid', 'post_steroid')
+  steroid_lineage_results <- run_de_by_comp_var(counts, meta, glue('{wd}/output/lineage'), steroid_contrast_vec,
+                                                deseq_formula = formula("~ steroid_treatment"))
+} else {
+  steroid_lineage_results <- read_csv(glue('{wd}/output/lineage_de_by_steroid_treatment_all_results.csv'))
+}
+
+#### then run gsea on de results
+if (!file.exists(glue('{wd}/output/gsea_by_steroid_treatment_by_lineage.csv'))) {
+  steroid_lineage_gsea <- run_gsea(steroid_lineage_results)
+  write_csv(steroid_lineage_gsea, glue('{wd}/output/gsea_by_steroid_treatment_by_lineage.csv'))
+} else {
+  steroid_lineage_gsea <- read_csv(glue('{wd}/output/gsea_by_steroid_treatment_by_lineage.csv'))
+}
+
+#### make heatmap
+pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
+              'KEGG_CELL_ADHESION_MOLECULES_CAMS', 'KEGG_DNA_REPLICATION', 'HALLMARK_INTERFERON_GAMMA_RESPONSE',
+              'KEGG_VIRAL_MYOCARDITIS')
+pathway_abbrevs <- c('KEGG: Allo', 'KEGG: AP', 'KEGG: CAMS', 'KEGG: DNA', 'HALLMARK: IFNG', 'KEGG: Viral Myo')
+abbrev_dict <- setNames(pathway_abbrevs, pathways)
+lineage_order <- c('pDCs', 'cDCs', 'B and plasma', 'MNP', 'CD4', 'CD8 and NK')
+p_thresh <- 0.1
+
+heatmap_df <- steroid_lineage_gsea %>%
+  complete(pathway, cluster) %>%
+  replace_na(list(log2FoldChange = 0, padj = 1)) %>%
+  select(pathway, cluster, NES, padj) %>%
+  filter(pathway %in% pathways) %>%
+  mutate(cluster = str_replace_all(cluster, '_', ' ')) %>%
+  mutate(pathway = abbrev_dict[pathway])
+
+# Format main body:
+# get information for the main body's cells
+# not replacing NA values so they are colored gray in heatmap
+nes_mtx <- heatmap_df %>%
+  select(c(pathway, cluster, NES)) %>%
+  pivot_wider(names_from = cluster, values_from = NES) %>%
+  column_to_rownames('pathway') %>%
+  select(all_of(lineage_order)) %>%
+  as.matrix()
+nes_mtx <- nes_mtx[pathway_abbrevs,] %>% t()
+
+# define cell color range
+heatmap_col_fun <- colorRamp2(c(-1, 0, ceiling(max(nes_mtx, na.rm = T))),
+                              brewer.pal(5, 'PiYG')[c(5, 3, 1)])
+
+# Main body annotation (FDR):
+# get fdr values
+# not replacing NA values so they are colored gray in heatmap
+fdr_mtx <- heatmap_df %>%
+  select(c(pathway, cluster, padj)) %>%
+  pivot_wider(names_from = cluster, values_from = padj) %>%
+  column_to_rownames('pathway') %>%
+  select(all_of(lineage_order)) %>%
+  as.matrix()
+fdr_mtx <- fdr_mtx[pathway_abbrevs,] %>% t()
+
+# make function for plotting fdr value (this function returns a function)
+fdr_func <- function(mtx) {
+  function(j, i, x, y, width, height, fill) {
+    if (!is.na(mtx[i, j]) & (mtx[i, j] < p_thresh)) {
+      grid.circle(x = x, y = y, r = unit(1.5, 'mm'),
+                  gp = gpar(fill = 'black', col = NA))
+    }
+  }
+}
+
+# make sure columns are the same
+stopifnot(colnames(fdr_mtx) == colnames(nes_mtx))
+stopifnot(rownames(fdr_mtx) == rownames(nes_mtx))
+
+# Legends
+gsea_lgd <- Legend(col_fun = heatmap_col_fun, title = 'NES', direction = 'horizontal')
+fdr_lgd <- Legend(pch = 16, type = "points", labels = glue("FDR < {p_thresh}"))
+na_lgd <- Legend(labels = 'N/A', legend_gp = gpar(fill = 'grey'))
+pd <- packLegend(gsea_lgd, fdr_lgd, na_lgd, direction = 'horizontal')
+
+# Plot
+ht_gsea <- Heatmap(nes_mtx,
+                   col = heatmap_col_fun,
+                   cell_fun = fdr_func(fdr_mtx),
+                   column_order = colnames(nes_mtx),
+                   top_annotation = NULL, column_title = NULL,
+                   name = 'NES', show_heatmap_legend = FALSE,
+                   cluster_columns = FALSE, column_names_side = "top",
+                   show_column_names = T, column_names_rot = 45,
+                   cluster_rows = FALSE, row_names_side = "left",
+                   row_title_rot = 0, row_title_gp = gpar(fontface = 'bold'),
+                   row_gap = unit(2, "mm"), border = TRUE,
+                   width = ncol(nes_mtx) * unit(6, "mm"),
+                   height = nrow(nes_mtx) * unit(6, "mm"))
+
+draw(ht_gsea,
+     heatmap_legend_list = pd,
+     heatmap_legend_side = 'bottom',
+     merge_legends = FALSE)
+```
+
 ## Supplemental figure 1M
 ```{r supp_1m, message = F, results = 'hold', warning = F, fig.width = 10, height = 12}
 
@@ -748,6 +855,7 @@ ggplot(plot_df, aes(x = lin, y = value, group = variable, fill = variable)) +
 
 ```
 
+## Supplemental figure 1O
 ```{r supp_1o, message = F, results = 'hold', warning = F, fig.width = 7, fig.height = 7}
 pathways <- c('KEGG_ALLOGRAFT_REJECTION', 'KEGG_ANTIGEN_PROCESSING_AND_PRESENTATION',
               'KEGG_CELL_ADHESION_MOLECULES_CAMS', 'KEGG_DNA_REPLICATION',
